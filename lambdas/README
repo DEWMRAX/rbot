@@ -1,0 +1,1 @@
+Feed handlers are written to be as compact in code, quick in execution, and as light in dependencies as possible.
