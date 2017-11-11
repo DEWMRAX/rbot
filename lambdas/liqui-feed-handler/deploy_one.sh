@@ -1,8 +1,8 @@
 #!/bin/bash -e -x
 
 EXCHANGE=LIQUI
-TOKEN=$2
-CURRENCY=$3
+TOKEN=$1
+CURRENCY=$2
 NAME=$EXCHANGE-$TOKEN-$CURRENCY
 
 echo "creating function" $NAME
@@ -12,7 +12,7 @@ aws lambda create-function \
   --region us-east-1 \
   --runtime nodejs6.10 \
   --role arn:aws:iam::554285174758:role/dynamodb-writer \
-  --handler bin/lambda.handler \
+  --handler build/index.handler \
   --code S3Bucket=dewmrax-lambdas-2,S3Key=liqui-feed-handler.zip \
   --memory-size 128 \
   --timeout 15 \

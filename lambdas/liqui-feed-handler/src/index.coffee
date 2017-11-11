@@ -29,7 +29,7 @@ exports.handler = (event, context, callback) ->
       return callback err
 
     try
-      book = JSON.parse body
+      book = JSON.parse body[pair_name token,currency]
 
       params =
         TableName: 'orderbooks'
@@ -42,11 +42,11 @@ exports.handler = (event, context, callback) ->
 
       await docClient.put params, defer err
       if err
-        console.error "Unable to insert quote", exchange, pair, ". Error JSON:", (JSON.stringify err, null, 2)
+        console.log "Unable to insert quote", exchange, pair, ". Error JSON:", (JSON.stringify err, null, 2)
         return callback err
 
       console.log "Quote insert succeeded", exchange, pair, "."
       return callback null, 'OK'
 
-    console.error "Unable to parse book", exchange, pair, ". Body:", body
+    console.log "Unable to parse book", exchange, pair, ". Body:", body
     return callback body
