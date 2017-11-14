@@ -4,10 +4,10 @@ import boto3
 import time
 
 STALE_TIMEOUT = 60
-REFRESH_RATE = 20
+REFRESH_RATE = 17
 
 # lambda-name => timestamp of last update
-last_updated = defaultdict(0)
+last_updated = defaultdict(lambda: 0)
 def process_data(response):
     for item in response['Items']:
         name = "%s-%s" % (item['exchange'], item['pair'])
@@ -33,3 +33,4 @@ while True:
             lambda_client.invoke(InvocationType='Event', FunctionName=name)
 
     record_event("SLEEPING,%s" % REFRESH_RATE)
+    time.sleep(REFRESH_RATE)
