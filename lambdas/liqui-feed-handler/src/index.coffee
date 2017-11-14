@@ -21,7 +21,7 @@ exports.handler = (event, context, callback) ->
   token = process.env.TOKEN
   currency = process.env.CURRENCY
   exchange = process.env.EXCHANGE
-  pair = "#{token}_#{currency}"
+  pair = "#{token}-#{currency}"
 
   console.log "Looking up #{pair} on #{exchange}"
 
