@@ -5,7 +5,7 @@ TOKEN=$1
 CURRENCY=$2
 NAME=$EXCHANGE-$TOKEN-$CURRENCY
 
-echo "creating function" $NAME
+echo "creating lambda" $NAME
 
 aws lambda delete-function --function-name $NAME 2>/dev/null || echo "function non-existant"
 aws lambda create-function \
@@ -15,6 +15,6 @@ aws lambda create-function \
   --handler build/index.handler \
   --code S3Bucket=dewmrax-lambdas-2,S3Key=liqui-feed-handler.zip \
   --memory-size 128 \
-  --timeout 15 \
+  --timeout 3 \
   --function-name $NAME \
   --environment "Variables={EXCHANGE=$EXCHANGE,TOKEN=$TOKEN,CURRENCY=$CURRENCY}"
