@@ -2,5 +2,5 @@
 
 grep "^LIQUI" ../../markets.csv | while IFS=, read -r exchange token currency
 do
-  ./deploy_one.sh $token $currency
+  ./deploy_one.sh $exchange $token $currency
 done

@@ -1,8 +1,8 @@
 #!/bin/bash -e -x
 
-EXCHANGE=LIQUI
-TOKEN=$1
-CURRENCY=$2
+EXCHANGE=$1
+TOKEN=$2
+CURRENCY=$3
 NAME=$EXCHANGE-$TOKEN-$CURRENCY
 
 echo "creating lambda" $NAME
