@@ -1,6 +1,6 @@
-#!/bin/bash -x
+#!/bin/bash
 
-cd /home/ec2-user/arbot
+cd /home/ec2-user/rbot/feed-manager
 
 PIDFILE=PIDFILE
 
