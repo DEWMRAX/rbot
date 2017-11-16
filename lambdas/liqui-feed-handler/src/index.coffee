@@ -1,4 +1,8 @@
 liqui = require './liqui'
+binance = require './binance'
+bittrex = require './bittrex'
+poloniex = require './poloniex'
+kraken = require './kraken'
 
 AWS = require 'aws-sdk'
 AWS.config.update
@@ -14,7 +18,14 @@ exports.handler = (event, context, callback) ->
 
   console.log "Looking up #{pair} on #{exchange}"
 
-  await liqui.get_book token, currency, callback, defer book
+  feed_handler = switch exchange
+    when 'LIQUI' then liqui
+    when 'BINANCE' then binance
+    when 'BITTREX' then bittrex
+    when 'POLO' then poloniex
+    when 'KRAKEN' then kraken
+
+  await feed_handler.get_book token, currency, callback, defer book
 
   params =
     TableName: 'orderbooks'
@@ -27,8 +38,8 @@ exports.handler = (event, context, callback) ->
 
   await docClient.put params, defer err
   if err
-    console.log "Unable to insert quote", exchange, pair, ". Error JSON:", (JSON.stringify err, null, 2)
+    console.log 'Unable to insert quote', exchange, pair, '. Error JSON:', (JSON.stringify err, null, 2)
     return callback err
   else
-    console.log "Quote insert succeeded", exchange, pair, "."
+    console.log 'Quote insert succeeded', exchange, pair, '.'
     return callback null, 'OK'

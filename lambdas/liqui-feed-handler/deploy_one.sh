@@ -13,7 +13,7 @@ aws lambda create-function \
   --runtime nodejs6.10 \
   --role arn:aws:iam::554285174758:role/dynamodb-writer \
   --handler build/index.handler \
-  --code S3Bucket=dewmrax-lambdas-2,S3Key=liqui-feed-handler.zip \
+  --code S3Bucket=dewmrax-lambdas-2,S3Key=feed-handler.zip \
   --memory-size 128 \
   --timeout 3 \
   --function-name $NAME \

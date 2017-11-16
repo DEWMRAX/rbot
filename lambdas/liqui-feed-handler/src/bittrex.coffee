@@ -4,33 +4,33 @@ LIMIT=50
 MIN_BOOK_DATA = 5
 
 format_quote = (quote) ->
-  [quote[0].toString(), quote[1].toString()]
+  [quote['Rate'], quote['Quantity']]
 
 format_quotes = (quotes) ->
   format_quote quote for quote in quotes[0..LIMIT]
 
 pair_name = (token, currency) ->
-  "#{token.toLowerCase()}_#{currency.toLowerCase()}"
+  "#{currency.toLowerCase()}-#{token.toLowerCase()}"
 
 sanity_check = (book) ->
-  (book?.asks and book.asks.length > MIN_BOOK_DATA and book?.bids and book.bids.length > MIN_BOOK_DATA)
+  (book?.buy and book.buy.length > MIN_BOOK_DATA and book?.sell and book.sell.length > MIN_BOOK_DATA)
 
 exports.get_book = (token, currency, error_cb, success_cb) ->
-  request "https://api.liqui.io/api/3/depth/#{pair_name token, currency}?limit=#{LIMIT}", (err, response, body) ->
+  request "https://bittrex.com/api/v1.1/public/getorderbook?type=both&market=#{pair_name token, currency}", (err, response, body) ->
     if err
       return error_cb err
 
     try
       body = JSON.parse body
+      book = body.result
     catch
       console.log 'Unable to parse body:', body
       return error_cb body
 
-    book = body[pair_name token,currency]
     if not sanity_check book
       console.log 'Insufficient book data:', (JSON.stringify book, null, 2)
-      return error_cb body
+      return error_cb book
 
     return success_cb
-      asks: format_quotes book.asks
-      bids: format_quotes book.bids
+      asks: format_quotes book.sell
+      bids: format_quotes book.buy
