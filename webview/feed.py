@@ -3,6 +3,8 @@ from flask import Flask
 import boto3
 import time
 
+MAX_AGE = 200
+
 app = Flask(__name__)
 
 table = boto3.resource('dynamodb', region_name='us-east-1').Table('orderbooks')
@@ -91,10 +93,10 @@ def check_imbalance(bidder, seller):
         ret += "ACTIONABLE IMBALANCE of %0.8f\n" % qty
         ret += "AVAILABLE PROFIT of %0.8f mBTC/mETH/mUSDT\n" % total_profit
 
-    return ret
+    return (ret, total_profit)
 
 def best_bidder(books):
-    eligible_books = filter(lambda book:book_age(book) < Decimal(120), books)
+    eligible_books = filter(lambda book:book_age(book) < Decimal(MAX_AGE), books)
     if len(eligible_books) == 0:
         return None
 
@@ -108,7 +110,7 @@ def best_bidder(books):
     return best
 
 def best_seller(books):
-    eligible_books = filter(lambda book:book_age(book) < Decimal(120), books)
+    eligible_books = filter(lambda book:book_age(book) < Decimal(MAX_AGE), books)
     if len(eligible_books) == 0:
         return None
 
@@ -124,14 +126,19 @@ def best_seller(books):
 def parse_quote(quote):
     return [Decimal(quote[0]), Decimal(quote[1])]
 
-@app.route('/<pair>')
-def show_books(pair):
-    fil = boto3.dynamodb.conditions.Key('pair').eq(pair)
-    response = table.scan(FilterExpression=fil)
+def scan_table():
+    response = table.scan()
     books = response['Items']
     while response.get('LastEvaluatedKey'):
         response = table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
         books.extend(respond['Items'])
+
+    return books
+
+@app.route('/check/<pair>')
+def show_books(pair):
+    fil = boto3.dynamodb.conditions.Key('pair').eq(pair)
+    books = table.scan(FilterExpression=fil)['Items']
 
     for book in books:
         book['asks'] = map(lambda ask:parse_quote(ask), book['asks'])
@@ -143,9 +150,28 @@ def show_books(pair):
     seller = best_seller(books)
 
     if bidder and seller:
-        return check_imbalance(bidder, seller) + ret
+        return check_imbalance(bidder, seller)[0] + ret
     else:
         return ret
+
+@app.route('/best')
+def best_book():
+    best = None
+    pairs = defaultdict(lambda:[])
+    books = scan_table()
+    for book in books:
+        pairs[book.pair].extend(book)
+
+    for pair,books in pairs.iteritems():
+        bidder = best_bidder(books)
+        seller = best_seller(books)
+
+        if bidder and seller
+            imbalance = check_imbalance(bidder, seller)
+            if book is None or book[1] < imbalance[1]:
+                best = imbalance
+
+    return best[0]
 
 if __name__ == '__main__':
   app.run()
