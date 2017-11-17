@@ -136,14 +136,16 @@ def scan_table():
 
     return books
 
+def parse_books(books):
+    for book in books:
+        book['asks'] = map(lambda ask:parse_quote(ask), book['asks'])
+        book['bids'] = map(lambda bid:parse_quote(bid), book['bids'])
+
 @app.route('/check/<pair>')
 def show_books(pair):
     fil = boto3.dynamodb.conditions.Key('pair').eq(pair)
     books = table.scan(FilterExpression=fil)['Items']
 
-    for book in books:
-        book['asks'] = map(lambda ask:parse_quote(ask), book['asks'])
-        book['bids'] = map(lambda bid:parse_quote(bid), book['bids'])
 
     ret = "<br><br>".join(map(lambda item:book_to_string(item, 5), books))
 
@@ -160,16 +162,17 @@ def best_book():
     best = None
     pairs = defaultdict(lambda:[])
     books = scan_table()
+    parse_books(books)
     for book in books:
-        pairs[book['pair']].extend(book)
+        pairs[book['pair']].extend([book])
 
-    for pair,pair_books in pairs.iteritems():
+    for pair,pair_books in pairs.items():
         bidder = best_bidder(pair_books)
         seller = best_seller(pair_books)
 
         if bidder and seller:
             imbalance = check_imbalance(bidder, seller)
-            if book is None or book[1] < imbalance[1]:
+            if best is None or best[1] < imbalance[1]:
                 best = imbalance
 
     return best[0]
