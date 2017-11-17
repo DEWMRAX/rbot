@@ -121,6 +121,9 @@ def best_seller(books):
 
     return best
 
+def parse_quote(quote):
+    return [Decimal(quote[0]), Decimal(quote[1])]
+
 @app.route('/<pair>')
 def show_books(pair):
     fil = boto3.dynamodb.conditions.Key('pair').eq(pair)
@@ -129,6 +132,10 @@ def show_books(pair):
     while response.get('LastEvaluatedKey'):
         response = table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
         books.extend(respond['Items'])
+
+    for book in books:
+        book['asks'] = map(lambda ask:parse_quote(ask), book['asks'])
+        book['bids'] = map(lambda bid:parse_quote(bid), book['bids'])
 
     ret = "<br><br>".join(map(lambda item:book_to_string(item, 5), books))
 
