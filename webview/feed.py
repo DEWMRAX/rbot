@@ -162,9 +162,9 @@ def best_book():
     for book in books:
         pairs[book.pair].extend(book)
 
-    for pair,books in pairs.iteritems():
-        bidder = best_bidder(books)
-        seller = best_seller(books)
+    for pair,pair_books in pairs.iteritems():
+        bidder = best_bidder(pair_books)
+        seller = best_seller(pair_books)
 
         if bidder and seller
             imbalance = check_imbalance(bidder, seller)
