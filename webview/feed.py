@@ -1,3 +1,4 @@
+from collections import defaultdict
 from decimal import Decimal
 from flask import Flask
 import boto3
@@ -150,7 +151,7 @@ def show_books(pair):
     seller = best_seller(books)
 
     if bidder and seller:
-        return check_imbalance(bidder, seller)[0] + ret
+        return check_imbalance(bidder, seller)[0] + "<br><br>" + ret
     else:
         return ret
 
@@ -160,13 +161,13 @@ def best_book():
     pairs = defaultdict(lambda:[])
     books = scan_table()
     for book in books:
-        pairs[book.pair].extend(book)
+        pairs[book['pair']].extend(book)
 
     for pair,pair_books in pairs.iteritems():
         bidder = best_bidder(pair_books)
         seller = best_seller(pair_books)
 
-        if bidder and seller
+        if bidder and seller:
             imbalance = check_imbalance(bidder, seller)
             if book is None or book[1] < imbalance[1]:
                 best = imbalance
