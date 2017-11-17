@@ -4,7 +4,10 @@ logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
+PIDFILE
+events.txt
+log.txt
+*.pyc
 # Runtime data
 pids
 *.pid
