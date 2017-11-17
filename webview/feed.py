@@ -8,8 +8,8 @@ app = Flask(__name__)
 table = boto3.resource('dynamodb', region_name='us-east-1').Table('orderbooks')
 
 def book_to_string(item, depth):
-    age = time.time() - item['timestamp'] / 1000
-    ret = "%s %s %0.3f<br>" % (item['exchange'], item['pair'], age)
+    age = Decimal(time.time()) - item['timestamp'] / 1000
+    ret = "%s %s AGE: %0.3fs<br>" % (item['exchange'], item['pair'], age)
 
     for i in xrange(depth, 0, -1):
         if i-1 < len(item['asks']):
