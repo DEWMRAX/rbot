@@ -28,8 +28,10 @@ def book_to_string(item, depth):
 
     return ret
 
-def check_imbalance(bids, asks):
+def check_imbalance(bidder, seller):
 
+    bids = bidder['bids']
+    asks = seller['asks']
     bids_idx = 0
     bid_price = bids[0][0]
     asks_idx = 0
@@ -38,8 +40,8 @@ def check_imbalance(bids, asks):
     total_profit = Decimal(0)
     ret = "<br>"
 
-    ret += "best bid %0.8f @ %s<br>" % (bids[0][0], buyer.exchange)
-    ret += "best ask %0.8f @ %s<br>" % (asks[0][0], seller.exchange)
+    ret += "best bid %0.8f @ %s<br>" % (bids[0][0], bidder['exchange'])
+    ret += "best ask %0.8f @ %s<br>" % (asks[0][0], seller['exchange'])
 
     while(1):
         if bids_idx >= len(bids) or asks_idx >= len(asks):
