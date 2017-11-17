@@ -145,7 +145,7 @@ def parse_books(books):
 def show_books(pair):
     fil = boto3.dynamodb.conditions.Key('pair').eq(pair)
     books = table.scan(FilterExpression=fil)['Items']
-
+    parse_books(books)
 
     ret = "<br><br>".join(map(lambda item:book_to_string(item, 5), books))
 
