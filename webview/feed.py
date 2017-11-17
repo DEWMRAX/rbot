@@ -8,7 +8,7 @@ app = Flask(__name__)
 table = boto3.resource('dynamodb', region_name='us-east-1').Table('orderbooks')
 
 def book_age(book):
-    return time.time() - item['timestamp'] / 1000
+    return Decimal(time.time()) - book['timestamp'] / 1000
 
 def book_to_string(item, depth):
     age = book_age(item)
@@ -93,7 +93,7 @@ def check_imbalance(bidder, seller):
 
     return ret
 
-def best_bids(books):
+def best_bidder(books):
     eligible_books = filter(lambda book:book_age(book) < Decimal(120), books)
     if len(eligible_books) == 0:
         return None
@@ -107,7 +107,7 @@ def best_bids(books):
 
     return best
 
-def best_asks(books):
+def best_seller(books):
     eligible_books = filter(lambda book:book_age(book) < Decimal(120), books)
     if len(eligible_books) == 0:
         return None
@@ -130,10 +130,15 @@ def show_books(pair):
         response = table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
         books.extend(respond['Items'])
 
-    bids = best_bids(books)
-    asks = best_asks(books)
+    ret = "<br><br>".join(map(lambda item:book_to_string(item, 5), books))
 
-    return check_imbalance(bids, asks) + "<br><br>".join(map(lambda item:book_to_string(item, 5), books))
+    bidder = best_bidder(books)
+    seller = best_seller(books)
+
+    if bidder and seller:
+        return check_imbalance(bidder, seller) + ret
+    else:
+        return ret
 
 if __name__ == '__main__':
   app.run()
