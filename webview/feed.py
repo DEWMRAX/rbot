@@ -43,8 +43,8 @@ def check_imbalance(bidder, seller):
     total_profit = Decimal(0)
     ret = "<br>"
 
-    ret += "best bid %0.8f @ %s<br>" % (bids[0][0], bidder['exchange'])
     ret += "best ask %0.8f @ %s<br>" % (asks[0][0], seller['exchange'])
+    ret += "best bid %0.8f @ %s<br>" % (bids[0][0], bidder['exchange'])
 
     while(1):
         if bids_idx >= len(bids) or asks_idx >= len(asks):
@@ -119,7 +119,7 @@ def best_seller(books):
     for book in eligible_books:
         if len(best['asks']) == 0:
             best = book
-        elif len(book['asks']) > 0 and book['asks'][0][0] > best['asks'][0][0]:
+        elif len(book['asks']) > 0 and book['asks'][0][0] < best['asks'][0][0]:
             best = book
 
     return best
