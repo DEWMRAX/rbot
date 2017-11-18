@@ -179,5 +179,35 @@ def best_book():
     return redirect(url_for('show_books', pair=best_books[0]['pair']))
     return best[0] + "<br><br>" + "<br><br>".join(map(lambda item:book_to_string(item, 5), best_books))
 
+def all_sort_key(el):
+    (pair, profit) = el
+    (token, currency) = pair.split('-')
+    if currency == 'BTC':
+        return Decimal(10000000) + profit
+    if currency == 'ETH':
+        return Decimal(5000000) + profit
+    return profit
+
+@app.route('/all')
+def all():
+    pairs = defaultdict(lambda:[])
+    books = scan_table()
+    parse_books(books)
+    for book in books:
+        pairs[book['pair']].extend([book])
+
+    ret = []
+    for pair,pair_books in pairs.items():
+        bidder = best_bidder(pair_books)
+        seller = best_seller(pair_books)
+
+        if bidder and seller:
+            profit = check_imbalance(bidder, seller)(1)
+            ret += [(pair, profit)]
+
+    ret.sort(key=all_sort_key)
+
+    return map(lambda el:"%s %0.4f mBTC/mETH/mUSD" % el, ret)
+
 if __name__ == '__main__':
   app.run()
