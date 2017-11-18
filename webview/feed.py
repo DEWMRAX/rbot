@@ -1,6 +1,6 @@
 from collections import defaultdict
 from decimal import Decimal
-from flask import Flask
+from flask import Flask, redirect, url_for
 import boto3
 import time
 
@@ -60,7 +60,7 @@ def check_imbalance(bidder, seller):
 
         benefit = bid[0] - ask[0]
         pct_benefit = benefit / bid[0]
-        ret += "benefit / friction / net : %0.8f / %0.8f / %0.8f\n" % (pct_benefit * Decimal(100), friction * Decimal(100), (pct_benefit - friction) * Decimal(100))
+        ret += "benefit / friction / net : %0.8f / %0.8f / %0.8f<br>" % (pct_benefit * Decimal(100), friction * Decimal(100), (pct_benefit - friction) * Decimal(100))
 
         if pct_benefit <= friction:
             break
@@ -70,29 +70,29 @@ def check_imbalance(bidder, seller):
 
         if bid[1] > ask[1]:
             qty += Decimal(ask[1])
-            bids[bids_idx] = Order(bid[0], bid[1] - ask[1])
-            profit = (pct_benefit - friction) * Decimal(ask[1]) * Decimal(1000)
+            bids[bids_idx] = (bid[0], bid[1] - ask[1])
+            profit = (pct_benefit - friction) * ask[0] * ask[1] * Decimal(1000)
             total_profit += profit
 
-            ret += "STACKING QTY %d/%d added: %0.8f, total: %0.8f\n" % (bids_idx, asks_idx, ask[1], qty)
+            ret += "STACKING QTY %d/%d added: %0.8f, total: %0.8f<br>" % (bids_idx, asks_idx, ask[1], qty)
             # print "STACKED PROFIT: %0.8f mBTC" % profit
 
             asks_idx += 1
         else:
             qty += Decimal(bid[1])
-            asks[asks_idx] = Order(ask[0], ask[1] - bid[1])
-            profit = (pct_benefit - friction) * Decimal(bid[1]) * Decimal(1000)
+            asks[asks_idx] = (ask[0], ask[1] - bid[1])
+            profit = (pct_benefit - friction) * bid[0] * bid[1] * Decimal(1000)
             total_profit += profit
 
-            ret += "STACKING QTY %d/%d added: %0.8f, total: %0.8f\n" % (bids_idx, asks_idx, bid[1], qty)
+            ret += "STACKING QTY %d/%d added: %0.8f, total: %0.8f<br>" % (bids_idx, asks_idx, bid[1], qty)
             # print "STACKED PROFIT: %0.8f mBTC" % profit
 
             bids_idx += 1
 
     if qty > Decimal(0):
 
-        ret += "ACTIONABLE IMBALANCE of %0.8f\n" % qty
-        ret += "AVAILABLE PROFIT of %0.8f mBTC/mETH/mUSDT\n" % total_profit
+        ret += "ACTIONABLE IMBALANCE of %0.8f<br>" % qty
+        ret += "AVAILABLE PROFIT of %0.8f mBTC/mETH/mUSDT<br>" % total_profit
 
     return (ret, total_profit)
 
@@ -160,6 +160,7 @@ def show_books(pair):
 @app.route('/best')
 def best_book():
     best = None
+    best_books = None
     pairs = defaultdict(lambda:[])
     books = scan_table()
     parse_books(books)
@@ -174,8 +175,9 @@ def best_book():
             imbalance = check_imbalance(bidder, seller)
             if best is None or best[1] < imbalance[1]:
                 best = imbalance
-
-    return best[0]
+                best_books = pair_books
+    return redirect(url_for('show_books', pair=best_books[0]['pair']))
+    return best[0] + "<br><br>" + "<br><br>".join(map(lambda item:book_to_string(item, 5), best_books))
 
 if __name__ == '__main__':
   app.run()
