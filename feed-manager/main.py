@@ -1,40 +1,46 @@
+from ai import check_imbalance
+from book import query_all
 from logger import record_event
 from collections import defaultdict
 import boto3
 import time
 
-STALE_TIMEOUT = 60
-INVOKE_THROTTLE = 20
+STALE_AGE = 60
+ACTIVE_AGE = 6
+INVOKE_THROTTLE = 4
 REFRESH_RATE = 2
 
 # lambda-name => timestamp of last update
-last_updated = defaultdict(lambda: 0)
+book_age = defaultdict(lambda: 0)
 last_invoked = defaultdict(lambda: 0)
-def process_data(response):
-    for item in response['Items']:
-        name = "%s-%s" % (item['exchange'], item['pair'])
-        last_updated[name] = item['timestamp'] / 1000 # ms to s
 
 with open('../markets.csv') as f:
-    markets = [line.strip('\n') for line in f]
+    markets = [line.strip('\n').replace(',', '-') for line in f]
 
 lambda_client = boto3.client('lambda')
-table = boto3.resource('dynamodb').Table('orderbooks')
+
+def invoke_one(market, reason, waiting_time):
+    if time.time() > last_invoked[market] + INVOKE_THROTTLE:
+        last_invoked[market] = time.time()
+        record_event("INVOKING,%s,%s,%0.4f" % (market, reason, waiting_time))
+        lambda_client.invoke(InvocationType='Event', FunctionName=market)
 
 while True:
-    response = table.scan()
-    process_data(response)
-    while response.get('LastEvaluatedKey'):
-        response = table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
-        process_data(response)
+    books = query_all()
+
+    for pair, pair_books in books.items():
+        for book in pair_books:
+            book_age[book.name] = book.age
+
+        if check_imbalance(pair_books) > Decimal(0):
+            for book in pair_books:
+                if book.age > ACTIVE_AGE:
+                    invoke_one(book.name, 'ACTIVE', book.age - ACTIVE_AGE)
 
     for market in markets:
-        name = market.replace(',', '-')
-        if time.time() > last_updated[name] + STALE_TIMEOUT and \
-           time.time() > last_invoked[name] + INVOKE_THROTTLE:
-            last_invoked[name] = time.time()
-            record_event("INVOKING,%s" % name)
-            lambda_client.invoke(InvocationType='Event', FunctionName=name)
+        market = market
+        if book_age[market] + STALE_TIMEOUT:
+           invoke_one(market, 'STALE', book_age[market] - STALE_AGE)
 
     record_event("SLEEPING,%s" % REFRESH_RATE)
     time.sleep(REFRESH_RATE)

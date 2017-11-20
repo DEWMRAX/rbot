@@ -1,3 +1,4 @@
+from fees import FEES
 import datetime
 
 def record_event(s):
