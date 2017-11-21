@@ -202,12 +202,12 @@ def all():
         seller = best_seller(pair_books)
 
         if bidder and seller:
-            profit = check_imbalance(bidder, seller)(1)
+            profit = check_imbalance(bidder, seller)[1]
             ret += [(pair, profit)]
 
-    ret.sort(key=all_sort_key)
+    ret.sort(key=all_sort_key, reverse=True)
 
-    return map(lambda el:"%s %0.4f mBTC/mETH/mUSD" % el, ret)
+    return "<br><br>".join(map(lambda el:"%s %0.4f mBTC/mETH/mUSD" % el, ret))
 
 if __name__ == '__main__':
   app.run()
