@@ -10,10 +10,10 @@ BOOK_DEPTH = 5
 def book_age(book):
     return Decimal(time()) - book['timestamp'] / 1000
 
-def parse_order(self, o):
+def parse_order(o):
     return Order(Decimal(o[0]), Decimal(o[1]))
 
-def parse_book(self, orders):
+def parse_book(orders):
     return map(lambda o:parse_order(o), orders[:BOOK_DEPTH])
 
 class Book():

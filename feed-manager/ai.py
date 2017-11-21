@@ -66,7 +66,7 @@ def check_imbalance_internal(bidder, seller):
     return total_profit
 
 def best_bidder(books):
-    eligible_books = filter(lambda book:book_age(book) < MAX_AGE, books)
+    eligible_books = filter(lambda book:book.age < MAX_AGE, books)
     if len(eligible_books) == 0:
         return None
 
@@ -80,7 +80,7 @@ def best_bidder(books):
     return best
 
 def best_seller(books):
-    eligible_books = filter(lambda book:book_age(book) < MAX_AGE, books)
+    eligible_books = filter(lambda book:book.age < MAX_AGE, books)
     if len(eligible_books) == 0:
         return None
 

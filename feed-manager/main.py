@@ -2,6 +2,7 @@ from ai import check_imbalance
 from book import query_all
 from logger import record_event
 from collections import defaultdict
+from decimal import Decimal
 import boto3
 import time
 
@@ -39,7 +40,7 @@ while True:
 
     for market in markets:
         market = market
-        if book_age[market] + STALE_TIMEOUT:
+        if book_age[market] > STALE_AGE:
            invoke_one(market, 'STALE', book_age[market] - STALE_AGE)
 
     record_event("SLEEPING,%s" % REFRESH_RATE)
