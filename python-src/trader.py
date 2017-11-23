@@ -504,21 +504,20 @@ def check_symbol_balance_loop(balance_map):
 last_balance_check_time = 0
 
 while True:
+    print
+    print balances_string()
+    print balances_detail()
+
     record_event("CONFIRMED,%s" % balances_string_confirmed())
     record_event("DETAIL,%s" % balances_detail())
     record_event("BTCVALUE,%s" % balances_string_in_btc())
     record_event("HEARTBEAT,%s" % balances_string())
 
-    if last_balance_check_time + 5 * 60 < int(time.time()):
-        check_symbol_balance_loop(TARGET_BALANCE)
-        last_balance_check_time = int(time.time())
+    # if last_balance_check_time + 5 * 60 < int(time.time()):
+    #     check_symbol_balance_loop(TARGET_BALANCE)
+    #     last_balance_check_time = int(time.time())
 
-
-    time.sleep(2)
+    time.sleep(20)
 
     for exch in exchanges:
         exch.refresh_balances()
-
-    print
-    print balances_string()
-    print balances_detail()
