@@ -26,6 +26,23 @@ class Book():
         self.name = "%s-%s" % (self.exchange_name, self.pair)
         self.taker_fee = Decimal(FEES[self.exchange_name].taker) / Decimal(10000)
 
+    def print_depth(self):
+        print
+        print "%s %s" % (self.exchange_name, self.pair)
+
+        for i in xrange(depth, 0, -1):
+            if i-1 < len(self.asks):
+                quote = self.asks[i-1]
+                print "%0.8f x %0.8f" % (quote.price, quote.quantity)
+
+        print "=============================="
+
+        for i in xrange(0, depth):
+            if i < len(self.bids):
+                quote = self.bids[i]
+                print "%0.8f x %0.8f" % (quote.price, quote.quantity)
+
+
 def process_data(ret, response):
     for doc in response['Items']:
         book = Book(doc)

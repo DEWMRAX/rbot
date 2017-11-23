@@ -33,7 +33,7 @@ while True:
         for book in pair_books:
             book_age[book.name] = book.age
 
-        if check_imbalance(pair_books) > Decimal(0):
+        if check_imbalance(pair_books, Decimal(80)) > Decimal(0):
             for book in pair_books:
                 if book.age > ACTIVE_AGE:
                     invoke_one(book.name, 'ACTIVE', book.age - ACTIVE_AGE)
