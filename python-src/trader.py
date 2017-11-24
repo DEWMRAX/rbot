@@ -420,7 +420,7 @@ while open_trades_collection.find_one():
         open_trades_collection.delete_one({'_id':trade['_id']})
         break
 
-    record_event("SHUTDOWN,RECOVERY_NEEDED,%s,%s" % (pair, balance - target_balance)
+    record_event("SHUTDOWN,RECOVERY_NEEDED,%s,%s" % (pair, balance - target_balance))
 
     if balance > target_balance:
         if (balance - target_balance) * Decimal(trade['bid']) < pair.min_notional():

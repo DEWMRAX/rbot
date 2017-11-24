@@ -4,6 +4,7 @@ from exchange import Exchange
 from order import Order
 from logger import record_event
 import time
+import json
 
 def symbol_from_polo(symbol):
     if symbol == "BCH":
@@ -24,8 +25,7 @@ class Poloniex(Exchange):
         Exchange.__init__(self, "POLO")
         with open("poloniex.keys") as secrets_file:
             secrets = json.load(secrets_file)
-            self.tapi = api(secrets['key'], secrets['secret'])
-
+            self.tapi = api(bytearray(secrets['key'], 'utf-8'), bytearray(secrets['secret'], 'utf-8'))
         self.tickers = self.tapi.returnTicker()
 
         self.symbols = ['BTC','ETH','GNT','LTC','REP','USDT','FCT','XEM','MAID','AMP','DASH','SC','LBC','BCC','ZRX','STRAT','SYS','GNO','CVC','OMG','STORJ','XMR','ZEC']
