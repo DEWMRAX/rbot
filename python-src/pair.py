@@ -163,11 +163,12 @@ ALL_PAIRS = [
 
 ALL_SYMBOLS=['BTC','ETH','GNT','ICN','LTC','MLN','REP','USDT','TRST','WAVES','INCNT','EDG','FCT','XEM','RLC','LUN','MAID','AMP','DASH','SC','LBC','MYST','BAT','ANT','1ST','WINGS','TIME','GUP','TKN','HMQ','QRL','BNT','PTOY','CFI','SNGLS','SNT','MCO','STORJ','ADX','PAY','OMG','QTUM','CVC','DGD','BCC','ZRX','STRAT','SYS','GNO','DNT','OAX','KNC','FUN','SNM','SALT','ENG','AST','MTL','RCN','KMD','ARK','XMR','POWR','ZEC']
 
+pair_map = dict()
+
+for pair in ALL_PAIRS:
+    pair_map[str(pair)] = pair
+
 def pair_factory(token, currency):
     token = token.upper()
     currency = currency.upper()
-    for pair in ALL_PAIRS:
-        if pair.token == token and pair.currency == currency:
-            return pair
-
-    assert(False)
+    return pair_map["%s-%s" % (token, currency)]

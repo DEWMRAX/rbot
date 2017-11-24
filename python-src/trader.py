@@ -7,6 +7,7 @@ from book import query_all
 from logger import record_event, record_trade
 from pair import ALL_PAIRS, ALL_SYMBOLS, pair_factory
 
+MAX_BOOK_AGE = 12
 TRANSFER_THRESHOLD=Decimal('.25')
 DRAWDOWN_AMOUNT=Decimal('.70') # how much to leave on an exchange we are withdrawing from
 DRAWUP_AMOUNT=Decimal('1.4') # how much to target on an exchange we are transferring to
@@ -194,6 +195,34 @@ def execute_trade(buyer, seller, pair, quantity, expected_profit, bid, ask):
 
     record_event("AI_CLOSE,%s" % info)
 
+def best_bidder(books):
+    eligible_books = filter(lambda book:book.age < MAX_BOOK_AGE, books)
+    if len(eligible_books) == 0:
+        return None
+
+    best = eligible_books[0]
+    for book in eligible_books:
+        if len(best.bids) == 0:
+            best = book
+        elif len(book.bids) > 0 and book.bids[0].price > best.bids[0].price:
+            best = book
+
+    return best
+
+def best_seller(books):
+    eligible_books = filter(lambda book:book.age < MAX_BOOK_AGE, books)
+    if len(eligible_books) == 0:
+        return None
+
+    best = eligible_books[0]
+    for book in eligible_books:
+        if len(best.asks) == 0:
+            best = book
+        elif len(book.asks) > 0 and book.asks[0].price < best.asks[0].price:
+            best = book
+
+    return best
+
 def check_imbalance(buyer_book, seller_book, pair):
 
     buyer = get_exchange_handler(buyer_book.name)
@@ -277,17 +306,6 @@ def check_imbalance(buyer_book, seller_book, pair):
         total_profit *= PRICE[pair.currency]
 
     return (total_profit, quantity, bid_price, ask_price)
-
-def check_pair(pair, pair_books):
-    buyer = best_bidder(pair)
-    seller = best_asker(pair)
-    if check_imbalance(buyer, seller, pair):
-        # kraken has very serious throttling
-        if buyer.name == 'KRAKEN' or seller.name == 'KRAKEN':
-            time.sleep(3)
-        return True
-    else:
-        return False
 
 def sanity_check_open(exch):
     if exch.any_open_orders():
@@ -379,71 +397,6 @@ def sell_at_market(reason, pair, amount, expected_price):
     return best_exch.trade_ioc(pair, 'sell', best_price, amount, reason)
 
 
-record_event('START')
-print
-print "Starting up"
-print
-
-for exch in exchanges:
-    exch.cancel_all_orders()
-
-time.sleep(1)
-
-for exch in exchanges:
-    exch.refresh_balances()
-
-time.sleep(1)
-
-for exch in exchanges:
-    sanity_check_open(exch)
-
-print balances_string()
-print balances_detail()
-
-while open_trades_collection.find_one():
-    trade = open_trades_collection.find_one()
-
-    pair = pair_factory(trade['token'], trade['currency'])
-    balance = total_balance(pair.token)
-
-    record_event("RECOVERY BEGIN,%s,%s,%s,%s,%s,%s,%s,%s" % (trade['buyer'], trade['seller'], trade['token'], trade['currency'], balance, trade['token_balance'], trade['bid'], trade['ask']))
-
-    target_balance = Decimal(trade['token_balance'])
-
-    if abs(target_balance - balance) * Decimal(.98) > Decimal(trade['quantity']):
-        record_event("SKIPPING RECOVERY,DISCREPENCY")
-        open_trades_collection.delete_one({'_id':trade['_id']})
-        break
-
-    if abs(target_balance - balance) < pair.min_quantity():
-        record_event("SKIPPING RECOVERY,MIN_QTY")
-        open_trades_collection.delete_one({'_id':trade['_id']})
-        break
-
-    record_event("SHUTDOWN,RECOVERY_NEEDED,%s,%s" % (pair, balance - target_balance))
-
-    if balance > target_balance:
-        if (balance - target_balance) * Decimal(trade['bid']) < pair.min_notional():
-            record_event("SKIPPING RECOVERY,MIN_NOTIONAL")
-            open_trades_collection.delete_one({'_id':trade['_id']})
-        elif sell_at_market("RECOVERY AUTOBALANCE", pair, balance - target_balance, Decimal(trade['bid'])) == Decimal(0):
-            record_event("SKIPPING RECOVERY,ZERO FILL")
-            open_trades_collection.delete_one({'_id':trade['_id']})
-    else:
-        if (target_balance - balance) * Decimal(trade['ask']) < pair.min_notional():
-            record_event("SKIPPING RECOVERY,MIN_NOTIONAL")
-            open_trades_collection.delete_one({'_id':trade['_id']})
-        elif buy_at_market("RECOVERY AUTOBALANCE", pair, target_balance - balance, Decimal(trade['ask'])) == Decimal(0):
-            record_event("SKIPPING RECOVERY,ZERO FILL")
-            open_trades_collection.delete_one({'_id':trade['_id']})
-
-    time.sleep(1)
-
-    for exch in get_exchanges(pair):
-        exch.refresh_balances()
-
-    time.sleep(1)
-
 def check_symbol_balance(symbol, target):
     balance = total_balance(symbol)
 
@@ -501,6 +454,71 @@ def check_symbol_balance_loop(balance_map):
     for exch in exchanges:
         exch.refresh_balances()
 
+record_event('START')
+print
+print "Starting up"
+print
+
+# for exch in exchanges:
+#     exch.cancel_all_orders()
+
+# time.sleep(1)
+
+for exch in exchanges:
+    exch.refresh_balances()
+
+time.sleep(1)
+
+# for exch in exchanges:
+#     sanity_check_open(exch)
+
+print balances_string()
+print balances_detail()
+
+while open_trades_collection.find_one():
+    trade = open_trades_collection.find_one()
+
+    pair = pair_factory(trade['token'], trade['currency'])
+    balance = total_balance(pair.token)
+
+    record_event("RECOVERY BEGIN,%s,%s,%s,%s,%s,%s,%s,%s" % (trade['buyer'], trade['seller'], trade['token'], trade['currency'], balance, trade['token_balance'], trade['bid'], trade['ask']))
+
+    target_balance = Decimal(trade['token_balance'])
+
+    if abs(target_balance - balance) * Decimal(.98) > Decimal(trade['quantity']):
+        record_event("SKIPPING RECOVERY,DISCREPENCY")
+        open_trades_collection.delete_one({'_id':trade['_id']})
+        break
+
+    if abs(target_balance - balance) < pair.min_quantity():
+        record_event("SKIPPING RECOVERY,MIN_QTY")
+        open_trades_collection.delete_one({'_id':trade['_id']})
+        break
+
+    record_event("SHUTDOWN,RECOVERY_NEEDED,%s,%s" % (pair, balance - target_balance))
+
+    if balance > target_balance:
+        if (balance - target_balance) * Decimal(trade['bid']) < pair.min_notional():
+            record_event("SKIPPING RECOVERY,MIN_NOTIONAL")
+            open_trades_collection.delete_one({'_id':trade['_id']})
+        elif sell_at_market("RECOVERY AUTOBALANCE", pair, balance - target_balance, Decimal(trade['bid'])) == Decimal(0):
+            record_event("SKIPPING RECOVERY,ZERO FILL")
+            open_trades_collection.delete_one({'_id':trade['_id']})
+    else:
+        if (target_balance - balance) * Decimal(trade['ask']) < pair.min_notional():
+            record_event("SKIPPING RECOVERY,MIN_NOTIONAL")
+            open_trades_collection.delete_one({'_id':trade['_id']})
+        elif buy_at_market("RECOVERY AUTOBALANCE", pair, target_balance - balance, Decimal(trade['ask'])) == Decimal(0):
+            record_event("SKIPPING RECOVERY,ZERO FILL")
+            open_trades_collection.delete_one({'_id':trade['_id']})
+
+    time.sleep(1)
+
+    for exch in get_exchanges(pair):
+        exch.refresh_balances()
+
+    time.sleep(1)
+
 last_balance_check_time = 0
 
 while True:
@@ -517,7 +535,26 @@ while True:
     #     check_symbol_balance_loop(TARGET_BALANCE)
     #     last_balance_check_time = int(time.time())
 
-    time.sleep(20)
+    best_trade = None
+    for pair, pair_books in query_all():
+        (token, currency) = pair.split('-')
+        pair = pair_factory(token, currency)
 
-    for exch in exchanges:
-        exch.refresh_balances()
+        buyer = best_bidder(pair_books)
+        seller = best_seller(pair_books)
+
+        (total_profit, quantity, bid_price, ask_price) = check_imbalance(buyer, seller, pair)
+        if best_trade is None or best_trade(0) < total_profit:
+            best_trade = (total_profit, quantity, bid_price, ask_price)
+
+    record_event("TRADE,%s,%.4f,%.4f,%.4f" % (best_trade(0), best_trade(1), best_trade(2), best_trade(3)))
+
+    # kraken has very serious throttling
+    # if buyer.name == 'KRAKEN' or seller.name == 'KRAKEN':
+    #     time.sleep(3)
+
+
+    time.sleep(2)
+
+    # for exch in exchanges:
+    #     exch.refresh_balances()
