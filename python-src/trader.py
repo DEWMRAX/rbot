@@ -225,8 +225,8 @@ def best_seller(books):
 
 def check_imbalance(buyer_book, seller_book, pair):
 
-    buyer = get_exchange_handler(buyer_book.name)
-    seller = get_exchange_handler(seller_book.name)
+    buyer = get_exchange_handler(buyer_book.exchange_name)
+    seller = get_exchange_handler(seller_book.exchange_name)
     bids = buyer_book.bids
     asks = seller_book.asks
     bids_idx = 0
@@ -536,7 +536,7 @@ while True:
     #     last_balance_check_time = int(time.time())
 
     best_trade = None
-    for pair, pair_books in query_all():
+    for pair, pair_books in query_all().iteritems():
         (token, currency) = pair.split('-')
         pair = pair_factory(token, currency)
 
