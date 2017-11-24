@@ -19,9 +19,9 @@ class Liqui(Exchange):
         self.tickers = liqui.common.market_info
 
         for ticker,info in self.tickers['pairs'].items():
-            uniform_ticker = ticker.upper()
-            a = uniform_ticker.split('_')
-            if a[0] in self.symbols and a[1] in self.symbols:
+            (token, currency) = ticker.upper().split('_')
+            uniform_ticker = "%s-%s" % (token, currency)
+            if token in self.symbols and currency in self.symbols:
                 self.fees[uniform_ticker] = Decimal(info[u'fee']) * Decimal('0.01')
 
     def pair_name(self, market):
