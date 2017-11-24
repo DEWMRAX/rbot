@@ -5,6 +5,7 @@ from pymongo import MongoClient
 import poloniex, kraken, bittrex, binance, liqui
 from book import query_all
 from logger import record_event, record_trade
+from order import Order
 from pair import ALL_PAIRS, ALL_SYMBOLS, pair_factory
 
 MAX_BOOK_AGE = 12
@@ -539,15 +540,23 @@ while True:
     for pair, pair_books in query_all().iteritems():
         (token, currency) = pair.split('-')
         pair = pair_factory(token, currency)
+        if pair is None:
+            continue
 
         buyer = best_bidder(pair_books)
         seller = best_seller(pair_books)
+        if buyer is None or seller is None:
+            continue
 
         (total_profit, quantity, bid_price, ask_price) = check_imbalance(buyer, seller, pair)
-        if best_trade is None or best_trade(0) < total_profit:
-            best_trade = (total_profit, quantity, bid_price, ask_price)
+        if total_profit > 0:
+            if best_trade is None or best_trade[0] < total_profit:
+                best_trade = (pair, total_profit, quantity, bid_price, ask_price)
 
-    record_event("TRADE,%s,%.4f,%.4f,%.4f" % (best_trade(0), best_trade(1), best_trade(2), best_trade(3)))
+    if best_trade is None:
+        record_event("NO_TRADE")
+    else:
+        record_event("TRADE,%s,%.8f,%.8f,%.8f,%.8f" % (best_trade[0], best_trade[1], best_trade[2], best_trade[3], best_trade[4]))
 
     # kraken has very serious throttling
     # if buyer.name == 'KRAKEN' or seller.name == 'KRAKEN':

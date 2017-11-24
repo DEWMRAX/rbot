@@ -171,4 +171,5 @@ for pair in ALL_PAIRS:
 def pair_factory(token, currency):
     token = token.upper()
     currency = currency.upper()
-    return pair_map["%s-%s" % (token, currency)]
+    return pair_map.get("%s-%s" % (token, currency))
+
