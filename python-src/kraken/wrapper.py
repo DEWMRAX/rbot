@@ -5,6 +5,7 @@ from kraken.connection import Connection
 from exchange import Exchange
 from order import Order
 from logger import record_event
+import json
 import pprint
 import sys
 import time
@@ -48,7 +49,8 @@ class Kraken(Exchange):
 
         self.pair_name_map = {}
 
-        self.tickers = self.query_public('AssetPairs', {})['result'].items()
+        with open('kraken_info.json') as f:
+            self.tickers = json.loads(f.read())['result'].items()
 
         self.symbols = ['BTC', 'ETH', 'LTC', 'ICN', 'MLN', 'REP', 'DASH', 'BCC', 'GNO', 'XMR', 'ZEC']
         for pair,info in self.tickers:

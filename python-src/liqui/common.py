@@ -179,7 +179,8 @@ decimal.getcontext().rounding = decimal.ROUND_DOWN
 exps = [decimal.Decimal("1e-%d" % i) for i in range(16)]
 
 connection = BTCEConnection("api.liqui.io", timeout=60)
-market_info = json.loads(open(INFO_CACHE_PATH).read())
+with open(INFO_CACHE_PATH) as f:
+    market_info = json.loads(f.read())
 
 all_currencies = []
 all_pairs = []
