@@ -224,7 +224,7 @@ def best_seller(books):
 
     return best
 
-def check_imbalance(buyer_book, seller_book, pair):
+def check_imbalance(buyer_book, seller_book, pair, print_trace):
 
     buyer = get_exchange_handler(buyer_book.exchange_name)
     seller = get_exchange_handler(seller_book.exchange_name)
@@ -237,9 +237,10 @@ def check_imbalance(buyer_book, seller_book, pair):
     quantity = Decimal(0)
     total_profit = Decimal(0)
 
-    # print
-    # print "best bid %0.8f @ %s" % (bids[0].price, buyer.name)
-    # print "best ask %0.8f @ %s" % (asks[0].price, seller.name)
+    if print_trace:
+        print
+        print "best bid %0.8f @ %s" % (bids[0].price, buyer.name)
+        print "best ask %0.8f @ %s" % (asks[0].price, seller.name)
 
     # update price array for NAV calculation
     if pair.currency == 'BTC' or (pair.currency == 'USDT' and pair.token == 'BTC'):
@@ -273,7 +274,8 @@ def check_imbalance(buyer_book, seller_book, pair):
 
         benefit = bid.price - ask.price
         pct_benefit = benefit / bid.price
-        # print "benefit / friction / net : %0.8f / %0.8f / %0.8f" % (pct_benefit * Decimal(100), friction * Decimal(100), (pct_benefit - friction) * Decimal(100))
+        if print_trace:
+            print "benefit / friction / net : %0.8f / %0.8f / %0.8f" % (pct_benefit * Decimal(100), friction * Decimal(100), (pct_benefit - friction) * Decimal(100))
 
         if pct_benefit <= friction:
             break
@@ -284,21 +286,23 @@ def check_imbalance(buyer_book, seller_book, pair):
         if bid.quantity > ask.quantity:
             quantity += ask.quantity
             bids[bids_idx] = Order(bid.price, bid.quantity - ask.quantity)
-            profit = (pct_benefit - friction) * Decimal(ask.quantity) * Decimal(1000)
+            profit = (pct_benefit - friction) * ask.quantity * Decimal(1000)
             total_profit += profit
 
-            # print "STACKING QTY %d/%d added: %0.8f, total: %0.8f" % (bids_idx, asks_idx, ask.quantity, quantity)
-            # print "STACKED PROFIT: %0.8f mBTC" % profit
+            if print_trace:
+                print "STACKING QTY %d/%d added: %0.8f, total: %0.8f" % (bids_idx, asks_idx, ask.quantity, quantity)
+                print "STACKED PROFIT: %0.8f mBTC" % profit
             asks_idx += 1
 
         else:
             quantity += bid.quantity
             asks[asks_idx] = Order(ask.price, ask.quantity - bid.quantity)
-            profit = (pct_benefit - friction) * Decimal(bid.quantity) * Decimal(1000)
+            profit = (pct_benefit - friction) * bid.quantity * Decimal(1000)
             total_profit += profit
 
-            # print "STACKING QTY %d/%d added: %0.8f, total: %0.8f" % (bids_idx, asks_idx, bid.quantity, quantity)
-            # print "STACKED PROFIT: %0.8f mBTC" % profit
+            if print_trace:
+                print "STACKING QTY %d/%d added: %0.8f, total: %0.8f" % (bids_idx, asks_idx, bid.quantity, quantity)
+                print "STACKED PROFIT: %0.8f mBTC" % profit
 
             bids_idx += 1
 
@@ -537,6 +541,8 @@ while True:
     #     last_balance_check_time = int(time.time())
 
     best_trade = None
+    best_buyer = None
+    best_seller = None
     for pair, pair_books in query_all().iteritems():
         (token, currency) = pair.split('-')
         pair = pair_factory(token, currency)
@@ -548,7 +554,7 @@ while True:
         if buyer is None or seller is None:
             continue
 
-        (total_profit, quantity, bid_price, ask_price) = check_imbalance(buyer, seller, pair)
+        (total_profit, quantity, bid_price, ask_price) = check_imbalance(buyer, seller, pair, False)
         if total_profit > 0:
             if best_trade is None or best_trade[0] < total_profit:
                 best_trade = (pair, total_profit, quantity, bid_price, ask_price)
@@ -556,6 +562,7 @@ while True:
     if best_trade is None:
         record_event("NO_TRADE")
     else:
+        check_imbalance(best_buyer, best_seller, best_trade[0], True)
         record_event("TRADE,%s,%.8f,%.8f,%.8f,%.8f" % (best_trade[0], best_trade[1], best_trade[2], best_trade[3], best_trade[4]))
 
     # kraken has very serious throttling
