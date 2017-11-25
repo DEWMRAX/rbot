@@ -1,4 +1,5 @@
 import datetime, sys, time
+from collections import namedtuple
 from decimal import Decimal
 from pymongo import MongoClient
 
@@ -104,34 +105,6 @@ def balances_detail():
 
 def execute_trade(buyer, seller, pair, quantity, expected_profit, bid, ask):
 
-    # Risk checks first
-    if quantity > Decimal(0):
-
-        print "ACTIONABLE IMBALANCE of %0.8f on %s" % (quantity, pair)
-
-        if buyer.get_balance(pair.token) < quantity:
-            print "%s LOW BALANCE of %s: %0.8f" % (buyer.name, pair.token, buyer.get_balance(pair.token))
-            quantity = Decimal(buyer.get_balance(pair.token)) * Decimal('0.9') # leave wiggle room in case market moves
-
-        if seller.get_balance(pair.currency) < quantity * ask_price:
-            print "%s LOW BALANCE of %s: %0.8f" % (seller.name, pair.currency, seller.get_balance(pair.currency))
-            quantity = Decimal(seller.get_balance(pair.currency) / ask_price) * Decimal('0.9') # leave wiggle room in case market moves
-
-        if quantity * ask_price > pair.max_notional():
-            print "risk check MAX_NOTIONAL, reducing %0.8f to %0.8f" % (quantity, pair.max_notional() / ask_price)
-            quantity = pair.max_notional() / ask_price
-
-        if quantity * ask_price < pair.min_notional():
-            print "risk check MIN_NOTIONAL, skipping trade %0.8f" % (quantity * ask_price)
-            return
-
-        if quantity < pair.min_quantity():
-            print "risk check MIN_QTY, skipping trade %0.8f" % (quantity)
-            return
-
-    else:
-        return
-
     starting_currency_balance = total_balance(pair.currency)
     starting_token_balance = total_balance(pair.token)
 
@@ -224,7 +197,8 @@ def best_seller(books):
 
     return best
 
-def check_imbalance(buyer_book, seller_book, pair, print_trace):
+Trade = namedtuple('Trade', ['profit', 'quantity', 'bid_price', 'ask_price', 'trace', 'buyer', 'seller'])
+def check_imbalance(buyer_book, seller_book, pair):
 
     buyer = get_exchange_handler(buyer_book.exchange_name)
     seller = get_exchange_handler(seller_book.exchange_name)
@@ -236,11 +210,11 @@ def check_imbalance(buyer_book, seller_book, pair, print_trace):
     ask_price = asks[0].price
     quantity = Decimal(0)
     total_profit = Decimal(0)
+    trace = ""
 
-    if print_trace:
-        print
-        print "best bid %0.8f @ %s" % (bids[0].price, buyer.name)
-        print "best ask %0.8f @ %s" % (asks[0].price, seller.name)
+    trace += "\n"
+    trace += "best bid %0.8f @ %s\n" % (bids[0].price, buyer.name)
+    trace += "best ask %0.8f @ %s\n" % (asks[0].price, seller.name)
 
     # update price array for NAV calculation
     if pair.currency == 'BTC' or (pair.currency == 'USDT' and pair.token == 'BTC'):
@@ -274,8 +248,7 @@ def check_imbalance(buyer_book, seller_book, pair, print_trace):
 
         benefit = bid.price - ask.price
         pct_benefit = benefit / bid.price
-        if print_trace:
-            print "benefit / friction / net : %0.8f / %0.8f / %0.8f" % (pct_benefit * Decimal(100), friction * Decimal(100), (pct_benefit - friction) * Decimal(100))
+        trace += "benefit / friction / net : %0.8f / %0.8f / %0.8f\n" % (pct_benefit * Decimal(100), friction * Decimal(100), (pct_benefit - friction) * Decimal(100))
 
         if pct_benefit <= friction:
             break
@@ -289,9 +262,9 @@ def check_imbalance(buyer_book, seller_book, pair, print_trace):
             profit = (pct_benefit - friction) * ask.quantity * Decimal(1000)
             total_profit += profit
 
-            if print_trace:
-                print "STACKING QTY %d/%d added: %0.8f, total: %0.8f" % (bids_idx, asks_idx, ask.quantity, quantity)
-                print "STACKED PROFIT: %0.8f mBTC" % profit
+            trace += "STACKING QTY %d/%d added: %0.8f, total: %0.8f\n" % (bids_idx, asks_idx, ask.quantity, quantity)
+            trace += "STACKED PROFIT: %0.8f mBTC\n" % profit
+
             asks_idx += 1
 
         else:
@@ -300,9 +273,8 @@ def check_imbalance(buyer_book, seller_book, pair, print_trace):
             profit = (pct_benefit - friction) * bid.quantity * Decimal(1000)
             total_profit += profit
 
-            if print_trace:
-                print "STACKING QTY %d/%d added: %0.8f, total: %0.8f" % (bids_idx, asks_idx, bid.quantity, quantity)
-                print "STACKED PROFIT: %0.8f mBTC" % profit
+            trace += "STACKING QTY %d/%d added: %0.8f, total: %0.8f\n" % (bids_idx, asks_idx, bid.quantity, quantity)
+            trace += "STACKED PROFIT: %0.8f mBTC\n" % profit
 
             bids_idx += 1
 
@@ -310,7 +282,33 @@ def check_imbalance(buyer_book, seller_book, pair, print_trace):
     if pair.currency != 'BTC':
         total_profit *= PRICE[pair.currency]
 
-    return (total_profit, quantity, bid_price, ask_price)
+    # TODO need to adjust total_profit return value based on
+    # Risk checks
+    if quantity > Decimal(0):
+
+        trace += "ACTIONABLE IMBALANCE of %0.8f on %s\n" % (quantity, pair)
+
+        if buyer.get_balance(pair.token) < quantity:
+            trace += "%s LOW BALANCE of %s: %0.8f\n" % (buyer.name, pair.token, buyer.get_balance(pair.token))
+            quantity = Decimal(buyer.get_balance(pair.token)) * Decimal('0.9') # leave wiggle room in case market moves
+
+        if seller.get_balance(pair.currency) < quantity * ask_price:
+            trace += "%s LOW BALANCE of %s: %0.8f\n" % (seller.name, pair.currency, seller.get_balance(pair.currency))
+            quantity = Decimal(seller.get_balance(pair.currency) / ask_price) * Decimal('0.9') # leave wiggle room in case market moves
+
+        if quantity * ask_price > pair.max_notional():
+            trace += "risk check MAX_NOTIONAL, reducing %0.8f to %0.8f\n" % (quantity, pair.max_notional() / ask_price)
+            quantity = pair.max_notional() / ask_price
+
+        if quantity * ask_price < pair.min_notional():
+            trace += "risk check MIN_NOTIONAL, skipping trade %0.8f\n" % (quantity * ask_price)
+            quantity = Decimal(0)
+
+        if quantity < pair.min_quantity():
+            trace += "risk check MIN_QTY, skipping trade %0.8f\n" % (quantity)
+            quantity = Decimal(0)
+
+    return Trade(total_profit, quantity, bid_price, ask_price, trace, buyer, seller)
 
 def sanity_check_open(exch):
     if exch.any_open_orders():
@@ -541,8 +539,6 @@ while True:
     #     last_balance_check_time = int(time.time())
 
     best_trade = None
-    best_buyer = None
-    best_seller = None
     for pair, pair_books in query_all().iteritems():
         (token, currency) = pair.split('-')
         pair = pair_factory(token, currency)
@@ -554,16 +550,16 @@ while True:
         if buyer is None or seller is None:
             continue
 
-        (total_profit, quantity, bid_price, ask_price) = check_imbalance(buyer, seller, pair, False)
-        if total_profit > 0:
-            if best_trade is None or best_trade[0] < total_profit:
-                best_trade = (pair, total_profit, quantity, bid_price, ask_price)
+        trade = check_imbalance(buyer, seller, pair)
+        if total_profit > 0 and (best_trade is None or best_trade.profit < trade.profit):
+            best_trade = trade
 
     if best_trade is None:
         record_event("NO_TRADE")
     else:
-        check_imbalance(best_buyer, best_seller, best_trade[0], True)
-        record_event("TRADE,%s,%.8f,%.8f,%.8f,%.8f" % (best_trade[0], best_trade[1], best_trade[2], best_trade[3], best_trade[4]))
+        record_event("TRADE,%s,%s,%s,%.8f,%.8f,%.8f,%.8f" %
+            (best_trade.pair, best_trade.buyer.name, best_trade.seller.name,
+             best_trade.profit, best_trade.quantity, best_trade.bid_price, best_trade.ask_price))
 
     # kraken has very serious throttling
     # if buyer.name == 'KRAKEN' or seller.name == 'KRAKEN':
