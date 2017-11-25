@@ -552,7 +552,7 @@ while True:
             continue
 
         trade = check_imbalance(buyer, seller, pair)
-        if total_profit > 0 and (best_trade is None or best_trade.profit < trade.profit):
+        if trade.profit > 0 and (best_trade is None or best_trade.profit < trade.profit):
             best_trade = trade
 
     if best_trade is None:
