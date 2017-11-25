@@ -197,6 +197,7 @@ def best_seller(books):
 
     return best
 
+# Trade is the return type of check_imbalance
 Trade = namedtuple('Trade', ['profit', 'quantity', 'bid_price', 'ask_price', 'trace', 'buyer', 'seller'])
 def check_imbalance(buyer_book, seller_book, pair):
 
@@ -557,6 +558,7 @@ while True:
     if best_trade is None:
         record_event("NO_TRADE")
     else:
+        print best_trade.trace
         record_event("TRADE,%s,%s,%s,%.8f,%.8f,%.8f,%.8f" %
             (best_trade.pair, best_trade.buyer.name, best_trade.seller.name,
              best_trade.profit, best_trade.quantity, best_trade.bid_price, best_trade.ask_price))
