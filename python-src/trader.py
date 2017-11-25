@@ -198,7 +198,7 @@ def best_seller(books):
     return best
 
 # Trade is the return type of check_imbalance
-Trade = namedtuple('Trade', ['profit', 'quantity', 'bid_price', 'ask_price', 'trace', 'buyer', 'seller'])
+Trade = namedtuple('Trade', ['pair', 'profit', 'quantity', 'bid_price', 'ask_price', 'trace', 'buyer', 'seller'])
 def check_imbalance(buyer_book, seller_book, pair):
 
     buyer = get_exchange_handler(buyer_book.exchange_name)
@@ -309,7 +309,7 @@ def check_imbalance(buyer_book, seller_book, pair):
             trace += "risk check MIN_QTY, skipping trade %0.8f\n" % (quantity)
             quantity = Decimal(0)
 
-    return Trade(total_profit, quantity, bid_price, ask_price, trace, buyer, seller)
+    return Trade(pair, total_profit, quantity, bid_price, ask_price, trace, buyer, seller)
 
 def sanity_check_open(exch):
     if exch.any_open_orders():
