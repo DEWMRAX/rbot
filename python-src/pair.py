@@ -4,7 +4,7 @@ from order import Order
 
 MAX_NOTIONAL={"BTC":Decimal('.2'), "ETH":Decimal('2'), "USDT":Decimal('200')}
 MIN_NOTIONAL={"BTC":Decimal('.001'), "ETH":Decimal('.015'), "USDT":Decimal('1')}
-MIN_QTY={"ZEC":Decimal('0.01'), "POWR":Decimal('10'), "XMR":Decimal('0.02'), "ARK":Decimal('1'), "RCN":Decimal('20'), "KMD":Decimal('2'), "ENG":Decimal('4'), "AST":Decimal('10'), "MTL":Decimal('.3'), "SALT":Decimal('.5'), "FUN":Decimal('50'), "SNM":Decimal('10'), "KNC":Decimal('3'), "DNT":Decimal('1'), "OAX":Decimal('.01'), "STRAT":Decimal('.01'), "GNO":Decimal('.01'), "SYS":Decimal('.01'), "ZRX":Decimal('1'), "BCC":Decimal('.01'), "MCO":Decimal('.01'), "STORJ":Decimal('.01'), "ADX":Decimal('.01'), "PAY":Decimal('.01'), "OMG":Decimal('.01'), "QTUM":Decimal('.01'), "CVC":Decimal('.01'), "DGD":Decimal('.01'), "WINGS":Decimal('.01'), "TIME":Decimal('.01'), "GUP":Decimal('.01'), "TKN":Decimal('.01'), "HMQ":Decimal('.01'), "QRL":Decimal('.01'), "BNT":Decimal('.01'), "PTOY":Decimal('.01'), "CFI":Decimal('.01'), "SNGLS":Decimal('.01'), "SNT":Decimal('.01'), "MYST":Decimal('.01'), "BAT":Decimal('.01'), "ANT":Decimal('.01'), "1ST":Decimal('.01'), "DASH":Decimal('.01'), "SC":Decimal('1'), "LBC":Decimal('0.1'), "EDG":Decimal('0.1'), "TRST":Decimal('0.1'), "WAVES":Decimal('0.1'), "INCNT":Decimal('0.1'), "ETH":Decimal('.01'), "GNT":Decimal('0.1'), "ICN":Decimal('2'), "MLN":Decimal('0.1'), "LTC":Decimal('0.1'), "REP":Decimal('0.3'), "BTC":Decimal('0.001'), "FCT":Decimal('0.1'), "XEM":Decimal('0.1'), "LUN":Decimal('0.1'), "RLC":Decimal('0.1'), "MAID":Decimal('0.1'), "AMP":Decimal('0.1')}
+MIN_QUANTITY={"ZEC":Decimal('0.01'), "POWR":Decimal('10'), "XMR":Decimal('0.02'), "ARK":Decimal('1'), "RCN":Decimal('20'), "KMD":Decimal('2'), "ENG":Decimal('4'), "AST":Decimal('10'), "MTL":Decimal('.3'), "SALT":Decimal('.5'), "FUN":Decimal('50'), "SNM":Decimal('10'), "KNC":Decimal('3'), "DNT":Decimal('1'), "OAX":Decimal('.01'), "STRAT":Decimal('.01'), "GNO":Decimal('.01'), "SYS":Decimal('.01'), "ZRX":Decimal('1'), "BCC":Decimal('.01'), "MCO":Decimal('.01'), "STORJ":Decimal('.01'), "ADX":Decimal('.01'), "PAY":Decimal('.01'), "OMG":Decimal('.01'), "QTUM":Decimal('.01'), "CVC":Decimal('.01'), "DGD":Decimal('.01'), "WINGS":Decimal('.01'), "TIME":Decimal('.01'), "GUP":Decimal('.01'), "TKN":Decimal('.01'), "HMQ":Decimal('.01'), "QRL":Decimal('.01'), "BNT":Decimal('.01'), "PTOY":Decimal('.01'), "CFI":Decimal('.01'), "SNGLS":Decimal('.01'), "SNT":Decimal('.01'), "MYST":Decimal('.01'), "BAT":Decimal('.01'), "ANT":Decimal('.01'), "1ST":Decimal('.01'), "DASH":Decimal('.01'), "SC":Decimal('1'), "LBC":Decimal('0.1'), "EDG":Decimal('0.1'), "TRST":Decimal('0.1'), "WAVES":Decimal('0.1'), "INCNT":Decimal('0.1'), "ETH":Decimal('.01'), "GNT":Decimal('0.1'), "ICN":Decimal('2'), "MLN":Decimal('0.1'), "LTC":Decimal('0.1'), "REP":Decimal('0.3'), "BTC":Decimal('0.001'), "FCT":Decimal('0.1'), "XEM":Decimal('0.1'), "LUN":Decimal('0.1'), "RLC":Decimal('0.1'), "MAID":Decimal('0.1'), "AMP":Decimal('0.1')}
 
 class Pair(namedtuple('Pair', ['token','currency','network_friction'])):
     __slots__ = ()
@@ -17,8 +17,8 @@ class Pair(namedtuple('Pair', ['token','currency','network_friction'])):
     def min_notional(self):
         return MIN_NOTIONAL[self.currency]
 
-    def min_qty(self):
-        return MIN_QTY[self.token]
+    def min_quantity(self):
+        return MIN_QUANTITY[self.token]
 
 def friction(base):
     return Decimal(1.8 * base)
@@ -172,4 +172,3 @@ def pair_factory(token, currency):
     token = token.upper()
     currency = currency.upper()
     return pair_map.get("%s-%s" % (token, currency))
-
