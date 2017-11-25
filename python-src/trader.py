@@ -260,7 +260,7 @@ def check_imbalance(buyer_book, seller_book, pair):
         if bid.quantity > ask.quantity:
             quantity += ask.quantity
             bids[bids_idx] = Order(bid.price, bid.quantity - ask.quantity)
-            profit = (pct_benefit - friction) * ask.quantity * Decimal(1000)
+            profit = (pct_benefit - friction) * ask.quantity * ask.price * Decimal(1000)
             total_profit += profit
 
             trace += "STACKING QTY %d/%d added: %0.8f, total: %0.8f\n" % (bids_idx, asks_idx, ask.quantity, quantity)
@@ -271,7 +271,7 @@ def check_imbalance(buyer_book, seller_book, pair):
         else:
             quantity += bid.quantity
             asks[asks_idx] = Order(ask.price, ask.quantity - bid.quantity)
-            profit = (pct_benefit - friction) * bid.quantity * Decimal(1000)
+            profit = (pct_benefit - friction) * bid.quantity * bid.price * Decimal(1000)
             total_profit += profit
 
             trace += "STACKING QTY %d/%d added: %0.8f, total: %0.8f\n" % (bids_idx, asks_idx, bid.quantity, quantity)
@@ -280,8 +280,7 @@ def check_imbalance(buyer_book, seller_book, pair):
             bids_idx += 1
 
     # convert profit to mBTC before returning
-    if pair.currency != 'BTC':
-        total_profit *= PRICE[pair.currency]
+    total_profit *= PRICE[pair.currency]
 
     # TODO need to adjust total_profit return value based on
     # Risk checks
