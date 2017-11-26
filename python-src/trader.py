@@ -570,8 +570,8 @@ while True:
 
         execute_trade(best_trade.buyer, best_trade.seller, best_trade.pair, best_trade.quantity, best_trade.profit, best_trade.bid_price, best_trade.ask_price)
 
-    break
-    # time.sleep(5)
-    #
-    # for exch in exchanges:
-    #     exch.refresh_balances()
+    record_event("SLEEPING,15")
+    time.sleep(15)
+
+    for exch in exchanges:
+        exch.refresh_balances()
