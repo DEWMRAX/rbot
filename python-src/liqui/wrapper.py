@@ -91,7 +91,7 @@ class Liqui(Exchange):
         self.open_orders = info.open_orders
 
         for ticker in self.symbols:
-            self.balance[ticker] = getattr(info, "balance_%s" % ticker.lower())
+            self.balance[ticker] = Decimal(getattr(info, "balance_%s" % ticker.lower()))
 
     def trade(self, market, side, price, amount):
         return self.tapi.trade(self.pair_name(market), side, price, amount, connection=self.conn)

@@ -209,8 +209,12 @@ def check_imbalance(buyer_book, seller_book, pair):
     asks_idx = 0
     bid_price = bids[0].price
     ask_price = asks[0].price
-    quantity = Decimal(0)
-    total_profit = Decimal(0)
+    total_quantity = Decimal(0)
+
+    # Only using 90% of balance in these calculations to leave wiggle room in case we need to do recovery and then the market moves
+    max_notional = min(pair.max_notional(), seller.get_balance(pair.currency) * Decimal('0.9'))
+    max_quantity = min(max_notional / bid_price, buyer.get_balance(pair.token) * Decimal('0.9'))
+
     trace = ""
 
     trace += "\n"
@@ -242,9 +246,12 @@ def check_imbalance(buyer_book, seller_book, pair):
         total_fee = buyer.get_fee(pair) + seller.get_fee(pair)
         friction = total_fee + Decimal('0.0015')
 
-        top_quantity = Decimal(min(bid.quantity, ask.quantity))
-        if buyer.get_balance(pair.token) - quantity - top_quantity < seller.get_balance(pair.token) + quantity + top_quantity:
-            friction_multiplier = Decimal(1) - ((buyer.get_balance(pair.token) - quantity - top_quantity) / (seller.get_balance(pair.token) + quantity + top_quantity))
+        top_quantity = min(bid.quantity, ask.quantity, max_quantity - total_quantity)
+        if near_equals(top_quantity, Decimal(0)):
+            break
+
+        if buyer.get_balance(pair.token) - total_quantity - top_quantity < seller.get_balance(pair.token) + total_quantity + top_quantity:
+            friction_multiplier = Decimal(1) - ((buyer.get_balance(pair.token) - total_quantity - top_quantity) / (seller.get_balance(pair.token) + total_quantity + top_quantity))
             friction = friction + (friction_multiplier * pair.network_friction)
 
         benefit = bid.price - ask.price
@@ -257,58 +264,51 @@ def check_imbalance(buyer_book, seller_book, pair):
         bid_price = bid.price
         ask_price = ask.price
 
-        if bid.quantity > ask.quantity:
-            quantity += ask.quantity
+        if top_quantity < bid.quantity and top_quantity < ask.quantity:
+            total_quantity += top_quantity
+            profit = (pct_benefit - friction) * ask.quantity * ask.price * Decimal(1000)
+            total_profit += profit
+
+            trace += "STACKING QTY %d/%d added: %0.8f, total: %0.8f\n" % (bids_idx, asks_idx, ask.quantity, total_quantity)
+            trace += "STACKED PROFIT: %0.8f mBTC/mETH/mUSDT\n" % profit
+            trace += "LIMITED ORDER SIZE DUE TO EXCHANGE BALANCE OR RISK CHECK"
+
+        elif bid.quantity > ask.quantity:
+            total_quantity += ask.quantity
             bids[bids_idx] = Order(bid.price, bid.quantity - ask.quantity)
             profit = (pct_benefit - friction) * ask.quantity * ask.price * Decimal(1000)
             total_profit += profit
 
-            trace += "STACKING QTY %d/%d added: %0.8f, total: %0.8f\n" % (bids_idx, asks_idx, ask.quantity, quantity)
-            trace += "STACKED PROFIT: %0.8f mBTC\n" % profit
+            trace += "STACKING QTY %d/%d added: %0.8f, total: %0.8f\n" % (bids_idx, asks_idx, ask.quantity, total_quantity)
+            trace += "STACKED PROFIT: %0.8f mBTC/mETH/mUSDT\n" % profit
 
             asks_idx += 1
 
         else:
-            quantity += bid.quantity
+            total_quantity += bid.quantity
             asks[asks_idx] = Order(ask.price, ask.quantity - bid.quantity)
             profit = (pct_benefit - friction) * bid.quantity * bid.price * Decimal(1000)
             total_profit += profit
 
-            trace += "STACKING QTY %d/%d added: %0.8f, total: %0.8f\n" % (bids_idx, asks_idx, bid.quantity, quantity)
-            trace += "STACKED PROFIT: %0.8f mBTC\n" % profit
+            trace += "STACKING QTY %d/%d added: %0.8f, total: %0.8f\n" % (bids_idx, asks_idx, bid.quantity, total_quantity)
+            trace += "STACKED PROFIT: %0.8f mBTC/mETH/mUSDT\n" % profit
 
             bids_idx += 1
 
     # convert profit to mBTC before returning
     total_profit *= PRICE[pair.currency]
 
-    # TODO need to adjust total_profit return value based on
-    # Risk checks
-    if quantity > Decimal(0):
+    trace += "ACTIONABLE IMBALANCE of %0.8f on %s\n" % (total_quantity, pair)
 
-        trace += "ACTIONABLE IMBALANCE of %0.8f on %s\n" % (quantity, pair)
+    if total_quantity * ask_price < pair.min_notional():
+        trace += "risk check MIN_NOTIONAL, skipping trade %0.8f\n" % (total_quantity * ask_price)
+        total_quantity = Decimal(0)
 
-        if buyer.get_balance(pair.token) < quantity:
-            trace += "%s LOW BALANCE of %s: %0.8f\n" % (buyer.name, pair.token, buyer.get_balance(pair.token))
-            quantity = Decimal(buyer.get_balance(pair.token)) * Decimal('0.9') # leave wiggle room in case market moves
+    if total_quantity < pair.min_quantity():
+        trace += "risk check MIN_QTY, skipping trade %0.8f\n" % (total_quantity)
+        total_quantity = Decimal(0)
 
-        if seller.get_balance(pair.currency) < quantity * ask_price:
-            trace += "%s LOW BALANCE of %s: %0.8f\n" % (seller.name, pair.currency, seller.get_balance(pair.currency))
-            quantity = Decimal(seller.get_balance(pair.currency) / ask_price) * Decimal('0.9') # leave wiggle room in case market moves
-
-        if quantity * ask_price > pair.max_notional():
-            trace += "risk check MAX_NOTIONAL, reducing %0.8f to %0.8f\n" % (quantity, pair.max_notional() / ask_price)
-            quantity = pair.max_notional() / ask_price
-
-        if quantity * ask_price < pair.min_notional():
-            trace += "risk check MIN_NOTIONAL, skipping trade %0.8f\n" % (quantity * ask_price)
-            quantity = Decimal(0)
-
-        if quantity < pair.min_quantity():
-            trace += "risk check MIN_QTY, skipping trade %0.8f\n" % (quantity)
-            quantity = Decimal(0)
-
-    return Trade(pair, total_profit, quantity, bid_price, ask_price, trace, buyer, seller)
+    return Trade(pair, total_profit, total_quantity, bid_price, ask_price, trace, buyer, seller)
 
 def sanity_check_open(exch):
     if exch.any_open_orders():
