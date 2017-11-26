@@ -482,11 +482,11 @@ print balances_detail()
 while open_trades_collection.find_one():
     trade = open_trades_collection.find_one()
 
-    record_event("RECOVERY_NEEDED,%s,%s,%s,%s,%s,%s,%s,%s" % (trade['buyer'], trade['seller'], trade['token'], trade['currency'], balance, trade['token_balance'], trade['bid'], trade['ask']))
-    sys.exit(1)
-
     pair = pair_factory(trade['token'], trade['currency'])
     balance = total_balance(pair.token)
+
+    record_event("RECOVERY_NEEDED,%s,%s,%s,%s,%s,%s,%s,%s" % (trade['buyer'], trade['seller'], trade['token'], trade['currency'], balance, trade['token_balance'], trade['bid'], trade['ask']))
+    sys.exit(1)
 
     record_event("RECOVERY BEGIN,%s,%s,%s,%s,%s,%s,%s,%s" % (trade['buyer'], trade['seller'], trade['token'], trade['currency'], balance, trade['token_balance'], trade['bid'], trade['ask']))
 
