@@ -478,10 +478,10 @@ print balances_string()
 print balances_detail()
 
 while open_trades_collection.find_one():
-    record_event("RECOVERY NEEDED,%s,%s,%s,%s,%s,%s,%s,%s" % (trade['buyer'], trade['seller'], trade['token'], trade['currency'], balance, trade['token_balance'], trade['bid'], trade['ask']))
-    sys.exit(1)
-
     trade = open_trades_collection.find_one()
+
+    record_event("RECOVERY_NEEDED,%s,%s,%s,%s,%s,%s,%s,%s" % (trade['buyer'], trade['seller'], trade['token'], trade['currency'], balance, trade['token_balance'], trade['bid'], trade['ask']))
+    sys.exit(1)
 
     pair = pair_factory(trade['token'], trade['currency'])
     balance = total_balance(pair.token)
@@ -554,7 +554,8 @@ while True:
 
         trade = check_imbalance(buyer, seller, pair)
         if trade.profit > 0 and (best_trade is None or best_trade.profit < trade.profit):
-            best_trade = trade
+            if trade.pair.token not in ['INCNT', 'LUN'] # halted markets
+                best_trade = trade
 
     if best_trade is None:
         record_event("NO_TRADE")
