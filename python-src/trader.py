@@ -304,11 +304,11 @@ def check_imbalance(buyer_book, seller_book, pair):
 
     if total_quantity * ask_price < pair.min_notional():
         trace += "risk check MIN_NOTIONAL, skipping trade %0.8f\n" % (total_quantity * ask_price)
-        total_quantity = Decimal(0)
+        total_profit = total_quantity = Decimal(0)
 
     if total_quantity < pair.min_quantity():
         trace += "risk check MIN_QTY, skipping trade %0.8f\n" % (total_quantity)
-        total_quantity = Decimal(0)
+        total_profit = total_quantity = Decimal(0)
 
     return Trade(pair, total_profit, total_quantity, bid_price, ask_price, trace, buyer, seller)
 
