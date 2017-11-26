@@ -540,6 +540,8 @@ while True:
     record_event("HEARTBEAT,%s" % balances_string())
 
     if last_balance_check_time + 60 < int(time.time()):
+        for exch in exchanges:
+            exch.refresh_balances()
         check_symbol_balance_loop(TARGET_BALANCE)
         last_balance_check_time = int(time.time())
 
@@ -562,6 +564,8 @@ while True:
 
     if best_trade is None:
         record_event("NO_TRADE")
+        record_event("SLEEPING,1")
+        time.sleep(1)
     else:
         print best_trade.trace
         record_event("TRADE,%s,%s,%s,%.8f,%.8f,%.8f,%.8f" %
@@ -570,8 +574,8 @@ while True:
 
         execute_trade(best_trade.buyer, best_trade.seller, best_trade.pair, best_trade.quantity, best_trade.profit, best_trade.bid_price, best_trade.ask_price)
 
-    record_event("SLEEPING,15")
-    time.sleep(15)
+        record_event("SLEEPING,15")
+        time.sleep(15)
 
     for exch in exchanges:
         exch.refresh_balances()
