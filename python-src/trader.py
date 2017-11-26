@@ -539,9 +539,9 @@ while True:
     record_event("BTCVALUE,%s" % balances_string_in_btc())
     record_event("HEARTBEAT,%s" % balances_string())
 
-    # if last_balance_check_time + 5 * 60 < int(time.time()):
-    #     check_symbol_balance_loop(TARGET_BALANCE)
-    #     last_balance_check_time = int(time.time())
+    if last_balance_check_time + 60 < int(time.time()):
+        check_symbol_balance_loop(TARGET_BALANCE)
+        last_balance_check_time = int(time.time())
 
     best_trade = None
     for pair, pair_books in query_all().iteritems():
