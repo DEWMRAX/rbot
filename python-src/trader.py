@@ -560,8 +560,8 @@ while True:
 
     if best_trade is None:
         record_event("NO_TRADE")
-        record_event("SLEEPING,1")
-        time.sleep(1)
+        record_event("SLEEPING,2")
+        time.sleep(2)
     else:
         print best_trade.trace
         record_event("TRADE,%s,%s,%s,%.8f,%.8f,%.8f,%.8f" %
@@ -570,8 +570,8 @@ while True:
 
         execute_trade(best_trade.buyer, best_trade.seller, best_trade.pair, best_trade.quantity, best_trade.profit, best_trade.bid_price, best_trade.ask_price)
 
-        record_event("SLEEPING,15")
-        time.sleep(15)
+        record_event("SLEEPING,8")
+        time.sleep(8)
 
         for exch in exchanges:
             exch.refresh_balances()
