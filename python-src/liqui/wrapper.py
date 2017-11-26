@@ -14,7 +14,7 @@ class Liqui(Exchange):
 
         self.prices = {}
 
-        self.symbols = ['BTC','ETH','GNT','ICN','LTC','MLN','REP','USDT','TRST','INCNT','WAVES','EDG','LUN','RLC','DASH','MYST','BAT','ANT','1ST','WINGS','TIME','GUP','TKN','HMQ','QRL','BNT','PTOY','CFI','SNGLS','SNT','MCO','STORJ','ADX','PAY','OMG','CVC','DGD','BCC','ZRX','GNO','DNT','OAX','KNC','SNM','SALT','ENG','AST']
+        self.symbols = ['BTC','ETH','GNT','ICN','LTC','MLN','REP','USDT','TRST','WAVES','EDG','RLC','DASH','MYST','BAT','ANT','WINGS','TIME','GUP','TKN','QRL','BNT','PTOY','CFI','SNGLS','SNT','MCO','STORJ','ADX','PAY','OMG','CVC','DGD','BCC','ZRX','GNO','DNT','OAX','KNC','SNM','SALT','ENG','AST']
 
         self.tickers = liqui.common.market_info
 
@@ -38,21 +38,17 @@ class Liqui(Exchange):
             "MLN":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "ICN":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "TRST":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
-            "INCNT":"3P2gtQScraBKPvALw2DK3ntUyaEFGo26b4p",
             "WAVES":"3PMgCcb5ZHQ54seUzAowQyyC8rJ1xPYQAoY",
             "EDG":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
-            "LUN":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "RLC":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "DASH":"Xsk3d6UnT2UPFckdEoJjfkyh1a1PkQh1MQ",
             "MYST":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "BAT":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "ANT":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
-            "1ST":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "WINGS":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "TIME":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "GUP":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "TKN":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
-            "HMQ":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "QRL":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "BNT":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "PTOY":"0xed631591f77bc43539606e7e7f1110ea4f821f02",

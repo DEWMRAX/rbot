@@ -9,7 +9,7 @@ from logger import record_event, record_trade
 from order import Order
 from pair import ALL_PAIRS, ALL_SYMBOLS, pair_factory
 
-MAX_BOOK_AGE = 12
+MAX_BOOK_AGE = 8
 TRANSFER_THRESHOLD=Decimal('.25')
 DRAWDOWN_AMOUNT=Decimal('.70') # how much to leave on an exchange we are withdrawing from
 DRAWUP_AMOUNT=Decimal('1.4') # how much to target on an exchange we are transferring to
@@ -246,7 +246,7 @@ def check_imbalance(buyer_book, seller_book, pair):
             break
 
         total_fee = buyer.get_fee(pair) + seller.get_fee(pair)
-        friction = total_fee + Decimal('0.0015')
+        friction = total_fee + Decimal('0.002')
 
         top_quantity = min(bid.quantity, ask.quantity, max_quantity - total_quantity)
 
@@ -400,7 +400,6 @@ def sell_at_market(reason, pair, amount, expected_price):
     sanity_check_market_price(best_price, best_exch.bids[str(pair)][0].price)
 
     return best_exch.trade_ioc(pair, 'sell', best_price, amount, reason)
-
 
 def check_symbol_balance(symbol, target):
     balance = total_balance(symbol)
@@ -557,8 +556,7 @@ while True:
 
         trade = check_imbalance(buyer, seller, pair)
         if trade.profit > 0 and (best_trade is None or best_trade.profit < trade.profit):
-            if trade.pair.token not in ['INCNT', 'LUN', '1ST', 'HMQ']: # halted markets
-                best_trade = trade
+            best_trade = trade
 
     if best_trade is None:
         record_event("NO_TRADE")
@@ -575,5 +573,5 @@ while True:
         record_event("SLEEPING,15")
         time.sleep(15)
 
-    for exch in exchanges:
-        exch.refresh_balances()
+        for exch in exchanges:
+            exch.refresh_balances()

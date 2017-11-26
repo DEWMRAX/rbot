@@ -13,7 +13,7 @@ class Bittrex(Exchange):
             secrets = json.load(secrets_file)
             self.api = api(secrets['key'], secrets['secret'])
 
-        self.symbols = ['EDG','TRST','INCNT','WAVES','BTC','ETH','LTC','MLN','REP','GNT','USDT','FCT','XEM','LUN','RLC','MAID','AMP','DASH','SC','LBC','MYST','BAT','ANT','1ST','WINGS','TIME','GUP','TKN','HMQ','QRL','BNT','PTOY','CFI','SNGLS','SNT','MCO','STORJ','ADX','PAY','OMG','QTUM','CVC','DGD','BCC','STRAT','SYS','GNO','FUN','DNT','SALT','MTL','RCN','KMD','ARK','XMR','POWR','ZEC']
+        self.symbols = ['EDG','TRST','WAVES','BTC','ETH','LTC','MLN','REP','GNT','USDT','FCT','XEM','RLC','MAID','AMP','DASH','SC','LBC','MYST','BAT','ANT','WINGS','TIME','GUP','TKN','QRL','BNT','PTOY','CFI','SNGLS','SNT','MCO','STORJ','ADX','PAY','OMG','QTUM','CVC','DGD','BCC','STRAT','SYS','GNO','FUN','DNT','SALT','MTL','RCN','KMD','ARK','XMR','POWR','ZEC']
 
         self.markets = self.api.get_markets()
 
