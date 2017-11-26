@@ -167,8 +167,11 @@ def execute_trade(buyer, seller, pair, quantity, expected_profit, bid, ask):
 
     record_event("AI_CLOSE,%s" % info)
 
+def eligible_books_filter(books):
+    return filter(lambda book:book.age < MAX_BOOK_AGE and book.exchange_name not in ['KRAKEN'], books)
+
 def best_bidder(books):
-    eligible_books = filter(lambda book:book.age < MAX_BOOK_AGE, books)
+    eligible_books = eligible_books_filter(books)
     if len(eligible_books) == 0:
         return None
 
@@ -182,7 +185,7 @@ def best_bidder(books):
     return best
 
 def best_seller(books):
-    eligible_books = filter(lambda book:book.age < MAX_BOOK_AGE, books)
+    eligible_books = eligible_books_filter(books)
     if len(eligible_books) == 0:
         return None
 
