@@ -117,8 +117,8 @@ def execute_trade(buyer, seller, pair, quantity, expected_profit, bid, ask):
 
     record_event("AI,%s" % info)
     # this comment is useful to turn off trading
-    open_trades_collection.delete_one({'_id':open_trades_id})
-    return
+    # open_trades_collection.delete_one({'_id':open_trades_id})
+    # return
 
     # exchanges ordering influences execution strategy
     buyer_idx = exchanges.index(buyer)
@@ -157,9 +157,7 @@ def execute_trade(buyer, seller, pair, quantity, expected_profit, bid, ask):
     seller.refresh_balances()
 
     ending_currency_balance = total_balance(pair.currency)
-    actual_profit = (ending_currency_balance - starting_currency_balance) * Decimal(1000)
-    if pair.currency != 'BTC':
-        actual_profit *= PRICE[pair.currency]
+    actual_profit = (ending_currency_balance - starting_currency_balance) * Decimal(1000) * PRICE[pair.currency]
 
     exec_report = info + ",%0.8f,%0.8f\n" % (quantity, actual_profit)
 
@@ -299,7 +297,7 @@ def check_imbalance(buyer_book, seller_book, pair):
     # convert profit to mBTC before returning
     total_profit *= PRICE[pair.currency]
 
-    trace += "ACTIONABLE IMBALANCE of %0.8f on %s\n" % (total_quantity, pair)
+    trace += "ACTIONABLE IMBALANCE of %0.8f on %s WITH TOTAL PROFIT %0.8f\n" % (total_quantity, pair, total_profit)
 
     if total_quantity * ask_price < pair.min_notional():
         trace += "risk check MIN_NOTIONAL, skipping trade %0.8f\n" % (total_quantity * ask_price)
@@ -463,23 +461,26 @@ print
 print "Starting up"
 print
 
-# for exch in exchanges:
-#     exch.cancel_all_orders()
+for exch in exchanges:
+    exch.cancel_all_orders()
 
-# time.sleep(1)
+time.sleep(1)
 
 for exch in exchanges:
     exch.refresh_balances()
 
 time.sleep(1)
 
-# for exch in exchanges:
-#     sanity_check_open(exch)
+for exch in exchanges:
+    sanity_check_open(exch)
 
 print balances_string()
 print balances_detail()
 
 while open_trades_collection.find_one():
+    record_event("RECOVERY NEEDED,%s,%s,%s,%s,%s,%s,%s,%s" % (trade['buyer'], trade['seller'], trade['token'], trade['currency'], balance, trade['token_balance'], trade['bid'], trade['ask']))
+    sys.exit(1)
+
     trade = open_trades_collection.find_one()
 
     pair = pair_factory(trade['token'], trade['currency'])
@@ -563,12 +564,10 @@ while True:
             (best_trade.pair, best_trade.buyer.name, best_trade.seller.name,
              best_trade.profit, best_trade.quantity, best_trade.bid_price, best_trade.ask_price))
 
-    # kraken has very serious throttling
-    # if buyer.name == 'KRAKEN' or seller.name == 'KRAKEN':
-    #     time.sleep(3)
+        execute_trade(best_trade.buyer, best_trade.seller, best_trade.pair, best_trade.quantity, best_trade.profit, best_trade.bid_price, best_trade.ask_price)
 
-
-    time.sleep(2)
-
+    break
+    # time.sleep(5)
+    #
     # for exch in exchanges:
     #     exch.refresh_balances()
