@@ -9,6 +9,7 @@ yarn-debug.log*
 yarn-error.log*
 PIDFILE
 events.txt
+trades.txt
 log.txt
 *.pyc
 # Runtime data
