@@ -210,6 +210,7 @@ def check_imbalance(buyer_book, seller_book, pair):
     bid_price = bids[0].price
     ask_price = asks[0].price
     total_quantity = Decimal(0)
+    total_profit = Decimal(0)
 
     # Only using 90% of balance in these calculations to leave wiggle room in case we need to do recovery and then the market moves
     max_notional = min(pair.max_notional(), seller.get_balance(pair.currency) * Decimal('0.9'))
@@ -247,8 +248,6 @@ def check_imbalance(buyer_book, seller_book, pair):
         friction = total_fee + Decimal('0.0015')
 
         top_quantity = min(bid.quantity, ask.quantity, max_quantity - total_quantity)
-        if near_equals(top_quantity, Decimal(0)):
-            break
 
         if buyer.get_balance(pair.token) - total_quantity - top_quantity < seller.get_balance(pair.token) + total_quantity + top_quantity:
             friction_multiplier = Decimal(1) - ((buyer.get_balance(pair.token) - total_quantity - top_quantity) / (seller.get_balance(pair.token) + total_quantity + top_quantity))
@@ -272,6 +271,8 @@ def check_imbalance(buyer_book, seller_book, pair):
             trace += "STACKING QTY %d/%d added: %0.8f, total: %0.8f\n" % (bids_idx, asks_idx, ask.quantity, total_quantity)
             trace += "STACKED PROFIT: %0.8f mBTC/mETH/mUSDT\n" % profit
             trace += "LIMITED ORDER SIZE DUE TO EXCHANGE BALANCE OR RISK CHECK"
+
+            break
 
         elif bid.quantity > ask.quantity:
             total_quantity += ask.quantity
