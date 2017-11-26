@@ -540,8 +540,6 @@ while True:
     record_event("HEARTBEAT,%s" % balances_string())
 
     if last_balance_check_time + 60 < int(time.time()):
-        for exch in exchanges:
-            exch.refresh_balances()
         check_symbol_balance_loop(TARGET_BALANCE)
         last_balance_check_time = int(time.time())
 
