@@ -3,7 +3,7 @@ from collections import namedtuple
 from decimal import Decimal
 from pymongo import MongoClient
 
-import poloniex, kraken, bittrex, binance, liqui
+import poloniex, bittrex, binance, liqui
 from book import query_all
 from logger import record_event, record_trade
 from order import Order
@@ -34,7 +34,7 @@ def panic(response):
 
  # order determines execution ordering, assumes more liquidity at the latter exchange
  #   and that earlier exchanges are faster responding
-exchanges = [kraken.Kraken(), liqui.Liqui(), binance.Binance(), bittrex.Bittrex(), poloniex.Poloniex()]
+exchanges = [liqui.Liqui(), binance.Binance(), bittrex.Bittrex(), poloniex.Poloniex()]
 def get_exchange_handler(name):
     return filter(lambda exchange:exchange.name == name, exchanges)[0]
 
@@ -271,7 +271,7 @@ def check_imbalance(buyer_book, seller_book, pair):
 
             trace += "STACKING QTY %d/%d added: %0.8f, total: %0.8f\n" % (bids_idx, asks_idx, ask.quantity, total_quantity)
             trace += "STACKED PROFIT: %0.8f mBTC/mETH/mUSDT\n" % profit
-            trace += "LIMITED ORDER SIZE DUE TO EXCHANGE BALANCE OR RISK CHECK"
+            trace += "LIMITED ORDER SIZE DUE TO EXCHANGE BALANCE OR RISK CHECK\n"
 
             break
 
