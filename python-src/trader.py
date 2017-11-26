@@ -557,7 +557,7 @@ while True:
 
         trade = check_imbalance(buyer, seller, pair)
         if trade.profit > 0 and (best_trade is None or best_trade.profit < trade.profit):
-            if trade.pair.token not in ['INCNT', 'LUN'] # halted markets
+            if trade.pair.token not in ['INCNT', 'LUN']: # halted markets
                 best_trade = trade
 
     if best_trade is None:
