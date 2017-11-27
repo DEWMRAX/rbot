@@ -485,9 +485,6 @@ while open_trades_collection.find_one():
     pair = pair_factory(trade['token'], trade['currency'])
     balance = total_balance(pair.token)
 
-    record_event("RECOVERY_NEEDED,%s,%s,%s,%s,%s,%s,%s,%s" % (trade['buyer'], trade['seller'], trade['token'], trade['currency'], balance, trade['token_balance'], trade['bid'], trade['ask']))
-    sys.exit(1)
-
     record_event("RECOVERY BEGIN,%s,%s,%s,%s,%s,%s,%s,%s" % (trade['buyer'], trade['seller'], trade['token'], trade['currency'], balance, trade['token_balance'], trade['bid'], trade['ask']))
 
     target_balance = Decimal(trade['token_balance'])
@@ -502,22 +499,27 @@ while open_trades_collection.find_one():
         open_trades_collection.delete_one({'_id':trade['_id']})
         break
 
-    record_event("SHUTDOWN,RECOVERY_NEEDED,%s,%s" % (pair, balance - target_balance))
-
     if balance > target_balance:
         if (balance - target_balance) * Decimal(trade['bid']) < pair.min_notional():
             record_event("SKIPPING RECOVERY,MIN_NOTIONAL")
             open_trades_collection.delete_one({'_id':trade['_id']})
-        elif sell_at_market("RECOVERY AUTOBALANCE", pair, balance - target_balance, Decimal(trade['bid'])) == Decimal(0):
-            record_event("SKIPPING RECOVERY,ZERO FILL")
-            open_trades_collection.delete_one({'_id':trade['_id']})
+        else:
+            record_event("SHUTDOWN,RECOVERY_NEEDED,%s,%s" % (pair, balance - target_balance))
+            sys.exit(1)
+        # elif sell_at_market("RECOVERY AUTOBALANCE", pair, balance - target_balance, Decimal(trade['bid'])) == Decimal(0):
+        #     record_event("SKIPPING RECOVERY,ZERO FILL")
+        #     open_trades_collection.delete_one({'_id':trade['_id']})
     else:
         if (target_balance - balance) * Decimal(trade['ask']) < pair.min_notional():
             record_event("SKIPPING RECOVERY,MIN_NOTIONAL")
             open_trades_collection.delete_one({'_id':trade['_id']})
-        elif buy_at_market("RECOVERY AUTOBALANCE", pair, target_balance - balance, Decimal(trade['ask'])) == Decimal(0):
-            record_event("SKIPPING RECOVERY,ZERO FILL")
-            open_trades_collection.delete_one({'_id':trade['_id']})
+        else:
+            record_event("SHUTDOWN,RECOVERY_NEEDED,%s,%s" % (pair, balance - target_balance))
+            sys.exit(1)
+
+        # elif buy_at_market("RECOVERY AUTOBALANCE", pair, target_balance - balance, Decimal(trade['ask'])) == Decimal(0):
+        #     record_event("SKIPPING RECOVERY,ZERO FILL")
+        #     open_trades_collection.delete_one({'_id':trade['_id']})
 
     time.sleep(1)
 
