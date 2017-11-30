@@ -12,7 +12,7 @@ INVOKE_THROTTLE = 4
 REFRESH_RATE = 2
 
 # lambda-name => timestamp of last update
-book_age = defaultdict(lambda: 0)
+book_age = defaultdict(lambda: 99999999)
 last_invoked = defaultdict(lambda: 0)
 
 with open('../markets.csv') as f:

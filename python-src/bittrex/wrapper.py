@@ -13,7 +13,7 @@ class Bittrex(Exchange):
             secrets = json.load(secrets_file)
             self.api = api(secrets['key'], secrets['secret'])
 
-        self.symbols = ['EDG','TRST','WAVES','BTC','ETH','LTC','MLN','REP','GNT','USDT','FCT','XEM','RLC','MAID','AMP','DASH','SC','LBC','MYST','BAT','ANT','WINGS','TIME','GUP','TKN','QRL','BNT','PTOY','CFI','SNGLS','SNT','MCO','STORJ','ADX','PAY','OMG','QTUM','CVC','DGD','BCC','STRAT','SYS','GNO','FUN','DNT','SALT','MTL','RCN','KMD','ARK','XMR','POWR','ZEC']
+        self.symbols = ['EDG','TRST','WAVES','BTC','ETH','LTC','MLN','REP','GNT','USDT','FCT','XEM','RLC','MAID','AMP','DASH','SC','LBC','MYST','BAT','ANT','WINGS','TIME','GUP','TKN','QRL','BNT','PTOY','CFI','SNGLS','SNT','MCO','STORJ','ADX','PAY','OMG','QTUM','CVC','DGD','BCC','STRAT','SYS','GNO','FUN','DNT','SALT','MTL','RCN','KMD','ARK','XMR','POWR','ZEC','ADA']
 
         self.markets = self.api.get_markets()
 
@@ -83,6 +83,7 @@ class Bittrex(Exchange):
             "XMR":"463tWEBn5XZJSxLU6uLQnQ2iY9xuNcDbjLSjkn3XAXHCbLrTTErJrBWYgHJQyrCwkNgYvyV3z8zctJLPCZy24jvb3NiTcTJ",
             "POWR":"0x2393e05d634cdee5d099a49be4750a2c6a9d9d73",
             "ZEC":"t1QSuLHGXwpvTTScYDWWUKRARTJpLFa6UH1",
+            "ADA":"DdzFFzCqrhsnjhEeVLtdyjvJuS95C4p7kb61zsu2zKXypmEqegtbi9ny7z2fjdtLFkkcy9fzxvZPek9M5eDvMMg8Us8Fjnoj5QGDtRmp",
             "DNT":"0xc2fb8a5e120dc566893544530d51131f84b4677f"
         }
 

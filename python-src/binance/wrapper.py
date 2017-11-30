@@ -8,6 +8,14 @@ def pair_name_to_binance(pair):
     return "%s%s" % (p[0], p[1])
 
 PAIRS = {
+    'ADA-BTC': {
+        'price_decimals': 8,
+        'lot_decimals': 0
+    },
+    'ADA-ETH': {
+        'price_decimals': 8,
+        'lot_decimals': 0
+    },
     'BAT-BTC': {
         'price_decimals': 8,
         'lot_decimals': 0
@@ -245,7 +253,7 @@ class Binance(Exchange):
         with open('binance.keys', 'r') as api_key:
             self.api = api(api_key.readline().strip(), api_key.readline().strip())
 
-        self.symbols = ['BTC','ETH','USDT','LTC','BNT','OAX','SNT','DNT','MCO','QTUM','ICN','OMG','ZRX','STRAT','SNGLS','KNC','SNM','FUN','SALT','DASH','ENG','AST','MTL','STORJ','RCN','KMD','ARK','XMR','BCC','POWR','ZEC','BAT']
+        self.symbols = ['BTC','ETH','USDT','LTC','BNT','OAX','SNT','DNT','MCO','QTUM','ICN','OMG','ZRX','STRAT','SNGLS','KNC','SNM','FUN','SALT','DASH','ENG','AST','MTL','STORJ','RCN','KMD','ARK','XMR','BCC','POWR','ZEC','BAT','ADA']
         self.fees = {}
 
         account_info = self.api.account_info()
@@ -289,6 +297,7 @@ class Binance(Exchange):
             "POWR":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
             "ZEC":"t1afnaVLGdDMpDeAZD4LrW9u56R4YAhJXR4",
             "BAT":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
+            "ADA":"DdzFFzCqrhszh9atnDUPySMZyBJqeyc4w6hZY67RH7uyXHF9QKSGZkey8VRBnmi2nRWUxS8J3CVu32wmkMYXdiRkoVU3evuZQCUv5hw8",
             "FUN":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522"
         }[symbol]
 
