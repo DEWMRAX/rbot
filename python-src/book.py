@@ -26,6 +26,9 @@ class Book():
         self.name = "%s-%s" % (self.exchange_name, self.pair)
         self.taker_fee = Decimal(FEES[self.exchange_name].taker) / Decimal(10000)
 
+    def __str__(self):
+        return self.name
+
     def print_depth(self):
         print
         print "%s %s" % (self.exchange_name, self.pair)
@@ -59,3 +62,8 @@ def query_all():
         process_data(ret, response)
 
     return ret
+
+def query_pair():
+    filtr = boto3.dynamodb.conditions.Key('pair').eq(pair)
+    table = boto3.resource('dynamodb').Table('orderbooks')
+    return table.scan(FilterExpression=filtr)['Items']

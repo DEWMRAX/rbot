@@ -4,7 +4,8 @@ from decimal import Decimal
 from pymongo import MongoClient
 
 import poloniex, bittrex, binance, liqui
-from book import query_all
+from book import query_all, query_pair
+from feed_manager import invoke_one
 from logger import record_event, record_trade
 from order import Order
 from pair import ALL_PAIRS, ALL_SYMBOLS, pair_factory
@@ -31,6 +32,10 @@ def panic(response):
     print response
     print "PANIC! At The Disco"
     sys.exit(1)
+
+def sleep(duration, reason):
+    record_event("SLEEPING,%d" % duration)
+    time.sleep(duration)
 
  # order determines execution ordering, assumes more liquidity at the latter exchange
  #   and that earlier exchanges are faster responding
@@ -78,7 +83,7 @@ if UPDATE_TARGET_BALANCE:
         target_balance_collection.update({'symbol':symbol}, {'$set':{'balance':balance}}, upsert=True)
 
     sys.exit(0)
-    time.sleep(3) # don't forget to throttle if decide not to shut down after
+    sleep(3, 'PRECAUTION') # don't forget to throttle if decide not to shut down after
 
 def target_nav():
     return sum(map(lambda symbol: PRICE[symbol]*TARGET_BALANCE[symbol], ALL_SYMBOLS))
@@ -152,7 +157,7 @@ def execute_trade(buyer, seller, pair, quantity, expected_profit, bid, ask):
 
     open_trades_collection.delete_one({'_id':open_trades_id})
 
-    time.sleep(2) # give exchanges (bittrex) chance to update balances
+    sleep(2, 'BALANCE_UPDATE') # give exchanges (bittrex) chance to update balances
     buyer.refresh_balances()
     seller.refresh_balances()
 
@@ -350,40 +355,52 @@ def sanity_check_market_price(price, top_of_book_price):
         record_event("SANITY CHECK,MARKET PRICE")
         sys.exit(1)
 
-def buy_at_market(reason, pair, amount, expected_price):
-    amount = amount / Decimal('.9975') # buy enough to cover exchange fee
+def refresh_all_markets(pair, reason):
+    books = query_pair(pair)
+
+    invoke_all(books, reason)
+    sleep(1, reason)
+    invoke_all(books, reason)
+    sleep(1, reason)
+    invoke_all(books, reason)
+    sleep(1, reason)
+
+    return query_pair(pair)
+
+def buy_at_market(reason, pair, _amount, expected_price):
+    amount = _amount / Decimal('.9975') # buy enough to cover exchange fee
 
     record_event("MKT BUY,%s,%s,%s,%0.8f" % (reason, pair.token, pair.currency, amount))
+    books = eligible_books_filter(refresh_all_markets(pair, 'MKT BUY'))
 
-    prices = map(lambda exch: simulate_market_order(exch, exch.asks[str(pair)], amount), get_exchanges(pair))
-
+    prices = map(lambda book: simulate_market_order(get_exchange_handler(book.exchange_name), book.asks, amount), books)
     eligible_prices = filter(lambda (exch, total, price):exch and exch.get_balance(pair.currency) > total, prices)
+
     if len(eligible_prices) == 0:
         record_event("MKT CANCEL,NONE ELIGIBLE")
         return Decimal(0)
 
     (best_exch, best_total, best_price) = min(eligible_prices, key=lambda (exch, total, price):total)
 
-    amount = amount / (1 - best_exch.get_fee(pair)) # adjust amount; now that we know which exchange can use exact fee
+    # TODO it doesn't even work this way on like, bittrex, maybe others
+    amount = _amount / (1 - best_exch.get_fee(pair)) # adjust amount; now that we know which exchange can use exact fee
 
     print "MKT BUY ROUTED to %s; %0.8f @ %0.8f, total: %0.8f" % (best_exch.name, amount, best_price, best_total)
 
-    if not USE_TARGET_BALANCE:
-        if not near_equals(best_price, expected_price, Decimal('0.1')):
-            record_event("MKT CANCEL,PRICE CHANGE")
-            return Decimal(0)
-
-    sanity_check_market_price(best_price, best_exch.asks[str(pair)][0].price)
+    if not near_equals(best_price, expected_price, Decimal('0.1')):
+        record_event("MKT CANCEL,PRICE CHANGE")
+        return Decimal(0)
 
     return best_exch.trade_ioc(pair, 'buy', best_price, amount, reason)
 
 def sell_at_market(reason, pair, amount, expected_price):
 
     record_event("MKT SELL,%s,%s,%s,%0.8f" % (reason, pair.token, pair.currency, amount))
+    books = eligible_books_filter(refresh_all_markets(pair, 'MKT SELL'))
 
-    prices = map(lambda exch: simulate_market_order(exch, exch.bids[str(pair)], amount), get_exchanges(pair))
+    prices = map(lambda book: simulate_market_order(get_exchange_handler(book.exchange_name), book.bids, amount), books)
+    eligible_prices = filter(lambda (exch, total, price):exch and exch.get_balance(pair.currency) > total, prices)
 
-    eligible_prices = filter(lambda (exch, total, price):exch and exch.get_balance(pair.token) >= amount, prices)
     if len(eligible_prices) == 0:
         record_event("MKT CANCEL,NONE ELIGIBLE")
         return Decimal(0)
@@ -392,12 +409,9 @@ def sell_at_market(reason, pair, amount, expected_price):
 
     print "MKT SELL ROUTED to %s; %0.8f @ %0.8f, total: %0.8f" % (best_exch.name, amount, best_price, best_total)
 
-    if not USE_TARGET_BALANCE:
-        if not near_equals(best_price, expected_price, Decimal('0.1')):
-            record_event("MKT CANCEL,PRICE CHANGE")
-            return Decimal(0)
-
-    sanity_check_market_price(best_price, best_exch.bids[str(pair)][0].price)
+    if not near_equals(best_price, expected_price, Decimal('0.1')):
+        record_event("MKT CANCEL,PRICE CHANGE")
+        return Decimal(0)
 
     return best_exch.trade_ioc(pair, 'sell', best_price, amount, reason)
 
@@ -451,10 +465,10 @@ def check_symbol_balance_loop(balance_map):
     for symbol,target in balance_map.items():
         try:
             if check_symbol_balance(symbol, target):
-                time.sleep(2)
+                sleep(1, 'WITHDRAW_LOOP')
         except:
             record_event("WITHDRAW_FAIL,%s" % symbol)
-            time.sleep(2)
+            sleep(1, 'WITHDRAW_LOOP')
     for exch in exchanges:
         exch.refresh_balances()
 
@@ -466,12 +480,12 @@ print
 for exch in exchanges:
     exch.cancel_all_orders()
 
-time.sleep(1)
+sleep(1, 'STARTUP')
 
 for exch in exchanges:
     exch.refresh_balances()
 
-time.sleep(1)
+sleep(1, 'STARTUP')
 
 for exch in exchanges:
     sanity_check_open(exch)
@@ -503,30 +517,23 @@ while open_trades_collection.find_one():
         if (balance - target_balance) * Decimal(trade['bid']) < pair.min_notional():
             record_event("SKIPPING RECOVERY,MIN_NOTIONAL")
             open_trades_collection.delete_one({'_id':trade['_id']})
-        else:
-            record_event("SHUTDOWN,RECOVERY_NEEDED,%s,%s" % (pair, balance - target_balance))
-            sys.exit(1)
-        # elif sell_at_market("RECOVERY AUTOBALANCE", pair, balance - target_balance, Decimal(trade['bid'])) == Decimal(0):
-        #     record_event("SKIPPING RECOVERY,ZERO FILL")
-        #     open_trades_collection.delete_one({'_id':trade['_id']})
+        elif sell_at_market("RECOVERY AUTOBALANCE", pair, balance - target_balance, Decimal(trade['bid'])) == Decimal(0):
+            record_event("SKIPPING RECOVERY,ZERO FILL")
+            open_trades_collection.delete_one({'_id':trade['_id']})
     else:
         if (target_balance - balance) * Decimal(trade['ask']) < pair.min_notional():
             record_event("SKIPPING RECOVERY,MIN_NOTIONAL")
             open_trades_collection.delete_one({'_id':trade['_id']})
-        else:
-            record_event("SHUTDOWN,RECOVERY_NEEDED,%s,%s" % (pair, balance - target_balance))
-            sys.exit(1)
+        elif buy_at_market("RECOVERY AUTOBALANCE", pair, target_balance - balance, Decimal(trade['ask'])) == Decimal(0):
+            record_event("SKIPPING RECOVERY,ZERO FILL")
+            open_trades_collection.delete_one({'_id':trade['_id']})
 
-        # elif buy_at_market("RECOVERY AUTOBALANCE", pair, target_balance - balance, Decimal(trade['ask'])) == Decimal(0):
-        #     record_event("SKIPPING RECOVERY,ZERO FILL")
-        #     open_trades_collection.delete_one({'_id':trade['_id']})
-
-    time.sleep(1)
+    sleep(1, 'BALANCE_REFRESH')
 
     for exch in get_exchanges(pair):
         exch.refresh_balances()
 
-    time.sleep(1)
+    sleep(1, 'BALANCE_REFRESH')
 
 last_balance_check_time = 0
 
@@ -561,9 +568,7 @@ while True:
             best_trade = trade
 
     if best_trade is None:
-        record_event("NO_TRADE")
-        record_event("SLEEPING,2")
-        time.sleep(2)
+        sleep(2, 'NO_TRADE')
     else:
         print best_trade.trace
         record_event("TRADE,%s,%s,%s,%.8f,%.8f,%.8f,%.8f" %
@@ -572,8 +577,7 @@ while True:
 
         execute_trade(best_trade.buyer, best_trade.seller, best_trade.pair, best_trade.quantity, best_trade.profit, best_trade.bid_price, best_trade.ask_price)
 
-        record_event("SLEEPING,8")
-        time.sleep(8)
+        sleep(8, 'TRADED')
 
         for exch in exchanges:
             exch.refresh_balances()
