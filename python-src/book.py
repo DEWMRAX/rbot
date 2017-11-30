@@ -3,6 +3,7 @@ from order import Order
 from decimal import Decimal
 from time import time
 from fees import FEES
+from boto3.dynamodb.conditions import Key
 import boto3
 
 BOOK_DEPTH = 5
@@ -63,7 +64,7 @@ def query_all():
 
     return ret
 
-def query_pair():
-    filtr = boto3.dynamodb.conditions.Key('pair').eq(pair)
+def query_pair(pair):
+    filtr = Key('pair').eq(str(pair))
     table = boto3.resource('dynamodb').Table('orderbooks')
-    return table.scan(FilterExpression=filtr)['Items']
+    return map(lambda doc:Book(doc), table.scan(FilterExpression=filtr)['Items'])

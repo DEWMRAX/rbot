@@ -5,7 +5,7 @@ from pymongo import MongoClient
 
 import poloniex, bittrex, binance, liqui
 from book import query_all, query_pair
-from feed_manager import invoke_one
+from feed_manager import invoke_one, invoke_all
 from logger import record_event, record_trade
 from order import Order
 from pair import ALL_PAIRS, ALL_SYMBOLS, pair_factory
@@ -34,7 +34,7 @@ def panic(response):
     sys.exit(1)
 
 def sleep(duration, reason):
-    record_event("SLEEPING,%d" % duration)
+    record_event("SLEEPING,%d,%s" % (duration, reason))
     time.sleep(duration)
 
  # order determines execution ordering, assumes more liquidity at the latter exchange
