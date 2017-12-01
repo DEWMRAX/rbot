@@ -15,11 +15,14 @@ TRANSFER_THRESHOLD=Decimal('.25')
 DRAWDOWN_AMOUNT=Decimal('.70') # how much to leave on an exchange we are withdrawing from
 DRAWUP_AMOUNT=Decimal('1.4') # how much to target on an exchange we are transferring to
 
-UPDATE_TARGET_BALANCE=False
+UPDATE_TARGET_BALANCE = False
+REPAIR_BALANCES = False
 
 if len(sys.argv) > 1:
     if sys.argv[1] == 'zero_balances':
-        UPDATE_TARGET_BALANCE=True
+        UPDATE_TARGET_BALANCE = True
+    if sys.argv[1] == 'repair_balances':
+        REPAIR_BALANCES = True
 
 open_trades_collection = MongoClient().arbot.trades
 open_transfers_collection = MongoClient().arbot.transfers
@@ -367,11 +370,16 @@ def refresh_all_markets(pair, reason):
 
     return query_pair(pair)
 
-def buy_at_market(reason, pair, _amount, expected_price):
+def buy_at_market(reason, pair, _amount, expected_price=None):
     amount = _amount / Decimal('.9975') # buy enough to cover exchange fee
 
     record_event("MKT BUY,%s,%s,%s,%0.8f" % (reason, pair.token, pair.currency, amount))
-    books = eligible_books_filter(refresh_all_markets(pair, 'MKT BUY'))
+    books = refresh_all_markets(pair, 'MKT BUY')
+
+    if expected_price is None:
+        expected_price = best_seller(books).asks[0].price
+
+    books = eligible_books_filter(books)
 
     prices = map(lambda book: simulate_market_order(get_exchange_handler(book.exchange_name), book.asks, amount), books)
     eligible_prices = filter(lambda (exch, total, price):exch and exch.get_balance(pair.currency) > total, prices)
@@ -393,10 +401,15 @@ def buy_at_market(reason, pair, _amount, expected_price):
 
     return best_exch.trade_ioc(pair, 'buy', best_price, amount, reason)
 
-def sell_at_market(reason, pair, amount, expected_price):
+def sell_at_market(reason, pair, amount, expected_price=None):
 
     record_event("MKT SELL,%s,%s,%s,%0.8f" % (reason, pair.token, pair.currency, amount))
-    books = eligible_books_filter(refresh_all_markets(pair, 'MKT SELL'))
+    books = refresh_all_markets(pair, 'MKT SELL')
+
+    if expected_price is None:
+        expected_price = best_bidder(books).bids[0].price
+
+    books = eligible_books_filter(books)
 
     prices = map(lambda book: simulate_market_order(get_exchange_handler(book.exchange_name), book.bids, amount), books)
     eligible_prices = filter(lambda (exch, total, price):exch and exch.get_balance(pair.currency) > total, prices)
@@ -418,19 +431,27 @@ def sell_at_market(reason, pair, amount, expected_price):
 def check_symbol_balance(symbol, target):
     balance = total_balance(symbol)
 
-    if balance < target and not near_equals(target, balance, '0.05'):
+    if balance < target and not near_equals(target, balance, '0.005'):
         tinfo = open_transfers_collection.find_one({'symbol':symbol, 'active':True})
         if not tinfo:
-            record_event("WITHDRAW MISSING BALANCE,%s,%0.4f,%0.4f,%0.4f" % (symbol, target, balance, target-balance))
+            if REPAIR_BALANCES and symbol not in ['BTC','ETH','USDT']:
+                buy_at_market('REPAIR', pair_factory(symbol, 'BTC'), target-balance)
+                sys.exit(1)
+            else:
+                record_event("WITHDRAW MISSING BALANCE,%s,%0.4f,%0.4f,%0.4f" % (symbol, target, balance, target-balance))
         else:
             record_event("WITHDRAW IN TRANSIT,%s,%s,%s,%s,%s,%s" % (tinfo['from'], tinfo['to'], symbol, tinfo['amount'], tinfo['address'], tinfo['time']))
         return False
 
-    elif balance > target or near_equals(target, balance, '0.05'): # no pending transfers
+    elif balance > target or near_equals(target, balance, '0.005'): # no pending transfers
         open_transfers_collection.update_many({'symbol':symbol}, {'$set':{'active':False}})
 
-        if not near_equals(target, balance, '0.05') and symbol not in ['BTC','ETH','USDT']:
-            record_event("WITHDRAW EXTRA BALANCE,%s,%0.4f,%0.4f,%0.4f" % (symbol, target, balance, balance-target))
+        if not near_equals(target, balance, '0.005') and symbol not in ['BTC','ETH','USDT']:
+            if REPAIR_BALANCES:
+                sell_at_market('REPAIR', pair_factory(symbol, 'BTC'), balance-target)
+                sys.exit(1)
+            else:
+                record_event("WITHDRAW EXTRA BALANCE,%s,%0.4f,%0.4f,%0.4f" % (symbol, target, balance, balance-target))
 
         participating_exchanges = filter(lambda exch:symbol in exch.symbols, exchanges)
         exchange_count = len(participating_exchanges)
