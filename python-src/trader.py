@@ -436,7 +436,6 @@ def check_symbol_balance(symbol, target):
         if not tinfo:
             if REPAIR_BALANCES and symbol not in ['BTC','ETH','USDT']:
                 buy_at_market('REPAIR', pair_factory(symbol, 'BTC'), target-balance)
-                sys.exit(1)
             else:
                 record_event("WITHDRAW MISSING BALANCE,%s,%0.4f,%0.4f,%0.4f" % (symbol, target, balance, target-balance))
         else:
@@ -449,7 +448,6 @@ def check_symbol_balance(symbol, target):
         if not near_equals(target, balance, '0.005') and symbol not in ['BTC','ETH','USDT']:
             if REPAIR_BALANCES:
                 sell_at_market('REPAIR', pair_factory(symbol, 'BTC'), balance-target)
-                sys.exit(1)
             else:
                 record_event("WITHDRAW EXTRA BALANCE,%s,%0.4f,%0.4f,%0.4f" % (symbol, target, balance, balance-target))
 
@@ -571,6 +569,9 @@ while True:
     if last_balance_check_time + 60 < int(time.time()):
         check_symbol_balance_loop(TARGET_BALANCE)
         last_balance_check_time = int(time.time())
+
+    if REPAIR_BALANCES:
+        sys.exit(1)
 
     best_trade = None
     for pair, pair_books in query_all().iteritems():
