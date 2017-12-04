@@ -94,6 +94,11 @@ def target_nav():
 def balances_nav(balance_func):
     return sum(map(lambda symbol: PRICE[symbol]*balance_func(symbol), ALL_SYMBOLS))
 
+# revenue in mBTC
+def arbitrage_revenue():
+    nav = balances_nav(total_balance_incl_pending)
+    return 1000 * (nav-target_nav())
+
 def balances_string_helper(balance_func):
     nav = balances_nav(balance_func)
     return ("%0.4f,%0.8f," % (1000*(nav-target_nav()), nav)) + ','.join(map(lambda symbol: "%0.8f" % balance_func(symbol), ALL_SYMBOLS))
@@ -565,6 +570,9 @@ while True:
     record_event("DETAIL,%s" % balances_detail())
     record_event("BTCVALUE,%s" % balances_string_in_btc())
     record_event("HEARTBEAT,%s" % balances_string())
+
+    if arbitrage_revenue() < Decimal(-100):
+        record_event("RISK_CHECK,PANIC! AT THE DISCO")
 
     if last_balance_check_time + 60 < int(time.time()):
         check_symbol_balance_loop(TARGET_BALANCE)
