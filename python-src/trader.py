@@ -573,6 +573,7 @@ while True:
 
     if arbitrage_revenue() < Decimal(-100):
         record_event("RISK_CHECK,PANIC! AT THE DISCO")
+        sys.exit(1)
 
     if last_balance_check_time + 60 < int(time.time()):
         check_symbol_balance_loop(TARGET_BALANCE)
