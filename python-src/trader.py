@@ -14,6 +14,7 @@ MAX_BOOK_AGE = 8
 TRANSFER_THRESHOLD=Decimal('.25')
 DRAWDOWN_AMOUNT=Decimal('.70') # how much to leave on an exchange we are withdrawing from
 DRAWUP_AMOUNT=Decimal('1.4') # how much to target on an exchange we are transferring to
+BALANCE_ACCURACY=Decimal('0.02')
 
 UPDATE_TARGET_BALANCE = False
 REPAIR_BALANCES = False
@@ -436,7 +437,7 @@ def sell_at_market(reason, pair, amount, expected_price=None):
 def check_symbol_balance(symbol, target):
     balance = total_balance(symbol)
 
-    if balance < target and not near_equals(target, balance, '0.005'):
+    if balance < target and not near_equals(target, balance, BALANCE_ACCURACY):
         tinfo = open_transfers_collection.find_one({'symbol':symbol, 'active':True})
         if not tinfo:
             if REPAIR_BALANCES and symbol not in ['BTC','ETH','USDT']:
@@ -444,13 +445,14 @@ def check_symbol_balance(symbol, target):
             else:
                 record_event("WITHDRAW MISSING BALANCE,%s,%0.4f,%0.4f,%0.4f" % (symbol, target, balance, target-balance))
         else:
+            # TODO highlight in transit, extra balance situation
             record_event("WITHDRAW IN TRANSIT,%s,%s,%s,%s,%s,%s" % (tinfo['from'], tinfo['to'], symbol, tinfo['amount'], tinfo['address'], tinfo['time']))
         return False
 
-    elif balance > target or near_equals(target, balance, '0.005'): # no pending transfers
+    elif balance > target or near_equals(target, balance, BALANCE_ACCURACY): # no pending transfers
         open_transfers_collection.update_many({'symbol':symbol}, {'$set':{'active':False}})
 
-        if not near_equals(target, balance, '0.005') and symbol not in ['BTC','ETH','USDT']:
+        if not near_equals(target, balance, BALANCE_ACCURACY) and symbol not in ['BTC','ETH','USDT']:
             if REPAIR_BALANCES:
                 sell_at_market('REPAIR', pair_factory(symbol, 'BTC'), balance-target)
             else:
