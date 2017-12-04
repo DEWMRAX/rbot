@@ -8,7 +8,7 @@ if [ -e $PIDFILE ]; then
   printf "pidfile exists $PIDFILE\n"
 else
   printf "%-50s\n" "Starting..."
-  while true; do python trader.py >> log.txt 2>&1; sleep 5; done &
+  while true; do python trader.py >> log.txt 2>&1; sleep 2; done &
   echo $! > PIDFILE
   PID=`cat $PIDFILE`
   if [ -z $PID ]; then
