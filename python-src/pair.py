@@ -30,14 +30,14 @@ ALL_PAIRS = [
 
     Pair('ZEC', 'BTC', friction(0.007)),
     Pair('ZEC', 'ETH', friction(0.007)),
-    Pair('ZEC', 'USDT', friction(0.008)),
+    Pair('ZEC', 'USDT', friction(0.013)),
 
     Pair('POWR', 'BTC', friction(0.0011)),
     Pair('POWR', 'ETH', friction(0.008)),
 
     Pair('XMR', 'BTC', friction(0.006)),
     Pair('XMR', 'ETH', friction(0.006)),
-    Pair('XMR', 'USDT', friction(0.007)),
+    Pair('XMR', 'USDT', friction(0.013)),
 
     Pair('ARK', 'BTC', friction(0.008)),
 
@@ -151,11 +151,11 @@ ALL_PAIRS = [
     Pair('BCC', 'BTC', friction(0.008)),
     Pair('BCC', 'ETH', friction(0.006)),
 
-    Pair('BTC', 'USDT', friction(0.012)),
-    Pair('ETH', 'USDT', friction(0.012)),
-    Pair('LTC', 'USDT', friction(0.012)),
-    Pair('DASH', 'USDT', friction(0.012)),
-    Pair('BCC', 'USDT', friction(0.014)),
+    Pair('BTC', 'USDT', friction(0.013)),
+    Pair('ETH', 'USDT', friction(0.013)),
+    Pair('LTC', 'USDT', friction(0.013)),
+    Pair('DASH', 'USDT', friction(0.015)),
+    Pair('BCC', 'USDT', friction(0.015)),
 ]
 
 ALL_SYMBOLS=['BTC','ETH','GNT','ICN','LTC','MLN','REP','USDT','TRST','WAVES','EDG','FCT','XEM','RLC','MAID','AMP','DASH','SC','LBC','MYST','BAT','ANT','WINGS','TIME','GUP','TKN','QRL','BNT','PTOY','CFI','SNGLS','SNT','MCO','STORJ','ADX','PAY','OMG','QTUM','CVC','DGD','BCC','ZRX','STRAT','SYS','GNO','DNT','OAX','KNC','FUN','SNM','SALT','ENG','AST','MTL','RCN','KMD','ARK','XMR','POWR','ZEC','ADA']
