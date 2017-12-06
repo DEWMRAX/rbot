@@ -492,7 +492,7 @@ def check_symbol_balance(symbol, target):
     return False
 
 def check_symbol_balance_loop(balance_map):
-    record_event("WITHDRAW LOOP")
+    record_event("WITHDRAW LOOP,***************************************************************")
     for symbol,target in balance_map.items():
         try:
             if check_symbol_balance(symbol, target):
