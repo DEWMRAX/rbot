@@ -24,7 +24,7 @@ INITIALIZE_BALANCE_CACHE = False
 if len(sys.argv) > 1:
     if sys.argv[1] == 'repair_balances':
         REPAIR_BALANCES = True
-    if sys.argv[1] == 'initialize_balance_cache:
+    if sys.argv[1] == 'initialize_balance_cache':
         INITIALIZE_BALANCE_CACHE = True
     if sys.argv[1] == 'zero_balances':
         UPDATE_TARGET_BALANCE = True
@@ -519,7 +519,7 @@ def check_symbol_balance_loop(balance_map):
     record_event("WITHDRAW LOOP,***************************************************************")
     for symbol,target in balance_map.items():
         try:
-            check_symbol_balance(symbol, target):
+            check_symbol_balance(symbol, target)
         except:
             record_event("WITHDRAW_FAIL,%s" % symbol)
             sleep(1, 'WITHDRAW_LOOP')
@@ -591,7 +591,7 @@ while open_trades_collection.find_one():
             record_event("SKIPPING RECOVERY,MIN_NOTIONAL")
             open_trades_collection.delete_one({'_id':trade['_id']})
         else:
-            traded_exchange = buy_at_market("RECOVERY AUTOBALANCE", pair, target_balance - balance, Decimal(trade['ask'])):
+            traded_exchange = buy_at_market("RECOVERY AUTOBALANCE", pair, target_balance - balance, Decimal(trade['ask']))
             if traded_exchange is None:
                 record_event("SKIPPING RECOVERY,ZERO FILL")
                 open_trades_collection.delete_one({'_id':trade['_id']})
