@@ -340,7 +340,7 @@ def check_imbalance(buyer_book, seller_book, pair):
     return Trade(pair, total_profit, total_quantity, bid_price, ask_price, trace, buyer, seller)
 
 def sanity_check_open(exch):
-    if exch.any_open_orders():
+    if exch.protected_any_open_orders():
         record_event("SHUTDOWN,OPEN ORDERS,%s" % exch.name)
         sys.exit(1)
 
@@ -534,7 +534,7 @@ for exch in exchanges:
 sleep(1, 'STARTUP,INITIAL_REFRESH')
 
 for exch in exchanges:
-    exch.cancel_all_orders()
+    exch.protected_cancel_all_orders()
 sleep(1, 'STARTUP,CANCEL_ALL')
 
 for exch in exchanges:

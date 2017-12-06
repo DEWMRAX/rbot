@@ -29,6 +29,18 @@ class Exchange():
         else:
             return Decimal(0)
 
+    def protected_any_open_orders(self):
+        if self.active:
+            return self.any_open_orders()
+        else:
+            retun False
+
+    def protected_cancel_all_orders(self):
+        if self.active:
+            return self.cancel_all_orders()
+        else:
+            return False
+
     def initial_refresh_balances(self):
         try:
             self.unprotected_refresh_balances()
