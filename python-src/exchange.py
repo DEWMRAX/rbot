@@ -33,7 +33,7 @@ class Exchange():
         if self.active:
             return self.any_open_orders()
         else:
-            retun False
+            return False
 
     def protected_cancel_all_orders(self):
         if self.active:
