@@ -418,7 +418,7 @@ def sell_at_market(reason, pair, amount, expected_price=None):
     books = eligible_books_filter(books)
 
     prices = map(lambda book: simulate_market_order(get_exchange_handler(book.exchange_name), book.bids, amount), books)
-    eligible_prices = filter(lambda (exch, total, price):exch and exch.get_balance(pair.currency) > total, prices)
+    eligible_prices = filter(lambda (exch, total, price):exch and exch.get_balance(pair.token) > amount, prices)
 
     if len(eligible_prices) == 0:
         record_event("MKT CANCEL,NONE ELIGIBLE")
