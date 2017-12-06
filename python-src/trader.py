@@ -17,11 +17,14 @@ DRAWUP_AMOUNT=Decimal('1.4') # how much to target on an exchange we are transfer
 BALANCE_ACCURACY=Decimal('0.02')
 
 UPDATE_TARGET_BALANCE = False
+UPDATE_ALL_TARGET_BALANCE = False
 REPAIR_BALANCES = False
 
 if len(sys.argv) > 1:
     if sys.argv[1] == 'zero_balances':
         UPDATE_TARGET_BALANCE = True
+        if sys.argv[2] == 'all':
+            UPDATE_ALL_TARGET_BALANCE = True
     if sys.argv[1] == 'repair_balances':
         REPAIR_BALANCES = True
 
@@ -82,7 +85,9 @@ if UPDATE_TARGET_BALANCE:
     for exch in exchanges:
         exch.refresh_balances()
 
-    for symbol in ALL_SYMBOLS:
+    symbol_list = ALL_SYMBOLS if UPDATE_ALL_TARGET_BALANCE else ['BTC','ETH','USDT']
+
+    for symbol in symbol_list:
         balance = "%0.8f" % total_balance_incl_pending(symbol)
         target_balance_collection.update({'symbol':symbol}, {'$set':{'balance':balance}}, upsert=True)
 
