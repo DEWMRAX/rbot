@@ -19,14 +19,17 @@ BALANCE_ACCURACY=Decimal('0.02')
 UPDATE_TARGET_BALANCE = False
 UPDATE_ALL_TARGET_BALANCE = False
 REPAIR_BALANCES = False
+INITIALIZE_BALANCE_CACHE = False
 
 if len(sys.argv) > 1:
+    if sys.argv[1] == 'repair_balances':
+        REPAIR_BALANCES = True
+    if sys.argv[1] == 'initialize_balance_cache:
+        INITIALIZE_BALANCE_CACHE = True
     if sys.argv[1] == 'zero_balances':
         UPDATE_TARGET_BALANCE = True
         if sys.argv[2] == 'all':
             UPDATE_ALL_TARGET_BALANCE = True
-    if sys.argv[1] == 'repair_balances':
-        REPAIR_BALANCES = True
 
 open_trades_collection = MongoClient().arbot.trades
 open_transfers_collection = MongoClient().arbot.transfers
@@ -49,6 +52,11 @@ def sleep(duration, reason):
 exchanges = [kraken.Kraken(), liqui.Liqui(), binance.Binance(), bittrex.Bittrex(), poloniex.Poloniex()]
 def get_exchange_handler(name):
     return filter(lambda exchange:exchange.name == name, exchanges)[0]
+
+if INITIALIZE_BALANCE_CACHE:
+    for exchange in exchanges:
+        exchange.unprotected_refresh_balances()
+    sys.exit(0)
 
 PRICE = {'BTC' : Decimal(1)}
 for record in price_collection.find({}):
@@ -83,7 +91,7 @@ def total_balance_incl_pending(symbol):
 
 if UPDATE_TARGET_BALANCE:
     for exch in exchanges:
-        exch.refresh_balances()
+        exch.unprotected_refresh_balances()
 
     symbol_list = ALL_SYMBOLS if UPDATE_ALL_TARGET_BALANCE else ['BTC','ETH','USDT']
 
@@ -172,8 +180,8 @@ def execute_trade(buyer, seller, pair, quantity, expected_profit, bid, ask):
     open_trades_collection.delete_one({'_id':open_trades_id})
 
     sleep(2, 'BALANCE_UPDATE') # give exchanges (bittrex) chance to update balances
-    buyer.refresh_balances()
-    seller.refresh_balances()
+    buyer.unprotected_refresh_balances()
+    seller.unprotected_refresh_balances()
 
     ending_currency_balance = total_balance(pair.currency)
     actual_profit = (ending_currency_balance - starting_currency_balance) * Decimal(1000) * PRICE[pair.currency]
@@ -187,7 +195,7 @@ def execute_trade(buyer, seller, pair, quantity, expected_profit, bid, ask):
     record_event("AI_CLOSE,%s" % info)
 
 def eligible_books_filter(books):
-    return filter(lambda book:book.age < MAX_BOOK_AGE and book.exchange_name not in ['KRAKEN'], books)
+    return filter(lambda book:book.age < MAX_BOOK_AGE and get_exchange_handler(book.exchange_name).active and book.exchange_name not in ['KRAKEN'], books)
 
 def best_bidder(books):
     eligible_books = eligible_books_filter(books)
@@ -410,7 +418,11 @@ def buy_at_market(reason, pair, _amount, expected_price=None):
         record_event("MKT CANCEL,PRICE CHANGE")
         return Decimal(0)
 
-    return best_exch.trade_ioc(pair, 'buy', best_price, amount, reason)
+    # make trade
+    if best_exch.trade_ioc(pair, 'buy', best_price, amount, reason) == Decimal(0):
+        return None
+
+    return best_exch
 
 def sell_at_market(reason, pair, amount, expected_price=None):
 
@@ -437,7 +449,10 @@ def sell_at_market(reason, pair, amount, expected_price=None):
         record_event("MKT CANCEL,PRICE CHANGE")
         return Decimal(0)
 
-    return best_exch.trade_ioc(pair, 'sell', best_price, amount, reason)
+    if best_exch.trade_ioc(pair, 'sell', best_price, amount, reason) == Decimal(0):
+        return None
+
+    return best_exch
 
 def check_symbol_balance(symbol, target):
     balance = total_balance(symbol)
@@ -483,11 +498,20 @@ def check_symbol_balance(symbol, target):
 
             amount_str = "%0.4f" % transfer_amount
             record_event("WITHDRAW_ATTEMPT,%s,%s,%s,%s" % (highest_exchange.name, lowest_exchange.name, symbol, amount_str))
-            highest_exchange.withdraw(lowest_exchange, symbol, amount_str)
-            timestamp = '{:%m-%d,%H:%M:%S}'.format(datetime.datetime.now())
-            open_transfers_collection.insert_one({'symbol':symbol, 'amount':amount_str, 'address':lowest_exchange.deposit_address(symbol),
-                'from':highest_exchange.name, 'to':lowest_exchange.name, 'time':timestamp, 'active':True})
-            return True
+            if highest_exchange.active and lowest_exchange.active:
+                highest_exchange.withdraw(lowest_exchange, symbol, amount_str)
+                timestamp = '{:%m-%d,%H:%M:%S}'.format(datetime.datetime.now())
+                open_transfers_collection.insert_one({'symbol':symbol, 'amount':amount_str, 'address':lowest_exchange.deposit_address(symbol),
+                    'from':highest_exchange.name, 'to':lowest_exchange.name, 'time':timestamp, 'active':True})
+
+                sleep(1, 'WITHDRAW_LOOP,BALANCE_REFRESH')
+                # force update balance for any exchanges with automated transfers
+                if highest_exchange.name != 'LIQUI':
+                    highest_exchange.unprotected_refresh_balances()
+                return True
+            else:
+                record_event("WITHDRAW_SKIPPED,EXCHANGE_DOWN")
+                return False
 
     return False
 
@@ -495,13 +519,10 @@ def check_symbol_balance_loop(balance_map):
     record_event("WITHDRAW LOOP,***************************************************************")
     for symbol,target in balance_map.items():
         try:
-            if check_symbol_balance(symbol, target):
-                sleep(1, 'WITHDRAW_LOOP')
+            check_symbol_balance(symbol, target):
         except:
             record_event("WITHDRAW_FAIL,%s" % symbol)
             sleep(1, 'WITHDRAW_LOOP')
-    for exch in exchanges:
-        exch.refresh_balances()
 
 record_event('START')
 print
@@ -509,23 +530,31 @@ print "Starting up"
 print
 
 for exch in exchanges:
-    exch.cancel_all_orders()
-
-sleep(1, 'STARTUP')
+    exch.initial_refresh_balances()
+sleep(1, 'STARTUP,INITIAL_REFRESH')
 
 for exch in exchanges:
-    exch.refresh_balances()
-
-sleep(1, 'STARTUP')
+    exch.cancel_all_orders()
+sleep(1, 'STARTUP,CANCEL_ALL')
 
 for exch in exchanges:
     sanity_check_open(exch)
-
-print balances_string()
-print balances_detail()
+sleep(1, 'STARTUP,SANITY_CHECK_OPEN')
 
 while open_trades_collection.find_one():
     trade = open_trades_collection.find_one()
+
+    for exch in exchanges:
+        # we must get fresh balances from the exchanges involved in the recovery
+        if exch.name == trade['buyer'] or exch.name == trade['seller']:
+            exch.unprotected_refresh_balances()
+        else:
+            exch.protected_refresh_balances()
+
+    sleep(1, 'RECOVERY,REFRESH_BALANCES')
+
+    print balances_string()
+    print balances_detail()
 
     pair = pair_factory(trade['token'], trade['currency'])
     balance = total_balance(pair.token)
@@ -548,23 +577,34 @@ while open_trades_collection.find_one():
         if (balance - target_balance) * Decimal(trade['bid']) < pair.min_notional():
             record_event("SKIPPING RECOVERY,MIN_NOTIONAL")
             open_trades_collection.delete_one({'_id':trade['_id']})
-        elif sell_at_market("RECOVERY AUTOBALANCE", pair, balance - target_balance, Decimal(trade['bid'])) == Decimal(0):
-            record_event("SKIPPING RECOVERY,ZERO FILL")
-            open_trades_collection.delete_one({'_id':trade['_id']})
+        else:
+            traded_exchange = sell_at_market("RECOVERY AUTOBALANCE", pair, balance - target_balance, Decimal(trade['bid']))
+            if traded_exchange is None:
+                record_event("SKIPPING RECOVERY,ZERO FILL")
+                open_trades_collection.delete_one({'_id':trade['_id']})
+            else:
+                sleep(2, 'RECOVERY,BALANCE_REFRESH')
+                traded_exchange.unprotected_refresh_balances()
+                sleep(1, 'RECOVERY,BALANCE_REFRESH')
     else:
         if (target_balance - balance) * Decimal(trade['ask']) < pair.min_notional():
             record_event("SKIPPING RECOVERY,MIN_NOTIONAL")
             open_trades_collection.delete_one({'_id':trade['_id']})
-        elif buy_at_market("RECOVERY AUTOBALANCE", pair, target_balance - balance, Decimal(trade['ask'])) == Decimal(0):
-            record_event("SKIPPING RECOVERY,ZERO FILL")
-            open_trades_collection.delete_one({'_id':trade['_id']})
+        else:
+            traded_exchange = buy_at_market("RECOVERY AUTOBALANCE", pair, target_balance - balance, Decimal(trade['ask'])):
+            if traded_exchange is None:
+                record_event("SKIPPING RECOVERY,ZERO FILL")
+                open_trades_collection.delete_one({'_id':trade['_id']})
+            else:
+                sleep(2, 'RECOVERY,BALANCE_REFRESH')
+                traded_exchange.unprotected_refresh_balances()
+                sleep(1, 'RECOVERY,BALANCE_REFRESH')
 
-    sleep(1, 'BALANCE_REFRESH')
+    sleep(2, 'RECOVERY,LOOP_CLOSE')
 
-    for exch in get_exchanges(pair):
-        exch.refresh_balances()
 
-    sleep(1, 'BALANCE_REFRESH')
+for exch in exchanges:
+    exch.protected_refresh_balances()
 
 last_balance_check_time = 0
 
@@ -618,4 +658,4 @@ while True:
         sleep(8, 'TRADED')
 
         for exch in exchanges:
-            exch.refresh_balances()
+            exch.protected_refresh_balances()
