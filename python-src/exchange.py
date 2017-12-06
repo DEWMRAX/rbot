@@ -2,6 +2,7 @@ from pymongo import MongoClient
 
 from order import Order
 from decimal import *
+from logger import record_event
 
 cached_balances = MongoClient().arbot.cached_balances
 
@@ -35,6 +36,7 @@ class Exchange():
             for doc in cached_balances.find({'exchange':self.name}):
                 self.balance[doc['symbol']] = Decimal(doc['balance'])
 
+            record_event("PERM_INACTIVE,%s" % self.name)
             self.permanent_inactive = True
             self.active = False
 
@@ -48,6 +50,7 @@ class Exchange():
             for doc in cached_balances.find({'exchange':self.name}):
                 self.balance[doc['symbol']] = Decimal(doc['balance'])
 
+            record_event("INACTIVE,%s" % self.name)
             self.active = False
 
     def unprotected_refresh_balances(self):
