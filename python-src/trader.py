@@ -504,9 +504,9 @@ def check_symbol_balance(symbol, target):
                 open_transfers_collection.insert_one({'symbol':symbol, 'amount':amount_str, 'address':lowest_exchange.deposit_address(symbol),
                     'from':highest_exchange.name, 'to':lowest_exchange.name, 'time':timestamp, 'active':True})
 
-                sleep(1, 'WITHDRAW_LOOP,BALANCE_REFRESH')
                 # force update balance for any exchanges with automated transfers
                 if highest_exchange.name != 'LIQUI':
+                    sleep(1, 'WITHDRAW_LOOP,BALANCE_REFRESH')
                     highest_exchange.unprotected_refresh_balances()
                 return True
             else:
