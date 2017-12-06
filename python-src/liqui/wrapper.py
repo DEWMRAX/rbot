@@ -28,6 +28,7 @@ class Liqui(Exchange):
         return "%s_%s" % (market.token.lower(), market.currency.lower())
 
     def deposit_address(self, symbol):
+        return {}[symbol]
         return {
             "BTC":"1GHEMS5syrGmcCpARx81iddcFM253Y15cK",
             "ETH":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
