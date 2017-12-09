@@ -28,7 +28,7 @@ if len(sys.argv) > 1:
         INITIALIZE_BALANCE_CACHE = True
     if sys.argv[1] == 'zero_balances':
         UPDATE_TARGET_BALANCE = True
-        if sys.argv[2] == 'all':
+        if len(sys.argv) > 2 and sys.argv[2] == 'all':
             UPDATE_ALL_TARGET_BALANCE = True
 
 open_trades_collection = MongoClient().arbot.trades
