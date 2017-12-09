@@ -175,15 +175,18 @@ class Kraken(Exchange):
         return self.query_private('CancelOrder', {'txid':txid})
 
     def any_open_orders(self):
+        return False
         for txid,info in self.active_orders().items():
             return True
 
         return False
 
     def cancel_all_orders(self):
+        return True
         for txid,info in self.active_orders().items():
             record_event("CANCELALL,%s,%s" % (self.name,txid))
             self.cancel(txid)
 
     def active_orders(self):
+        return []
         return self.query_private('OpenOrders', {})['result']['open']
