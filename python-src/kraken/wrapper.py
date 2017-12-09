@@ -130,6 +130,7 @@ class Kraken(Exchange):
         print self.query_private('Withdraw', {'asset':asset_name(symbol), 'key':key_name, 'amount':amount})
 
     def refresh_balances(self):
+        raise Exception("DUCK KRAKEN")
         balances = self.query_private('Balance', {})['result']
 
         for symbol in self.symbols:
