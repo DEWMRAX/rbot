@@ -72,6 +72,6 @@ class Exchange():
         self.refresh_balances()
 
         for symbol in self.balance:
-            cached_balances.update({'symbol':symbol}, {'$set':{'exchange':self.name, 'balance':"%d" % self.balance[symbol]}})
+            cached_balances.update({'symbol':symbol}, {'$set':{'exchange':self.name, 'balance':"%d" % self.balance[symbol]}}, upsert=True)
 
         self.active = True
