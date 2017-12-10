@@ -195,7 +195,7 @@ def execute_trade(buyer, seller, pair, quantity, expected_profit, bid, ask):
     record_event("AI_CLOSE,%s" % info)
 
 def eligible_books_filter(books):
-    return filter(lambda book:book.age < MAX_BOOK_AGE and get_exchange_handler(book.exchange_name).active and book.exchange_name not in ['KRAKEN'], books)
+    return filter(lambda book:book.exchange_name not in ['KRAKEN'] and book.age < MAX_BOOK_AGE and get_exchange_handler(book.exchange_name).active, books)
 
 def best_bidder(books):
     eligible_books = eligible_books_filter(books)
