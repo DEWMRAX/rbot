@@ -13,7 +13,7 @@ from pair import ALL_PAIRS, ALL_SYMBOLS, pair_factory
 MAX_BOOK_AGE = 8
 TRANSFER_THRESHOLD=Decimal('.25')
 DRAWDOWN_AMOUNT=Decimal('.70') # how much to leave on an exchange we are withdrawing from
-DRAWUP_AMOUNT=Decimal('1.4') # how much to target on an exchange we are transferring to
+DRAWUP_AMOUNT=Decimal('1.3') # how much to target on an exchange we are transferring to
 BALANCE_ACCURACY=Decimal('0.02')
 
 UPDATE_TARGET_BALANCE = False
@@ -71,14 +71,47 @@ def get_exchanges(pair):
 def total_balance(symbol):
     return sum(map(lambda exch:exch.get_balance(symbol), exchanges))
 
+OVERRIDE_TARGET_BALANCE = {'LIQUI':{
+    'BTC': Decimal(1.1),
+    'ETH': Decimal(28),
+    'LTC': Decimal(8),
+    'BCC': Decimal(2.1),
+    'SALT': Decimal(360)
+}}
+def has_override(exchange, symbol):
+    return exchange.name in OVERRIDE_TARGET_BALANCE and symbol in OVERRIDE_TARGET_BALANCE[exchange.name]
+
 TARGET_BALANCE = dict()
+TOTAL_TARGET_BALANCE = dict()
 for symbol in ALL_SYMBOLS:
     doc = target_balance_collection.find_one({'symbol':symbol})
-    TARGET_BALANCE[symbol] = Decimal(doc['balance'] if doc else 0)
+    TARGET_BALANCE[symbol] = dict()
+    TOTAL_TARGET_BALANCE[symbol] = Decimal(doc['balance'])
+    remaining_balance = Decimal(doc['balance'])
+
+    # First, check all target overrides
+    for exchange in exchanges:
+        if has_override(exchange, symbol):
+            TARGET_BALANCE[symbol][exchange.name] = OVERRIDE_TARGET_BALANCE[exchange.name][symbol]
+            remaining_balance -= TARGET_BALANCE[symbol][exchange.name]
+
+    remaining_count = len(filter(lambda exch:not has_override(exch, symbol), exchanges))
+
+    for exchange in exchanges:
+        if not has_override(exchange, symbol):
+            TARGET_BALANCE[symbol][exchange.name] = remaining_balance / remaining_count
+
+for symbol in TARGET_BALANCE:
+    print symbol
+    for exch in TARGET_BALANCE[symbol]:
+        print "  %s,%0.4f" % (exch, TARGET_BALANCE[symbol][exch])
+    print ""
+
+sys.exit(0)
 
 def total_balance_incl_pending(symbol):
     confirmed = total_balance(symbol)
-    target = TARGET_BALANCE[symbol]
+    target = TOTAL_TARGET_BALANCE[symbol]
 
     if confirmed > target or near_equals(confirmed, target, '0.05'):
         return confirmed
@@ -103,7 +136,7 @@ if UPDATE_TARGET_BALANCE:
     sleep(3, 'PRECAUTION') # don't forget to throttle if decide not to shut down after
 
 def target_nav():
-    return sum(map(lambda symbol: PRICE[symbol]*TARGET_BALANCE[symbol], ALL_SYMBOLS))
+    return sum(map(lambda symbol: PRICE[symbol]*TOTAL_TARGET_BALANCE[symbol], ALL_SYMBOLS))
 
 def balances_nav(balance_func):
     return sum(map(lambda symbol: PRICE[symbol]*balance_func(symbol), ALL_SYMBOLS))
@@ -454,7 +487,8 @@ def sell_at_market(reason, pair, amount, expected_price=None):
 
     return best_exch
 
-def check_symbol_balance(symbol, target):
+# target is total target, targets is exchange-name mapped individual targets
+def check_symbol_balance(symbol, target, targets):
     balance = total_balance(symbol)
 
     if balance < target and not near_equals(target, balance, BALANCE_ACCURACY):
@@ -479,26 +513,26 @@ def check_symbol_balance(symbol, target):
                 record_event("WITHDRAW EXTRA BALANCE,%s,%0.4f,%0.4f,%0.4f" % (symbol, target, balance, balance-target))
 
         participating_exchanges = filter(lambda exch:symbol in exch.symbols, exchanges)
-        exchange_count = len(participating_exchanges)
-        lowest_exchange = min(participating_exchanges, key=lambda exch:exch.balance[symbol]) # intentionally using unsafe get_balance
-        highest_exchange = max(participating_exchanges, key=lambda exch:exch.balance[symbol])
+        lowest_exchange = min(participating_exchanges, key=lambda exch:exch.balance[symbol] / targets[exch.name])
 
-        exchange_target = balance / exchange_count
-        if lowest_exchange.balance[symbol] < exchange_target * TRANSFER_THRESHOLD:
-            transfer_amount = min(highest_exchange.balance[symbol] - exchange_target * DRAWDOWN_AMOUNT,
-                                  exchange_target * DRAWUP_AMOUNT - lowest_exchange.balance[symbol])
+        if lowest_exchange.balance[symbol] / targets[exch.name] < TRANSFER_THRESHOLD:
+            capable_exchanges = filter(lambda exch:exch.balance[symbol] > targets[lowest_exchange.name])
+            highest_exchange = max(capable_exchanges, key=lambda exch:exch.balance[symbol] / targets[exch.name])
+            transfer_amount = min(highest_exchange.balance[symbol] - targets[highest_exchange.name] * DRAWDOWN_AMOUNT,
+                                  targets[lowest_exchange.name] * DRAWUP_AMOUNT - lowest_exchange.balance[symbol])
+
             if transfer_amount <= 0:
                 record_event("SANITY CHECK,TRANSFER LOW")
                 return False
 
             # make sure we don't transfer thrash
-            if highest_exchange.balance[symbol] - transfer_amount <= exchange_target * TRANSFER_THRESHOLD:
+            if highest_exchange.balance[symbol] - transfer_amount <= targets[highest_exchange.name] * TRANSFER_THRESHOLD:
                 record_event("SANITY CHECK,TRANSFER THRASH")
                 return False
 
             amount_str = "%0.4f" % transfer_amount
             record_event("WITHDRAW_ATTEMPT,%s,%s,%s,%s" % (highest_exchange.name, lowest_exchange.name, symbol, amount_str))
-            if highest_exchange.active and lowest_exchange.active:
+            if False and highest_exchange.active and lowest_exchange.active:
                 highest_exchange.withdraw(lowest_exchange, symbol, amount_str)
                 timestamp = '{:%m-%d,%H:%M:%S}'.format(datetime.datetime.now())
                 open_transfers_collection.insert_one({'symbol':symbol, 'amount':amount_str, 'address':lowest_exchange.deposit_address(symbol),
@@ -515,11 +549,11 @@ def check_symbol_balance(symbol, target):
 
     return False
 
-def check_symbol_balance_loop(balance_map):
+def check_symbol_balance_loop():
     record_event("WITHDRAW LOOP,***************************************************************")
-    for symbol,target in balance_map.items():
+    for symbol,targets in TARGET_BALANCE.items():
         try:
-            check_symbol_balance(symbol, target)
+            check_symbol_balance(symbol, TOTAL_TARGET_BALANCE[symbol], targets)
         except:
             record_event("WITHDRAW_FAIL,%s" % symbol)
             sleep(1, 'WITHDRAW_LOOP')
@@ -623,7 +657,7 @@ while True:
         sys.exit(1)
 
     if last_balance_check_time + 60 < int(time.time()):
-        check_symbol_balance_loop(TARGET_BALANCE)
+        check_symbol_balance_loop()
         last_balance_check_time = int(time.time())
 
     if REPAIR_BALANCES:
