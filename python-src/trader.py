@@ -101,14 +101,6 @@ for symbol in ALL_SYMBOLS:
         if not has_override(exchange, symbol):
             TARGET_BALANCE[symbol][exchange.name] = remaining_balance / remaining_count
 
-for symbol in TARGET_BALANCE:
-    print symbol
-    for exch in TARGET_BALANCE[symbol]:
-        print "  %s,%0.4f" % (exch, TARGET_BALANCE[symbol][exch])
-    print ""
-
-sys.exit(0)
-
 def total_balance_incl_pending(symbol):
     confirmed = total_balance(symbol)
     target = TOTAL_TARGET_BALANCE[symbol]
@@ -514,9 +506,8 @@ def check_symbol_balance(symbol, target, targets):
 
         participating_exchanges = filter(lambda exch:symbol in exch.symbols, exchanges)
         lowest_exchange = min(participating_exchanges, key=lambda exch:exch.balance[symbol] / targets[exch.name])
-
         if lowest_exchange.balance[symbol] / targets[exch.name] < TRANSFER_THRESHOLD:
-            capable_exchanges = filter(lambda exch:exch.balance[symbol] > targets[lowest_exchange.name])
+            capable_exchanges = filter(lambda exch:exch.balance[symbol] > targets[lowest_exchange.name], participating_exchanges)
             highest_exchange = max(capable_exchanges, key=lambda exch:exch.balance[symbol] / targets[exch.name])
             transfer_amount = min(highest_exchange.balance[symbol] - targets[highest_exchange.name] * DRAWDOWN_AMOUNT,
                                   targets[lowest_exchange.name] * DRAWUP_AMOUNT - lowest_exchange.balance[symbol])
@@ -532,7 +523,7 @@ def check_symbol_balance(symbol, target, targets):
 
             amount_str = "%0.4f" % transfer_amount
             record_event("WITHDRAW_ATTEMPT,%s,%s,%s,%s" % (highest_exchange.name, lowest_exchange.name, symbol, amount_str))
-            if False and highest_exchange.active and lowest_exchange.active:
+            if highest_exchange.active and lowest_exchange.active:
                 highest_exchange.withdraw(lowest_exchange, symbol, amount_str)
                 timestamp = '{:%m-%d,%H:%M:%S}'.format(datetime.datetime.now())
                 open_transfers_collection.insert_one({'symbol':symbol, 'amount':amount_str, 'address':lowest_exchange.deposit_address(symbol),
