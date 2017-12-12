@@ -105,7 +105,7 @@ def total_balance_incl_pending(symbol):
     confirmed = total_balance(symbol)
     target = TOTAL_TARGET_BALANCE[symbol]
 
-    if (confirmed > target or near_equals(confirmed, target, '0.05')) and symbol not in ['BTC','ETH','USDT']:
+    if (confirmed > target or near_equals(confirmed, target, '0.05')):
         return confirmed
 
     transfer = open_transfers_collection.find_one({'symbol':symbol, 'active':True})
