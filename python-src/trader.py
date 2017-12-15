@@ -11,7 +11,8 @@ from order import Order
 from pair import ALL_PAIRS, ALL_SYMBOLS, pair_factory
 
 MAX_BOOK_AGE = 8
-TRANSFER_THRESHOLD=Decimal('.25')
+TRANSFER_THRESHOLD_LOW=Decimal('.22')
+TRANSFER_THRESHOLD_HIGH=Decimal('2.5')
 DRAWDOWN_AMOUNT=Decimal('.35') # how much to leave on an exchange we are withdrawing from
 DRAWUP_AMOUNT=Decimal('1.8') # how much to target on an exchange we are transferring to
 BALANCE_ACCURACY=Decimal('0.02')
@@ -520,9 +521,9 @@ def check_symbol_balance(symbol, target, targets):
 
         participating_exchanges = filter(lambda exch:symbol in exch.symbols, exchanges)
         lowest_exchange = min(participating_exchanges, key=lambda exch:exch.balance[symbol] / targets[exch.name])
-        if lowest_exchange.balance[symbol] / targets[exch.name] < TRANSFER_THRESHOLD:
-            capable_exchanges = filter(lambda exch:exch.balance[symbol] > targets[lowest_exchange.name], participating_exchanges)
-            highest_exchange = max(capable_exchanges, key=lambda exch:exch.balance[symbol] / targets[exch.name])
+        highest_exchange = max(participating_exchanges, key=lambda exch:exch.balance[symbol] / targets[exch.name])
+        if lowest_exchange.balance[symbol] / targets[exch.name] < TRANSFER_THRESHOLD_LOW or
+           highest_exchange.balance[symbol] / targets[exch.name] > TRANSFER_THRESHOLD_HIGH:
             transfer_amount = min(highest_exchange.balance[symbol] - targets[highest_exchange.name] * DRAWDOWN_AMOUNT,
                                   targets[lowest_exchange.name] * DRAWUP_AMOUNT - lowest_exchange.balance[symbol])
 
@@ -531,8 +532,12 @@ def check_symbol_balance(symbol, target, targets):
                 return False
 
             # make sure we don't transfer thrash
-            if highest_exchange.balance[symbol] - transfer_amount <= targets[highest_exchange.name] * TRANSFER_THRESHOLD:
-                record_event("SANITY CHECK,TRANSFER THRASH")
+            if highest_exchange.balance[symbol] - transfer_amount <= targets[highest_exchange.name] * TRANSFER_THRESHOLD_LOW:
+                record_event("SANITY CHECK,TRANSFER THRASH LOW")
+                return False
+
+            if lowest_exchange.balance[symbol] + transfer_amount >= targets[lowest_exchange.name] * TRANSFER_THRESHOLD_HIGH
+                record_event("SANITY CHECK,TRANSFER THRASH HIGH")
                 return False
 
             amount_str = "%0.4f" % transfer_amount
