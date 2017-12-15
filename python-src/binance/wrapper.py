@@ -265,7 +265,7 @@ class Binance(Exchange):
         return "%s%s" % (pair.token.upper(), pair.currency.upper())
 
     def deposit_address(self, symbol):
-        return {
+        address = {
             "ETH":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
             "OAX":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
             "SNT":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
@@ -300,6 +300,10 @@ class Binance(Exchange):
             "ADA":"DdzFFzCqrhszh9atnDUPySMZyBJqeyc4w6hZY67RH7uyXHF9QKSGZkey8VRBnmi2nRWUxS8J3CVu32wmkMYXdiRkoVU3evuZQCUv5hw8",
             "FUN":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522"
         }[symbol]
+
+        assert(address == self.api.deposit_address(symbol))
+
+        return address
 
     def deposit_message(self, symbol):
         msg_map = {

@@ -61,6 +61,12 @@ class api(object):
                 headers=headers
             ).json()
 
+        if method == 'depositAddress':
+            return requests.get(
+                wapi_url(method, query_string),
+                headers=headers
+            ).json()
+
         raise Exception()
 
     def account_info(self):
@@ -68,6 +74,9 @@ class api(object):
 
     def withdraw(self, asset, amount, address, name):
         return self.private('withdraw', {'asset':asset, 'amount':amount, 'address':address, 'name':name})
+
+    def deposit_address(self, asset):
+        return self.private('depositAddress', {'asset':asset})['address']
 
     def get_orderbook(self, ticker):
         return requests.get(full_url("depth?symbol=%s" % ticker)).json()
