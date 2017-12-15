@@ -14,7 +14,7 @@ MAX_BOOK_AGE = 8
 TRANSFER_THRESHOLD_LOW=Decimal('.22')
 TRANSFER_THRESHOLD_HIGH=Decimal('2.5')
 DRAWDOWN_AMOUNT=Decimal('.35') # how much to leave on an exchange we are withdrawing from
-DRAWUP_AMOUNT=Decimal('1.8') # how much to target on an exchange we are transferring to
+DRAWUP_AMOUNT=Decimal('1.75') # how much to target on an exchange we are transferring to
 BALANCE_ACCURACY=Decimal('0.02')
 LIQUI_USDT_TARGET=Decimal(135000)
 
@@ -74,11 +74,11 @@ def total_balance(symbol):
     return sum(map(lambda exch:exch.get_balance(symbol), exchanges))
 
 OVERRIDE_TARGET_BALANCE = {'LIQUI':{
-    'BTC': Decimal(0.8),
-    'ETH': Decimal(17),
-    'LTC': Decimal(6),
-    'BCC': Decimal(1.3),
-    'SALT': Decimal(270)
+    'BTC': Decimal(1.1),
+    'ETH': Decimal(23),
+    'LTC': Decimal(7),
+    'BCC': Decimal(1.7),
+    'SALT': Decimal(710)
 }}
 def has_override(exchange, symbol):
     return exchange.name in OVERRIDE_TARGET_BALANCE and symbol in OVERRIDE_TARGET_BALANCE[exchange.name]
@@ -97,7 +97,7 @@ for symbol in ALL_SYMBOLS:
             TARGET_BALANCE[symbol][exchange.name] = OVERRIDE_TARGET_BALANCE[exchange.name][symbol]
             remaining_balance -= TARGET_BALANCE[symbol][exchange.name]
 
-    remaining_count = len(filter(lambda exch:not has_override(exch, symbol), exchanges))
+    remaining_count = len(filter(lambda exch:symbol in exch.symbols and not has_override(exch, symbol), exchanges))
 
     for exchange in exchanges:
         if not has_override(exchange, symbol):
@@ -522,8 +522,9 @@ def check_symbol_balance(symbol, target, targets):
         participating_exchanges = filter(lambda exch:symbol in exch.symbols, exchanges)
         lowest_exchange = min(participating_exchanges, key=lambda exch:exch.balance[symbol] / targets[exch.name])
         highest_exchange = max(participating_exchanges, key=lambda exch:exch.balance[symbol] / targets[exch.name])
-        if lowest_exchange.balance[symbol] / targets[exch.name] < TRANSFER_THRESHOLD_LOW or
-           highest_exchange.balance[symbol] / targets[exch.name] > TRANSFER_THRESHOLD_HIGH:
+        if lowest_exchange.balance[symbol] / targets[lowest_exchange.name] < TRANSFER_THRESHOLD_LOW or \
+           highest_exchange.balance[symbol] / targets[highest_exchange.name] > TRANSFER_THRESHOLD_HIGH:
+            record_event("WITHDRAW_INFO,%s,%f,%f,%f,%f,%f,%f" % (symbol, highest_exchange.balance[symbol], targets[highest_exchange.name], highest_exchange.balance[symbol] - targets[highest_exchange.name] * DRAWDOWN_AMOUNT, lowest_exchange.balance[symbol], targets[lowest_exchange.name], targets[lowest_exchange.name] * DRAWUP_AMOUNT - lowest_exchange.balance[symbol]))
             transfer_amount = min(highest_exchange.balance[symbol] - targets[highest_exchange.name] * DRAWDOWN_AMOUNT,
                                   targets[lowest_exchange.name] * DRAWUP_AMOUNT - lowest_exchange.balance[symbol])
 
@@ -536,7 +537,7 @@ def check_symbol_balance(symbol, target, targets):
                 record_event("SANITY CHECK,TRANSFER THRASH LOW")
                 return False
 
-            if lowest_exchange.balance[symbol] + transfer_amount >= targets[lowest_exchange.name] * TRANSFER_THRESHOLD_HIGH
+            if lowest_exchange.balance[symbol] + transfer_amount >= targets[lowest_exchange.name] * TRANSFER_THRESHOLD_HIGH:
                 record_event("SANITY CHECK,TRANSFER THRASH HIGH")
                 return False
 
