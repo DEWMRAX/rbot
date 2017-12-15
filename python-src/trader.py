@@ -12,8 +12,8 @@ from pair import ALL_PAIRS, ALL_SYMBOLS, pair_factory
 
 MAX_BOOK_AGE = 8
 TRANSFER_THRESHOLD=Decimal('.25')
-DRAWDOWN_AMOUNT=Decimal('.70') # how much to leave on an exchange we are withdrawing from
-DRAWUP_AMOUNT=Decimal('1.3') # how much to target on an exchange we are transferring to
+DRAWDOWN_AMOUNT=Decimal('.35') # how much to leave on an exchange we are withdrawing from
+DRAWUP_AMOUNT=Decimal('1.8') # how much to target on an exchange we are transferring to
 BALANCE_ACCURACY=Decimal('0.02')
 
 UPDATE_TARGET_BALANCE = False
