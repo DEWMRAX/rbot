@@ -7,244 +7,36 @@ def pair_name_to_binance(pair):
     p = pair.split('-')
     return "%s%s" % (p[0], p[1])
 
-PAIRS = {
-    'ADA-BTC': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'ADA-ETH': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'BAT-BTC': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'BAT-ETH': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'POWR-BTC': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'POWR-ETH': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'ZEC-BTC': {
-        'price_decimals': 6,
-        'lot_decimals': 3
-    },
-    'ZEC-ETH': {
-        'price_decimals': 5,
-        'lot_decimals': 3
-    },
-    'BCC-BTC': {
-        'price_decimals': 6,
-        'lot_decimals': 3
-    },
-    'BCC-ETH': {
-        'price_decimals': 5,
-        'lot_decimals': 3
-    },
-    'BCC-USDT': {
-        'price_decimals': 2,
-        'lot_decimals': 5
-    },
-    'ARK-BTC': {
-        'price_decimals': 7,
-        'lot_decimals': 2
-    },
-    'ARK-ETH': {
-        'price_decimals': 6,
-        'lot_decimals': 2
-    },
-    'XMR-BTC': {
-        'price_decimals': 6,
-        'lot_decimals': 3
-    },
-    'XMR-ETH': {
-        'price_decimals': 5,
-        'lot_decimals': 3
-    },
-    'RCN-BTC': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'RCN-ETH': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'KMD-BTC': {
-        'price_decimals': 7,
-        'lot_decimals': 2
-    },
-    'KMD-ETH': {
-        'price_decimals': 6,
-        'lot_decimals': 2
-    },
-    'STORJ-BTC': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'STORJ-ETH': {
-        'price_decimals': 7,
-        'lot_decimals': 0
-    },
-    'ENG-BTC': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'ENG-ETH': {
-        'price_decimals': 7,
-        'lot_decimals': 0
-    },
-    'AST-BTC': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'AST-ETH': {
-        'price_decimals': 7,
-        'lot_decimals': 0
-    },
-    'MTL-BTC': {
-        'price_decimals': 6,
-        'lot_decimals': 2
-    },
-    'MTL-ETH': {
-        'price_decimals': 6,
-        'lot_decimals': 2
-    },
-    'DASH-BTC': {
-        'price_decimals': 6,
-        'lot_decimals': 3
-    },
-    'DASH-ETH': {
-        'price_decimals': 5,
-        'lot_decimals': 3
-    },
-    'SALT-BTC': {
-        'price_decimals': 6,
-        'lot_decimals': 2
-    },
-    'SALT-ETH': {
-        'price_decimals': 6,
-        'lot_decimals': 2
-    },
-    'SNM-BTC': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'SNM-ETH': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'FUN-BTC': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'FUN-ETH': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'KNC-BTC': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'KNC-ETH': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'SNGLS-BTC': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'SNGLS-ETH': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'STRAT-BTC': {
-        'price_decimals': 6,
-        'lot_decimals': 2
-    },
-    'STRAT-ETH': {
-        'price_decimals': 6,
-        'lot_decimals': 2
-    },
-    'ZRX-ETH': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'ZRX-BTC': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'OMG-ETH': {
-        'price_decimals': 6,
-        'lot_decimals': 2
-    },
-    'OMG-BTC': {
-        'price_decimals': 6,
-        'lot_decimals': 2
-    },
-    'OAX-ETH': {
-        'price_decimals': 7,
-        'lot_decimals': 0
-    },
-    'SNT-ETH': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'DNT-ETH': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'MCO-ETH': {
-        'price_decimals': 6,
-        'lot_decimals': 2
-    },
-    'QTUM-ETH': {
-        'price_decimals': 6,
-        'lot_decimals': 2
-    },
-    'ICN-BTC': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'ICN-ETH': {
-        'price_decimals': 7,
-        'lot_decimals': 0
-    },
-    'ETH-BTC': {
-        'price_decimals': 6,
-        'lot_decimals': 3
-    },
-    'LTC-BTC': {
-        'price_decimals': 6,
-        'lot_decimals': 2
-    },
-    'MCO-BTC': {
-        'price_decimals': 6,
-        'lot_decimals': 2
-    },
-    'QTUM-BTC': {
-        'price_decimals': 6,
-        'lot_decimals': 2
-    },
-    'BNT-BTC': {
-        'price_decimals': 8,
-        'lot_decimals': 0
-    },
-    'BTC-USDT': {
-        'price_decimals': 2,
-        'lot_decimals': 6
-    },
-    'ETH-USDT': {
-        'price_decimals': 2,
-        'lot_decimals': 5
-    }
-}
+PAIRS = dict()
+INFO_CACHE_PATH = 'binance_info.json'
+def convert_tick_size_to_decimal_position(s):
+    n = Decimal(s)
+    ret = 0
+    if n > Decimal('1'):
+        raise Exception()
+
+    while n < Decimal('1'):
+        n = n * Decimal('10')
+        ret = ret + 1
+
+    return ret
+
+with open(INFO_CACHE_PATH) as f:
+    info = json.loads(f.read())
+    for pair_info in info['symbols']:
+        if pair_info['status'] != 'TRADING':
+            continue
+
+        for filtr in pair_info['filters']:
+            if filtr['filterType'] == 'PRICE_FILTER':
+                price_decimals = convert_tick_size_to_decimal_position(filtr['tickSize'])
+            elif filtr['filterType'] == 'LOT_SIZE':
+                lot_decimals = convert_tick_size_to_decimal_position(filtr['stepSize'])
+
+        PAIRS["%s-%s" % (pair_info['baseAsset'],pair_info['quoteAsset'])] = {
+            'price_decimals':price_decimals,
+            'lot_decimals':lot_decimals
+        }
 
 class Binance(Exchange):
     def __init__(self):
