@@ -134,12 +134,12 @@ def balances_nav(balance_func):
     return sum(map(lambda symbol: PRICE[symbol]*balance_func(symbol), ALL_SYMBOLS))
 
 def exchange_nav(exch):
-    return balances_nav(lambda symbol:exch.balance[symbol])
+    return balances_nav(lambda symbol:exch.get_balance(symbol))
 
 def exchange_nav_incl_pending(exch):
     total = exchange_nav(exch)
     for doc in open_transfers_collection.find({'active':True,'to':exch.name}):
-        total = total + Decimal(doc.amount)
+        total = total + Decimal(doc['amount']) * PRICE[doc['symbol']]
 
     return total
 
