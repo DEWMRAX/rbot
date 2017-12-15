@@ -13,7 +13,7 @@ def full_url(s):
     return "https://www.binance.com/api/v3/%s" % s
 
 def wapi_url(s, q):
-    return "https://www.binance.com/wapi/v1/%s.html?%s" % (s, q)
+    return "https://www.binance.com/wapi/v3/%s.html?%s" % (s, q)
 
 class api(object):
     def __init__(self, api_key, api_secret):
