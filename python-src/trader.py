@@ -15,6 +15,7 @@ TRANSFER_THRESHOLD=Decimal('.25')
 DRAWDOWN_AMOUNT=Decimal('.35') # how much to leave on an exchange we are withdrawing from
 DRAWUP_AMOUNT=Decimal('1.8') # how much to target on an exchange we are transferring to
 BALANCE_ACCURACY=Decimal('0.02')
+LIQUI_USDT_TARGET=Decimal(130000)
 
 UPDATE_TARGET_BALANCE = False
 UPDATE_ALL_TARGET_BALANCE = False
@@ -142,6 +143,9 @@ def exchange_nav_incl_pending(exch):
         total = total + Decimal(doc['amount']) * PRICE[doc['symbol']]
 
     return total
+
+def exchange_nav_incl_pending_in_usdt(exch):
+    return exchange_nav_incl_pending(exch) / PRICE['USDT']
 
 # revenue in mBTC
 def arbitrage_revenue():
@@ -533,7 +537,9 @@ def check_symbol_balance(symbol, target, targets):
 
             amount_str = "%0.4f" % transfer_amount
             record_event("WITHDRAW_ATTEMPT,%s,%s,%s,%s" % (highest_exchange.name, lowest_exchange.name, symbol, amount_str))
-            if highest_exchange.active and lowest_exchange.active:
+            if lowest_exchange.name == 'LIQUI' and exchange_nav_incl_pending_in_usdt(get_exchange_handler('LIQUI')) > LIQUI_USDT_TARGET:
+                record_event("WITHDRAW_HOLD,%s,%s" % (lowest_exchange.name, exchange_nav_incl_pending_in_usdt(get_exchange_handler('LIQUI'))))
+            elif highest_exchange.active and lowest_exchange.active:
                 highest_exchange.withdraw(lowest_exchange, symbol, amount_str)
                 timestamp = '{:%m-%d,%H:%M:%S}'.format(datetime.datetime.now())
                 open_transfers_collection.insert_one({'symbol':symbol, 'amount':amount_str, 'address':lowest_exchange.deposit_address(symbol),
@@ -642,13 +648,6 @@ for exch in exchanges:
     exch.protected_refresh_balances()
 
 last_balance_check_time = 0
-
-print 'LIQUI TEST'
-print exchange_nav(get_exchange_handler('LIQUI'))
-print exchange_nav_incl_pending(get_exchange_handler('LIQUI'))
-print exchange_nav(get_exchange_handler('LIQUI')) / PRICE['USDT']
-print exchange_nav_incl_pending(get_exchange_handler('LIQUI')) / PRICE['USDT']
-sys.exit(1)
 
 while True:
     print
