@@ -72,11 +72,11 @@ def total_balance(symbol):
     return sum(map(lambda exch:exch.get_balance(symbol), exchanges))
 
 OVERRIDE_TARGET_BALANCE = {'LIQUI':{
-    'BTC': Decimal(1.1),
-    'ETH': Decimal(28),
+    'BTC': Decimal(0.8),
+    'ETH': Decimal(22),
     'LTC': Decimal(8),
-    'BCC': Decimal(2.1),
-    'SALT': Decimal(360)
+    'BCC': Decimal(1.5),
+    'SALT': Decimal(300)
 }}
 def has_override(exchange, symbol):
     return exchange.name in OVERRIDE_TARGET_BALANCE and symbol in OVERRIDE_TARGET_BALANCE[exchange.name]
@@ -132,6 +132,16 @@ def target_nav():
 
 def balances_nav(balance_func):
     return sum(map(lambda symbol: PRICE[symbol]*balance_func(symbol), ALL_SYMBOLS))
+
+def exchange_nav(exch):
+    return balances_nav(lambda symbol:exch.balance[symbol])
+
+def exchange_nav_incl_pending(exch):
+    total = exchange_nav(exch)
+    for doc in open_transfers_collection.find({'active':True,'to':exch.name}):
+        total = total + Decimal(doc.amount)
+
+    return total
 
 # revenue in mBTC
 def arbitrage_revenue():
@@ -632,6 +642,13 @@ for exch in exchanges:
     exch.protected_refresh_balances()
 
 last_balance_check_time = 0
+
+print 'LIQUI TEST'
+print exchange_nav(get_exchange_handler('LIQUI'))
+print exchange_nav_incl_pending(get_exchange_handler('LIQUI'))
+print exchange_nav(get_exchange_handler('LIQUI')) / PRICE['USDT']
+print exchange_nav_incl_pending(get_exchange_handler('LIQUI')) / PRICE['USDT']
+sys.exit(1)
 
 while True:
     print
