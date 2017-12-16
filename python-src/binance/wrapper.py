@@ -2,6 +2,7 @@ from decimal import *
 from exchange import Exchange
 from logger import record_event
 from binance.api import api
+import json
 
 def pair_name_to_binance(pair):
     p = pair.split('-')
