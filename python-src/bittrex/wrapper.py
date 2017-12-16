@@ -13,7 +13,7 @@ class Bittrex(Exchange):
             secrets = json.load(secrets_file)
             self.api = api(secrets['key'], secrets['secret'])
 
-        self.symbols = ['EDG','TRST','WAVES','BTC','ETH','LTC','MLN','REP','GNT','USDT','FCT','XEM','RLC','MAID','AMP','DASH','SC','LBC','MYST','BAT','ANT','WINGS','TIME','GUP','TKN','QRL','BNT','PTOY','CFI','SNGLS','SNT','MCO','STORJ','ADX','PAY','OMG','QTUM','CVC','DGD','BCC','STRAT','SYS','GNO','FUN','DNT','SALT','MTL','RCN','KMD','ARK','XMR','POWR','ZEC','ADA']
+        self.symbols = ['EDG','TRST','WAVES','BTC','ETH','LTC','MLN','REP','GNT','USDT','FCT','XEM','RLC','MAID','AMP','DASH','SC','LBC','MYST','BAT','ANT','QRL','BNT','PTOY','SNGLS','SNT','MCO','STORJ','ADX','OMG','QTUM','CVC','DGD','BCC','STRAT','SYS','FUN','DNT','SALT','MTL','RCN','KMD','ARK','XMR','POWR','ZEC','ADA']
 
         self.markets = self.api.get_markets()
 
@@ -51,27 +51,20 @@ class Bittrex(Exchange):
             "BAT":"0x9be2499f084bf1d77529db53746256c71be2fc62",
             "ANT":"0xe443971e4dde9e8cf3837c1ff8942f6ba2e65bbc",
             "1ST":"0x08489cbde7352162d46027a61abb3700abc01b89",
-            "WINGS":"0x44d366a45540eed0a3e8bac18f542ccc650a40cc",
-            "TIME":"0xb4de521d7a2ab9f080661c3e722e1c626e95ee6e",
-            "GUP":"0x764d3dd9410d2d515027619a5a5dab40eb7fa8af",
-            "TKN":"0x373f35b67f48f97bf061b2be5176d059f167ffad",
             "HMQ":"0x684a5c9af9e0400bce47eafb9169a373f18455c2",
             "QRL":"0xe23c1001e05d0a7d115bc322bd9cf9b548e1d7d5",
             "BNT":"0x4c37e79d6735a3f3993b8c137c043a52ef8f2c86",
             "PTOY":"0x704dfefd38404751b37528178fe8038c327567d7",
-            "CFI":"0x98b0fcd96610bf9d0e9ec0c1fc587ff97831f3a3",
             "SNGLS":"0x418684cfe6bcba5d1bf27e17271778097bac451a",
             "SNT":"0x90bb6c2cf13761d3071365ca1ada85387eb31569",
             "MCO":"0x0bf450a1729474605f45e8b582209a8c291d7cef",
             "STORJ":"0xe59f7d8149c8836caf8c13b8f71cb3765bd008e4",
             "ADX":"0xdc53401db51d306c3995f2b15d5f821a33ae119c",
-            "PAY":"0x46d1f80c8ea9ddb4f30b962ac8781e446e829231",
             "OMG":"0xb75484c5c4456ccc9ace88ca79d98ed38c1e0c38",
             "QTUM":"QbDy528rVZFKGWQUpvSkiDMFm49P7LZLV6",
             "CVC":"0x77a8586078cf6f21f4c93b55f98134d6b1ab4500",
             "DGD":"0x8f59c61955f2155a43cda71342f42788d8401e1a",
             "BCC":"1JbhFhk9guXyZuiYWJo1wVsNNPwenguhFn",
-            "GNO":"0xccf4d4848b96476f6c448160fb085c7f6c5cc188",
             "STRAT":"SVkyfcMzo3VJxCaA5WjoG4nJLNTeWh44tf",
             "SYS":"SNHvSbxWxjG8qvSjsaqzVajjQRHpJgZRi3",
             "FUN":"0x4a10875dce29877c383f308e0c120937ba5bb41f",

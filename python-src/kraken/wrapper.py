@@ -52,7 +52,7 @@ class Kraken(Exchange):
         with open('kraken_info.json') as f:
             self.tickers = json.loads(f.read())['result'].items()
 
-        self.symbols = ['BTC', 'ETH', 'LTC', 'ICN', 'MLN', 'REP', 'DASH', 'BCC', 'GNO', 'XMR', 'ZEC']
+        self.symbols = ['BTC', 'ETH', 'LTC', 'ICN', 'MLN', 'REP', 'DASH', 'BCC', 'XMR', 'ZEC']
         for pair,info in self.tickers:
             if '.' in pair: # some duplicate entries have a period, unsure why
                 continue
@@ -91,7 +91,6 @@ class Kraken(Exchange):
             "BCC":"1BhN1Mpwa6j7JsEWyWuckYAmnR8iukijmx",
             "XMR":"4GdoN7NCTi8a5gZug7PrwZNKjvHFmKeV11L6pNJPgj5QNEHsN6eeX3DaAQFwZ1ufD4LYCZKArktt113W7QjWvQ7CWG18YB7CuKmUY4QxAH",
             "ZEC":"t1a4ErZkCfqfckwojUh6iRheDSHHVQcNQdk",
-            "GNO":"0x526e5eb490a4e71e0a8795977fe4f851d0f86f61"
         }
         method_map = {
             "BTC":"Bitcoin",
@@ -104,7 +103,6 @@ class Kraken(Exchange):
             "BCC":"Bitcoin Cash",
             "XMR":"Monero",
             "ZEC":"Zcash (Transparent)",
-            "GNO":"GNO"
         }
 
         addr_info = filter(lambda info: info['address'] == addr_map[symbol], self.query_private('DepositAddresses', {'asset':asset_name(symbol), 'method':method_map[symbol]})['result'])[0]

@@ -45,7 +45,7 @@ class Binance(Exchange):
         with open('binance.keys', 'r') as api_key:
             self.api = api(api_key.readline().strip(), api_key.readline().strip())
 
-        self.symbols = ['BTC','ETH','USDT','LTC','BNT','OAX','SNT','DNT','MCO','QTUM','ICN','OMG','ZRX','STRAT','SNGLS','KNC','SNM','FUN','SALT','DASH','ENG','AST','MTL','STORJ','RCN','KMD','ARK','XMR','BCC','POWR','ZEC','BAT','ADA']
+        self.symbols = ['BTC','ETH','USDT','LTC','BNT','OAX','SNT','DNT','MCO','QTUM','ICN','OMG','ZRX','STRAT','SNGLS','KNC','FUN','SALT','DASH','ENG','AST','MTL','STORJ','RCN','KMD','ARK','XMR','BCC','POWR','ZEC','BAT','ADA']
         self.fees = {}
 
         account_info = self.api.account_info()
@@ -74,7 +74,6 @@ class Binance(Exchange):
             "STRAT":"Sa5vFpjh4MitFCPxpkKXbp16rYe4n9n72A",
             "SNGLS":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
             "KNC":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
-            "SNM":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
             "SALT":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
             "ENG":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
             "AST":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",

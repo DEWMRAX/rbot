@@ -28,7 +28,7 @@ class Poloniex(Exchange):
             self.tapi = api(bytearray(secrets['key'], 'utf-8'), bytearray(secrets['secret'], 'utf-8'))
         self.tickers = self.tapi.returnTicker()
 
-        self.symbols = ['BTC','ETH','GNT','LTC','REP','USDT','FCT','XEM','MAID','AMP','DASH','SC','LBC','BCC','ZRX','STRAT','SYS','GNO','CVC','OMG','STORJ','XMR','ZEC']
+        self.symbols = ['BTC','ETH','GNT','LTC','REP','USDT','FCT','XEM','MAID','AMP','DASH','SC','LBC','BCC','ZRX','STRAT','SYS','CVC','OMG','STORJ','XMR','ZEC']
         for ticker in self.tickers.keys():
             (token, currency) = parse_ticker(ticker)
             if token in self.symbols and currency in self.symbols:
@@ -58,7 +58,6 @@ class Poloniex(Exchange):
             "CVC":"0xe571d5011c3f57c3c82a62793825e0d1ec8b97e6",
             "STRAT":"ScGYRqA7A9nD4iyERBe86BmsFabKcskwrk",
             "SYS":"STcmyMDmyvQJEUtVr7DfqxCqVKWtDhtYqc",
-            "GNO":"0x127309f8a73162504e2744abebd0add2c5844b94",
             "STORJ":"0x32cc01288f18c8a9d7c650bec2c1582b4766d4be",
             "XMR":"4JUdGzvrMFDWrUUwY3toJATSeNwjn54LkCnKBPRzDuhzi5vSepHfUckJNxRL2gjkNrSqtCoRUrEDAgRwsQvVCjZbS4TFDq8Urz68nzwMvk",
             "ZEC":"t1NE899bnfzmXkr4fbDcQqX79dyJTK5T1SQ",

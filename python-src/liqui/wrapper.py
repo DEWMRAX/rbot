@@ -14,7 +14,7 @@ class Liqui(Exchange):
 
         self.prices = {}
 
-        self.symbols = ['BTC','ETH','GNT','ICN','LTC','MLN','REP','USDT','TRST','WAVES','EDG','RLC','DASH','MYST','BAT','ANT','WINGS','TIME','GUP','TKN','QRL','BNT','PTOY','CFI','SNGLS','SNT','MCO','STORJ','ADX','PAY','OMG','CVC','DGD','BCC','ZRX','GNO','DNT','OAX','KNC','SNM','SALT','ENG','AST']
+        self.symbols = ['BTC','ETH','GNT','ICN','LTC','MLN','REP','USDT','TRST','WAVES','EDG','RLC','DASH','MYST','BAT','ANT','QRL','BNT','PTOY','SNGLS','SNT','MCO','STORJ','ADX','OMG','CVC','DGD','BCC','ZRX','DNT','OAX','KNC','SALT','ENG','AST']
 
         self.tickers = liqui.common.market_info
 
@@ -45,20 +45,14 @@ class Liqui(Exchange):
             "MYST":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "BAT":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "ANT":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
-            "WINGS":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
-            "TIME":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
-            "GUP":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
-            "TKN":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "QRL":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "BNT":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "PTOY":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
-            "CFI":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "SNGLS":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "SNT":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "MCO":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "STORJ":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "ADX":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
-            "PAY":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "OMG":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "CVC":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "DGD":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
@@ -66,8 +60,6 @@ class Liqui(Exchange):
             "ZRX":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "DNT":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "OAX":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
-            "GNO":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
-            "SNM":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "SALT":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "ENG":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "AST":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
