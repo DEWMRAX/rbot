@@ -1,6 +1,6 @@
 request = require 'request'
 
-LIMIT=50
+LIMIT=15
 MIN_BOOK_DATA = 5
 
 format_quote = (quote) ->
@@ -12,6 +12,8 @@ format_quotes = (quotes) ->
 symbol_to_polo = (symbol) ->
   if symbol == 'BCC'
     return 'BCH'
+  if symbol == 'XLM'
+    return 'STR'
   return symbol
 
 pair_name = (token, currency) ->

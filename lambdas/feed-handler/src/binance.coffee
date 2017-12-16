@@ -1,6 +1,6 @@
 request = require 'request'
 
-LIMIT=50
+LIMIT=15
 MIN_BOOK_DATA = 5
 
 format_quote = (quote) ->
