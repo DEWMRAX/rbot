@@ -65,6 +65,8 @@ for record in price_collection.find({}):
     PRICE[record['symbol']] = Decimal(record['price'])
 
 def near_equals(x, y, threshold='0.001'):
+    if x == Decimal('0'):
+        return y == Decimal('0')
     return (abs(x - y) / x) < Decimal(threshold)
 
 def get_exchanges(pair):
