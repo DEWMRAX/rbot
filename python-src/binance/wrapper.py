@@ -46,7 +46,7 @@ class Binance(Exchange):
         with open('binance.keys', 'r') as api_key:
             self.api = api(api_key.readline().strip(), api_key.readline().strip())
 
-        self.symbols = ['BTC','ETH','USDT','LTC','BNT','OAX','SNT','DNT','MCO','QTUM','ICN','OMG','ZRX','STRAT','SNGLS','KNC','FUN','SALT','DASH','ENG','AST','MTL','STORJ','RCN','KMD','ARK','XMR','BCC','POWR','ZEC','BAT','ADA']
+        self.symbols = ['BTC','ETH','USDT','LTC','BNT','OAX','SNT','DNT','MCO','QTUM','ICN','OMG','ZRX','STRAT','SNGLS','KNC','FUN','SALT','DASH','ENG','AST','MTL','STORJ','RCN','KMD','ARK','XMR','BCC','POWR','ZEC','BAT','ADA','ADX','DGD']
         self.fees = {}
 
         account_info = self.api.account_info()
@@ -90,7 +90,9 @@ class Binance(Exchange):
             "ZEC":"t1afnaVLGdDMpDeAZD4LrW9u56R4YAhJXR4",
             "BAT":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
             "ADA":"DdzFFzCqrhszh9atnDUPySMZyBJqeyc4w6hZY67RH7uyXHF9QKSGZkey8VRBnmi2nRWUxS8J3CVu32wmkMYXdiRkoVU3evuZQCUv5hw8",
-            "FUN":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522"
+            "FUN":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
+            "ADX":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
+            "DGD":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522"
         }[symbol]
 
         assert(address == self.api.deposit_address(symbol))
