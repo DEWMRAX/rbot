@@ -14,7 +14,7 @@ class Liqui(Exchange):
 
         self.prices = {}
 
-        self.symbols = ['BTC','ETH','GNT','ICN','LTC','MLN','REP','USDT','TRST','WAVES','EDG','RLC','DASH','MYST','BAT','ANT','QRL','BNT','PTOY','SNGLS','SNT','MCO','STORJ','ADX','OMG','CVC','DGD','BCC','ZRX','DNT','OAX','KNC','SALT','ENG','AST']
+        self.symbols = ['BTC','ETH','GNT','ICN','LTC','MLN','REP','USDT','TRST','WAVES','EDG','RLC','DASH','MYST','BAT','ANT','QRL','BNT','PTOY','SNGLS','SNT','MCO','STORJ','ADX','OMG','CVC','DGD','BCC','ZRX','DNT','OAX','KNC','SALT','ENG','AST','REQ','MANA']
 
         self.tickers = liqui.common.market_info
 
@@ -63,6 +63,8 @@ class Liqui(Exchange):
             "SALT":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "ENG":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "AST":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
+            "REQ":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
+            "MANA":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "KNC":"0xed631591f77bc43539606e7e7f1110ea4f821f02"
         }[symbol]
 

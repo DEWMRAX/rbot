@@ -46,7 +46,7 @@ class Binance(Exchange):
         with open('binance.keys', 'r') as api_key:
             self.api = api(api_key.readline().strip(), api_key.readline().strip())
 
-        self.symbols = ['BTC','ETH','USDT','LTC','BNT','OAX','SNT','DNT','MCO','QTUM','ICN','OMG','ZRX','STRAT','SNGLS','KNC','FUN','SALT','DASH','ENG','AST','MTL','STORJ','RCN','KMD','ARK','XMR','BCC','POWR','ZEC','BAT','ADA','ADX','DGD']
+        self.symbols = ['BTC','ETH','USDT','LTC','BNT','OAX','SNT','DNT','MCO','QTUM','ICN','OMG','ZRX','STRAT','SNGLS','KNC','FUN','SALT','DASH','ENG','AST','MTL','STORJ','RCN','KMD','ARK','XMR','BCC','POWR','ZEC','BAT','ADA','ADX','DGD','REQ','XRP','LSK','MANA','XLM','NEO']
         self.fees = {}
 
         account_info = self.api.account_info()
@@ -92,6 +92,12 @@ class Binance(Exchange):
             "ADA":"DdzFFzCqrhszh9atnDUPySMZyBJqeyc4w6hZY67RH7uyXHF9QKSGZkey8VRBnmi2nRWUxS8J3CVu32wmkMYXdiRkoVU3evuZQCUv5hw8",
             "FUN":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
             "ADX":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
+            "REQ":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
+            "XRP":"rEb8TK3gBgk5auZkwc6sHnwrGVJH8DuaLh",
+            "LSK":"13259482612946031465L",
+            "MANA":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
+            "XLM":"GAHK7EEG2WWHVKDNT4CEQFZGKF2LGDSW2IVM4S5DP42RBW3K6BTODB4A",
+            "NEO":"AHrEFA4dPbQfwNssFiHvTh4ZTDXViB8JxS",
             "DGD":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522"
         }[symbol]
 
@@ -101,7 +107,9 @@ class Binance(Exchange):
 
     def deposit_message(self, symbol):
         msg_map = {
-            "XMR":"0264ae179190b497fc85a4ccfda4e21d88a3f1f4934112509735276e066124c2"
+            "XMR":"0264ae179190b497fc85a4ccfda4e21d88a3f1f4934112509735276e066124c2",
+            "XRP":"109689253",
+            "XLM":"1018407122"
         }
         return msg_map[symbol]
 

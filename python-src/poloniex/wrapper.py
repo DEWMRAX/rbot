@@ -9,11 +9,15 @@ import json
 def symbol_from_polo(symbol):
     if symbol == "BCH":
         return "BCC"
+    if symbol == "STR":
+        return "XLM"
     return symbol
 
 def symbol_to_polo(symbol):
     if symbol == "BCC":
         return "BCH"
+    if symbol == "XLM":
+        return "STR"
     return symbol
 
 def parse_ticker(ticker):
@@ -28,7 +32,7 @@ class Poloniex(Exchange):
             self.tapi = api(bytearray(secrets['key'], 'utf-8'), bytearray(secrets['secret'], 'utf-8'))
         self.tickers = self.tapi.returnTicker()
 
-        self.symbols = ['BTC','ETH','GNT','LTC','REP','USDT','FCT','XEM','MAID','AMP','DASH','SC','LBC','BCC','ZRX','STRAT','SYS','CVC','OMG','STORJ','XMR','ZEC']
+        self.symbols = ['BTC','ETH','GNT','LTC','REP','USDT','FCT','XEM','MAID','AMP','DASH','SC','LBC','BCC','ZRX','STRAT','SYS','CVC','OMG','STORJ','XMR','ZEC','XRP','LSK','XLM','DCR']
         for ticker in self.tickers.keys():
             (token, currency) = parse_ticker(ticker)
             if token in self.symbols and currency in self.symbols:
@@ -61,10 +65,14 @@ class Poloniex(Exchange):
             "STORJ":"0x32cc01288f18c8a9d7c650bec2c1582b4766d4be",
             "XMR":"4JUdGzvrMFDWrUUwY3toJATSeNwjn54LkCnKBPRzDuhzi5vSepHfUckJNxRL2gjkNrSqtCoRUrEDAgRwsQvVCjZbS4TFDq8Urz68nzwMvk",
             "ZEC":"t1NE899bnfzmXkr4fbDcQqX79dyJTK5T1SQ",
+            "XRP":"raSrwKu8JqzRR9M7JBoRVw5yVXXu9Ctynj",
+            "LSK":"6761288143735703303L",
+            "XLM":"GCGNWKCJ3KHRLPM3TM6N7D3W5YKDJFL6A2YCXFXNMRTZ4Q66MEMZ6FI2",
+            "DCR":"DsSAaFwT3YTq51eLGcji2w58Dxe7JEr5KPq",
             "OMG":"0x9e5841973e2a3e3636c8b398a4e7a5c0adc53287"
         }
 
-        if symbol in ['XEM']: # only message is returned from api for XEM
+        if symbol in ['XEM','XLM']: # only message is returned from api for XEM
             return addr_map[symbol]
 
         returned_addrs = self.tapi.returnDepositAddresses()
@@ -73,14 +81,15 @@ class Poloniex(Exchange):
         return addr_map[symbol]
 
     def deposit_message(self, symbol):
-        if symbol in ['XMR']: # polo does not use payment-id on incoming XMR deposits
+        if symbol in ['XMR','XRP']: # polo does not use payment-id on incoming XMR deposits
             return ""
 
         msg_map = {
-            "XEM":"b4100e259d74b5a7"
+            "XEM":"b4100e259d74b5a7",
+            "XLM":"6007798"
         }
         returned_msgs = self.tapi.returnDepositAddresses()
-        assert(msg_map[symbol] == returned_msgs[symbol])
+        assert(msg_map[symbol] == returned_msgs[symbol_to_polo(symbol)])
 
         return msg_map[symbol]
 

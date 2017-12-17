@@ -13,7 +13,7 @@ class Bittrex(Exchange):
             secrets = json.load(secrets_file)
             self.api = api(secrets['key'], secrets['secret'])
 
-        self.symbols = ['EDG','TRST','WAVES','BTC','ETH','LTC','MLN','REP','GNT','USDT','FCT','XEM','RLC','MAID','AMP','DASH','SC','LBC','MYST','BAT','ANT','QRL','BNT','PTOY','SNGLS','SNT','MCO','STORJ','ADX','OMG','QTUM','CVC','DGD','BCC','STRAT','SYS','FUN','DNT','SALT','MTL','RCN','KMD','ARK','XMR','POWR','ZEC','ADA']
+        self.symbols = ['EDG','TRST','WAVES','BTC','ETH','LTC','MLN','REP','GNT','USDT','FCT','XEM','RLC','MAID','AMP','DASH','SC','LBC','MYST','BAT','ANT','QRL','BNT','PTOY','SNGLS','SNT','MCO','STORJ','ADX','OMG','QTUM','CVC','DGD','BCC','STRAT','SYS','FUN','DNT','SALT','MTL','RCN','KMD','ARK','XMR','POWR','ZEC','ADA','XRP','LSK','MANA','XLM','NEO','DCR']
 
         self.markets = self.api.get_markets()
 
@@ -77,6 +77,12 @@ class Bittrex(Exchange):
             "POWR":"0x2393e05d634cdee5d099a49be4750a2c6a9d9d73",
             "ZEC":"t1QSuLHGXwpvTTScYDWWUKRARTJpLFa6UH1",
             "ADA":"DdzFFzCqrhsnjhEeVLtdyjvJuS95C4p7kb61zsu2zKXypmEqegtbi9ny7z2fjdtLFkkcy9fzxvZPek9M5eDvMMg8Us8Fjnoj5QGDtRmp",
+            "XRP":"rPVMhWBsfF9iMXYj3aAzJVkPDTFNSyWdKy",
+            "LSK":"11955598195039745432L",
+            "MANA":"0xbc1a0905775c51832f11f9563c1024fbedc0a276",
+            "XLM":"GB6YPGW5JFMMP2QB2USQ33EUWTXVL4ZT5ITUNCY3YKVWOJPP57CANOF3",
+            "NEO":"Abg4CcBGzixsebjfmiKWpvyh6pbfYc2FrL",
+            "DCR":"Dsa9UDLMw2VeGsKxaSZMV4Q6wDuHQB2C5ck",
             "DNT":"0xc2fb8a5e120dc566893544530d51131f84b4677f"
         }
 
@@ -92,6 +98,8 @@ class Bittrex(Exchange):
     def deposit_message(self, symbol):
         msg_map = {
             "XEM":"1cdb8c71c28542f3a27",
+            "XRP":"1276454630",
+            "XLM":"5bbf3951cb0e4c59af8",
             "XMR":"e0474c83ba4244bbab5ce22538afea5db78963079cf54aeead92a02872b25969"
         }
 
