@@ -22,7 +22,7 @@ class Pair(namedtuple('Pair', ['token','currency','network_friction'])):
         return MIN_QUANTITY[self.token]
 
 def friction(base):
-    return Decimal(5.5 * base)
+    return Decimal(4.0 * base)
 
 ALL_PAIRS = [
 

@@ -16,7 +16,7 @@ TRANSFER_THRESHOLD_HIGH=Decimal('2.5')
 DRAWDOWN_AMOUNT=Decimal('.35') # how much to leave on an exchange we are withdrawing from
 DRAWUP_AMOUNT=Decimal('1.75') # how much to target on an exchange we are transferring to
 BALANCE_ACCURACY=Decimal('0.02')
-LIQUI_USDT_TARGET=Decimal(135000)
+LIQUI_USDT_TARGET=Decimal(185000)
 
 UPDATE_TARGET_BALANCE = False
 UPDATE_ALL_TARGET_BALANCE = False
@@ -76,8 +76,8 @@ def total_balance(symbol):
     return sum(map(lambda exch:exch.get_balance(symbol), exchanges))
 
 OVERRIDE_TARGET_BALANCE = {'LIQUI':{
-    'BTC': Decimal(1.1),
-    'ETH': Decimal(23),
+    'BTC': Decimal(0.8),
+    'ETH': Decimal(17),
     'LTC': Decimal(7),
     'BCC': Decimal(1.7),
     'SALT': Decimal(710)
