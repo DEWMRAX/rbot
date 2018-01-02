@@ -79,8 +79,7 @@ OVERRIDE_TARGET_BALANCE = {'LIQUI':{
     'BTC': Decimal(0.8),
     'ETH': Decimal(17),
     'LTC': Decimal(7),
-    'BCC': Decimal(1.7),
-    'SALT': Decimal(710)
+    'BCC': Decimal(1.7)
 }}
 def has_override(exchange, symbol):
     return exchange.name in OVERRIDE_TARGET_BALANCE and symbol in OVERRIDE_TARGET_BALANCE[exchange.name]
