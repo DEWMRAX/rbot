@@ -3,7 +3,7 @@ from collections import namedtuple
 from decimal import Decimal
 from pymongo import MongoClient
 
-import poloniex, bittrex, binance, liqui
+import poloniex, bittrex, binance, liqui, exchange
 from book import query_all, query_pair
 from feed_manager import invoke_one, invoke_all
 from logger import record_event, record_trade
@@ -52,7 +52,10 @@ def sleep(duration, reason):
  # order determines execution ordering, assumes more liquidity at the latter exchange
  #   and that earlier exchanges are faster responding
 exchanges = [liqui.Liqui(), binance.Binance(), bittrex.Bittrex(), poloniex.Poloniex()]
+gdax_stub = exchange.Exchange('GDAX')
 def get_exchange_handler(name):
+    if name == 'GDAX':
+        return gdax_stub
     return filter(lambda exchange:exchange.name == name, exchanges)[0]
 
 if INITIALIZE_BALANCE_CACHE:
@@ -156,11 +159,13 @@ def arbitrage_revenue():
 
 def balances_string_helper(balance_func):
     nav = balances_nav(balance_func)
-    return ("%0.4f,%0.8f," % (1000*(nav-target_nav()), nav)) + ','.join(map(lambda symbol: "%0.8f" % balance_func(symbol), ALL_SYMBOLS))
+    usd_nav = nav / PRICE['USD'] / 1e6
+    return ("%0.4f,%0.4f,%0.8f," % (1000*(nav-target_nav()), usd_nav, nav)) + ','.join(map(lambda symbol: "%0.8f" % balance_func(symbol), ALL_SYMBOLS))
 
 def balances_string_in_btc():
     nav = balances_nav(total_balance_incl_pending)
-    return ("%0.4f,%0.8f," % (1000*(nav-target_nav()), nav)) + ','.join(map(lambda symbol: "%0.8f" % (PRICE[symbol] * total_balance_incl_pending(symbol)), ALL_SYMBOLS))
+    usd_nav = nav / PRICE['USD'] / 1e6
+    return ("%0.4f,%0.4f,%0.8f," % (1000*(nav-target_nav()), usd_nav, nav)) + ','.join(map(lambda symbol: "%0.8f" % (PRICE[symbol] * total_balance_incl_pending(symbol)), ALL_SYMBOLS))
 
 def balances_string():
     return balances_string_helper(total_balance_incl_pending)
@@ -292,11 +297,11 @@ def check_imbalance(buyer_book, seller_book, pair):
     trace += "best ask %0.8f @ %s\n" % (asks[0].price, seller.name)
 
     # update price array for NAV calculation
-    if pair.currency == 'BTC' or (pair.currency == 'USDT' and pair.token == 'BTC'):
+    if pair.currency == 'BTC' or (pair.currency == 'USDT' and pair.token == 'BTC') or (pair.currency == 'USD' and pair.token == 'BTC'):
         symbol = pair.token
         average_price = (bids[0].price + asks[0].price) / Decimal(2)
-        if pair.currency == 'USDT': # our NAV is denominated in BTC so gotta flip USDT markets
-            symbol = 'USDT'
+        if pair.currency == 'USDT' or pair.currency == 'USD': # our PRICE array is denominated in BTC so gotta flip USD(T) markets
+            symbol = pair.currency
             average_price = Decimal(1) / average_price
 
         PRICE[symbol] = Decimal(average_price)
