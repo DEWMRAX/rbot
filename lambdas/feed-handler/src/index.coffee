@@ -3,6 +3,7 @@ binance = require './binance'
 bittrex = require './bittrex'
 poloniex = require './poloniex'
 kraken = require './kraken'
+gdax = require './gdax'
 
 AWS = require 'aws-sdk'
 AWS.config.update
@@ -24,6 +25,7 @@ exports.handler = (event, context, callback) ->
     when 'BITTREX' then bittrex
     when 'POLO' then poloniex
     when 'KRAKEN' then kraken
+    when 'GDAX' then gdax
 
   await feed_handler.get_book token, currency, callback, defer book
 

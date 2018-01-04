@@ -7,5 +7,6 @@ FEES = {
     "KRAKEN":Fee(10, 20),
     "BITTREX":Fee(25, 25),
     "BINANCE":Fee(5, 5),
-    "LIQUI":Fee(10, 25)
+    "LIQUI":Fee(10, 25),
+    "GDAX":Fee(25, 0)
 }
