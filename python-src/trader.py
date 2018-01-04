@@ -159,12 +159,12 @@ def arbitrage_revenue():
 
 def balances_string_helper(balance_func):
     nav = balances_nav(balance_func)
-    usd_nav = nav / PRICE['USD'] / 1e6
+    usd_nav = nav / PRICE['USD'] / Decimal(1e6)
     return ("%0.4f,%0.4f,%0.8f," % (1000*(nav-target_nav()), usd_nav, nav)) + ','.join(map(lambda symbol: "%0.8f" % balance_func(symbol), ALL_SYMBOLS))
 
 def balances_string_in_btc():
     nav = balances_nav(total_balance_incl_pending)
-    usd_nav = nav / PRICE['USD'] / 1e6
+    usd_nav = nav / PRICE['USD'] / Decimal(1e6)
     return ("%0.4f,%0.4f,%0.8f," % (1000*(nav-target_nav()), usd_nav, nav)) + ','.join(map(lambda symbol: "%0.8f" % (PRICE[symbol] * total_balance_incl_pending(symbol)), ALL_SYMBOLS))
 
 def balances_string():
