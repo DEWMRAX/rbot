@@ -670,7 +670,7 @@ while True:
         record_event("RISK_CHECK,PANIC! AT THE DISCO")
         sys.exit(1)
 
-    if last_balance_check_time + 60 < int(time.time()):
+    if last_balance_check_time + 300 < int(time.time()):
         check_symbol_balance_loop()
         last_balance_check_time = int(time.time())
 
