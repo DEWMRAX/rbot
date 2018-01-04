@@ -547,11 +547,11 @@ def check_symbol_balance(symbol, target, targets):
             if lowest_exchange.name == 'LIQUI' and exchange_nav_incl_pending_in_usdt(get_exchange_handler('LIQUI')) > LIQUI_USDT_TARGET:
                 record_event("WITHDRAW_HOLD,%s,%s" % (lowest_exchange.name, exchange_nav_incl_pending_in_usdt(get_exchange_handler('LIQUI'))))
             elif highest_exchange.active and lowest_exchange.active:
-                highest_exchange.withdraw(lowest_exchange, symbol, amount_str)
                 timestamp = '{:%m-%d,%H:%M:%S}'.format(datetime.datetime.now())
                 open_transfers_collection.insert_one({'symbol':symbol, 'amount':amount_str, 'address':lowest_exchange.deposit_address(symbol),
                     'from':highest_exchange.name, 'to':lowest_exchange.name, 'time':timestamp, 'active':True})
 
+                highest_exchange.withdraw(lowest_exchange, symbol, amount_str)
                 # force update balance for any exchanges with automated transfers
                 if highest_exchange.name != 'LIQUI':
                     sleep(1, 'WITHDRAW_LOOP,BALANCE_REFRESH')
