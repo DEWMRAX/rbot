@@ -49,8 +49,8 @@ def sleep(duration, reason):
     record_event("SLEEPING,%d,%s" % (duration, reason))
     time.sleep(duration)
 
- # order determines execution ordering, assumes more liquidity at the latter exchange
- #   and that earlier exchanges are faster responding
+# order determines execution ordering, assumes more liquidity at the latter exchange
+#   and that earlier exchanges are faster responding
 exchanges = [liqui.Liqui(), binance.Binance(), bittrex.Bittrex(), poloniex.Poloniex()]
 gdax_stub = exchange.Exchange('GDAX')
 def get_exchange_handler(name):
@@ -308,7 +308,7 @@ def check_imbalance(buyer_book, seller_book, pair):
         price_collection.update({'symbol':symbol}, {'$set':{'price':float(average_price)}}, upsert=True)
 
     while(1):
-        if buyer.exchange_name == seller.exchange_name:
+        if buyer.name == seller.name:
             break
 
         if bids_idx >= len(bids) or asks_idx >= len(asks):
