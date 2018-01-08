@@ -46,7 +46,7 @@ class Binance(Exchange):
         with open('binance.keys', 'r') as api_key:
             self.api = api(api_key.readline().strip(), api_key.readline().strip())
 
-        self.symbols = ['BTC','ETH','USDT','LTC','BNT','OAX','SNT','DNT','MCO','QTUM','ICN','OMG','ZRX','STRAT','SNGLS','KNC','FUN','SALT','DASH','ENG','AST','MTL','STORJ','RCN','KMD','ARK','XMR','BCC','POWR','ZEC','BAT','ADA','ADX','DGD','REQ','XRP','LSK','MANA','XLM','NEO']
+        self.symbols = ['BTC','ETH','USDT','LTC','BNT','OAX','SNT','DNT','MCO','QTUM','ICN','OMG','ZRX','STRAT','SNGLS','KNC','FUN','SALT','DASH','ENG','AST','MTL','STORJ','RCN','KMD','ARK','XMR','BCC','POWR','ZEC','BAT','ADA','ADX','DGD','REQ','XRP','LSK','MANA','XLM','NEO','BNB','VEN']
         self.fees = {}
 
         account_info = self.api.account_info()
@@ -98,6 +98,7 @@ class Binance(Exchange):
             "MANA":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
             "XLM":"GAHK7EEG2WWHVKDNT4CEQFZGKF2LGDSW2IVM4S5DP42RBW3K6BTODB4A",
             "NEO":"AHrEFA4dPbQfwNssFiHvTh4ZTDXViB8JxS",
+            "VEN":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
             "DGD":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522"
         }[symbol]
 
