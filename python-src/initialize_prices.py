@@ -11,7 +11,7 @@ books = query_all()
 
 for pair, pair_book in books.iteritems():
     (token, currency) = pair.split('-')
-    if currency == 'BTC' or (token == 'BTC' and currency == 'USDT'):
+    if currency == 'BTC' or (token == 'BTC' and currency == 'USDT') or (pair.currency == 'USD' and pair.token == 'BTC'):
         price = (ai.best_bidder(pair_book).bids[0].price + ai.best_seller(pair_book).asks[0].price) / 2
         print pair, price
         symbol = token
