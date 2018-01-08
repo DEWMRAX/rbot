@@ -162,6 +162,8 @@ ALL_PAIRS = [
     Pair('LTC', 'USDT', friction(0.013)),
     Pair('DASH', 'USDT', friction(0.015)),
     Pair('BCC', 'USDT', friction(0.015)),
+
+    Pair('BTC', 'USD', friction(10)),
 ]
 
 ALL_SYMBOLS=['BTC','ETH','GNT','ICN','LTC','MLN','REP','USDT','TRST','WAVES','EDG','FCT','XEM','RLC','MAID','AMP','DASH','SC','LBC','MYST','BAT','ANT','QRL','BNT','PTOY','SNGLS','SNT','MCO','STORJ','ADX','OMG','QTUM','CVC','DGD','BCC','ZRX','STRAT','SYS','DNT','OAX','KNC','FUN','SALT','ENG','AST','MTL','RCN','KMD','ARK','XMR','POWR','ZEC','ADA','REQ','XRP','LSK','MANA','XLM','NEO','DCR']

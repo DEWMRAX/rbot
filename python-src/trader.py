@@ -308,6 +308,9 @@ def check_imbalance(buyer_book, seller_book, pair):
         price_collection.update({'symbol':symbol}, {'$set':{'price':float(average_price)}}, upsert=True)
 
     while(1):
+        if buyer.exchange_name == seller.exchange_name:
+            break
+
         if bids_idx >= len(bids) or asks_idx >= len(asks):
             break
 
