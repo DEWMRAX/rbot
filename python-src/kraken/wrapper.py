@@ -52,7 +52,7 @@ class Kraken(Exchange):
         with open('kraken_info.json') as f:
             self.tickers = json.loads(f.read())['result'].items()
 
-        self.symbols = ['BTC', 'ETH', 'LTC', 'ICN', 'MLN', 'REP', 'DASH', 'BCC', 'XMR', 'ZEC']
+        self.symbols = ['BTC', 'ETH', 'LTC', 'ICN', 'MLN', 'REP', 'DASH', 'BCC', 'XMR', 'ZEC', 'XRP', 'XLM']
         for pair,info in self.tickers:
             if '.' in pair: # some duplicate entries have a period, unsure why
                 continue
@@ -64,9 +64,9 @@ class Kraken(Exchange):
                 uniform_ticker = "%s-%s" % (token, currency)
                 self.pair_name_map[uniform_ticker] = pair
 
-                [vol,fee] = info['fees'][4]
-                assert(vol == 500000)
-                self.fees[uniform_ticker] = Decimal(fee) / 100
+                # [vol,fee] = info['fees'][4]
+                # assert(vol == 500000)
+                self.fees[uniform_ticker] = 0 # trading temporarily free at kraken #Decimal(fee) / 100
                 self.price_decimals[uniform_ticker] = info['pair_decimals']
                 self.lot_decimals[uniform_ticker] = min(info['lot_decimals'], info['pair_decimals'])
 
@@ -91,6 +91,8 @@ class Kraken(Exchange):
             "BCC":"1BhN1Mpwa6j7JsEWyWuckYAmnR8iukijmx",
             "XMR":"4GdoN7NCTi8a5gZug7PrwZNKjvHFmKeV11L6pNJPgj5QNEHsN6eeX3DaAQFwZ1ufD4LYCZKArktt113W7QjWvQ7CWG18YB7CuKmUY4QxAH",
             "ZEC":"t1a4ErZkCfqfckwojUh6iRheDSHHVQcNQdk",
+            "XRP":"rLHzPsX6oXkzU2qL12kHCH8G8cnZv1rBJh",
+            "XLM":"GA5XIGA5C7QTPTWXQHY6MCJRMTRZDOSHR6EFIBNDQTCQHG262N4GGKTM"
         }
         method_map = {
             "BTC":"Bitcoin",
@@ -103,6 +105,8 @@ class Kraken(Exchange):
             "BCC":"Bitcoin Cash",
             "XMR":"Monero",
             "ZEC":"Zcash (Transparent)",
+            "XRP":"Ripple XRP",
+            "XLM":"Stellar XLM"
         }
 
         addr_info = filter(lambda info: info['address'] == addr_map[symbol], self.query_private('DepositAddresses', {'asset':asset_name(symbol), 'method':method_map[symbol]})['result'])[0]
@@ -113,7 +117,9 @@ class Kraken(Exchange):
 
     def deposit_message(self, symbol):
         msg_map = {
-            "XMR":""
+            "XMR":"",
+            "XRP":"3732985062",
+            "XLM":"1843521132"
         }
         return msg_map[symbol]
 
