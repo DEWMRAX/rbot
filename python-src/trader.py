@@ -3,7 +3,7 @@ from collections import namedtuple
 from decimal import Decimal
 from pymongo import MongoClient
 
-import poloniex, bittrex, binance, liqui, exchange
+import poloniex, bittrex, binance, liqui, kraken, exchange
 from book import query_all, query_pair
 from feed_manager import invoke_one, invoke_all
 from logger import record_event, record_trade
@@ -51,7 +51,7 @@ def sleep(duration, reason):
 
 # order determines execution ordering, assumes more liquidity at the latter exchange
 #   and that earlier exchanges are faster responding
-exchanges = [liqui.Liqui(), binance.Binance(), bittrex.Bittrex(), poloniex.Poloniex()]
+exchanges = [kraken.Kraken(), liqui.Liqui(), binance.Binance(), bittrex.Bittrex(), poloniex.Poloniex()]
 gdax_stub = exchange.Exchange('GDAX')
 def get_exchange_handler(name):
     if name == 'GDAX':
@@ -241,7 +241,7 @@ def execute_trade(buyer, seller, pair, quantity, expected_profit, bid, ask):
     record_event("AI_CLOSE,%s" % info)
 
 def eligible_books_filter(books):
-    return filter(lambda book:book.exchange_name not in ['KRAKEN'] and book.age < MAX_BOOK_AGE and get_exchange_handler(book.exchange_name).active, books)
+    return filter(lambda book:book.exchange_name not in [] and book.age < MAX_BOOK_AGE and get_exchange_handler(book.exchange_name).active, books)
 
 def best_bidder(books):
     eligible_books = eligible_books_filter(books)
@@ -552,7 +552,9 @@ def check_symbol_balance(symbol, target, targets):
 
             amount_str = "%0.4f" % transfer_amount
             record_event("WITHDRAW_ATTEMPT,%s,%s,%s,%s" % (highest_exchange.name, lowest_exchange.name, symbol, amount_str))
-            if lowest_exchange.name == 'LIQUI' and exchange_nav_incl_pending_in_usdt(get_exchange_handler('LIQUI')) > LIQUI_USDT_TARGET:
+            if lowest_exchange.name == 'KRAKEN' or highest_exchange.name == 'KRAKEN':
+                record_event("WITHDRAW_HOLD,KRAKEN")
+            elif lowest_exchange.name == 'LIQUI' and exchange_nav_incl_pending_in_usdt(get_exchange_handler('LIQUI')) > LIQUI_USDT_TARGET:
                 record_event("WITHDRAW_HOLD,%s,%s" % (lowest_exchange.name, exchange_nav_incl_pending_in_usdt(get_exchange_handler('LIQUI'))))
             elif highest_exchange.active and lowest_exchange.active:
                 timestamp = '{:%m-%d,%H:%M:%S}'.format(datetime.datetime.now())

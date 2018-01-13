@@ -128,7 +128,6 @@ class Kraken(Exchange):
         print self.query_private('Withdraw', {'asset':asset_name(symbol), 'key':key_name, 'amount':amount})
 
     def refresh_balances(self):
-        raise Exception("DUCK KRAKEN")
         balances = self.query_private('Balance', {})['result']
 
         for symbol in self.symbols:
@@ -174,18 +173,15 @@ class Kraken(Exchange):
         return self.query_private('CancelOrder', {'txid':txid})
 
     def any_open_orders(self):
-        return False
         for txid,info in self.active_orders().items():
             return True
 
         return False
 
     def cancel_all_orders(self):
-        return True
         for txid,info in self.active_orders().items():
             record_event("CANCELALL,%s,%s" % (self.name,txid))
             self.cancel(txid)
 
     def active_orders(self):
-        return []
         return self.query_private('OpenOrders', {})['result']['open']
