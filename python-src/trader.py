@@ -552,7 +552,7 @@ def check_symbol_balance(symbol, target, targets):
 
             amount_str = "%0.4f" % transfer_amount
             record_event("WITHDRAW_ATTEMPT,%s,%s,%s,%s" % (highest_exchange.name, lowest_exchange.name, symbol, amount_str))
-            if lowest_exchange.name == 'KRAKEN' or highest_exchange.name == 'KRAKEN':
+            if (lowest_exchange.name == 'KRAKEN' and not highest_exchange.name == 'LIQUI') or highest_exchange.name == 'KRAKEN':
                 record_event("WITHDRAW_HOLD,KRAKEN")
             elif lowest_exchange.name == 'LIQUI' and exchange_nav_incl_pending_in_usdt(get_exchange_handler('LIQUI')) > LIQUI_USDT_TARGET:
                 record_event("WITHDRAW_HOLD,%s,%s" % (lowest_exchange.name, exchange_nav_incl_pending_in_usdt(get_exchange_handler('LIQUI'))))
