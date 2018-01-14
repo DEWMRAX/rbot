@@ -17,7 +17,7 @@ TRANSFER_THRESHOLD_HIGH=Decimal('2.5')
 DRAWDOWN_AMOUNT=Decimal('.42') # how much to leave on an exchange we are withdrawing from
 DRAWUP_AMOUNT=Decimal('1.75') # how much to target on an exchange we are transferring to
 BALANCE_ACCURACY=Decimal('0.02')
-LIQUI_USDT_TARGET=Decimal(185000)
+LIQUI_NAV_PERCENTAGE_MAX=DECIMAL('0.15')
 
 UPDATE_TARGET_BALANCE = False
 UPDATE_ALL_TARGET_BALANCE = False
@@ -150,8 +150,10 @@ def exchange_nav_incl_pending(exch):
 
     return total
 
-def exchange_nav_incl_pending_in_usdt(exch):
-    return exchange_nav_incl_pending(exch) / PRICE['USDT']
+def exchange_nav_as_percentage_of_total(exch):
+    exchange_nav = exchange_nav_incl_pending(exch)
+    total_nav = balances_nav(total_balance_incl_pending)
+    return exchange_nav / total_nav
 
 # revenue in mBTC
 def arbitrage_revenue():
@@ -555,8 +557,8 @@ def check_symbol_balance(symbol, target, targets):
             record_event("WITHDRAW_ATTEMPT,%s,%s,%s,%s" % (highest_exchange.name, lowest_exchange.name, symbol, amount_str))
             if (lowest_exchange.name == 'KRAKEN' and not highest_exchange.name == 'LIQUI') or highest_exchange.name == 'KRAKEN':
                 record_event("WITHDRAW_HOLD,KRAKEN")
-            elif lowest_exchange.name == 'LIQUI' and exchange_nav_incl_pending_in_usdt(get_exchange_handler('LIQUI')) > LIQUI_USDT_TARGET:
-                record_event("WITHDRAW_HOLD,%s,%s" % (lowest_exchange.name, exchange_nav_incl_pending_in_usdt(get_exchange_handler('LIQUI'))))
+            elif lowest_exchange.name == 'LIQUI' and exchange_nav_as_percentage_of_total(get_exchange_handler('LIQUI')) > LIQUI_NAV_PERCENTAGE_MAX:
+                record_event("WITHDRAW_HOLD,%s,%0.3f" % (lowest_exchange.name, exchange_nav_as_percentage_of_total(get_exchange_handler('LIQUI'))))
             elif highest_exchange.active and lowest_exchange.active:
                 timestamp = '{:%m-%d,%H:%M:%S}'.format(datetime.datetime.now())
                 open_transfers_collection.insert_one({'symbol':symbol, 'amount':amount_str, 'address':lowest_exchange.deposit_address(symbol),
