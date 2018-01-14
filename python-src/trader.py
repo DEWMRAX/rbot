@@ -11,6 +11,7 @@ from order import Order
 from pair import ALL_PAIRS, ALL_SYMBOLS, pair_factory
 
 MAX_BOOK_AGE = 8
+MAX_RECOVERY_ATTEMPTS = 10
 TRANSFER_THRESHOLD_LOW=Decimal('.22')
 TRANSFER_THRESHOLD_HIGH=Decimal('2.5')
 DRAWDOWN_AMOUNT=Decimal('.42') # how much to leave on an exchange we are withdrawing from
@@ -183,7 +184,7 @@ def execute_trade(buyer, seller, pair, quantity, expected_profit, bid, ask):
 
     trade_doc = {'buyer':buyer.name, 'seller':seller.name, 'quantity':"%0.8f" % quantity,
                  'token':pair.token, 'currency':pair.currency, 'bid':"%0.8f" % bid, 'ask':"%0.8f" % ask,
-                 'token_balance':"%0.8f" % starting_token_balance}
+                 'token_balance':"%0.8f" % starting_token_balance, 'recovery_attempts':0}
     open_trades_id = open_trades_collection.insert_one(trade_doc).inserted_id
 
     info = balances_string() + ",%s,%s,%s,%s,%0.8f,%0.8f,%0.8f,%0.8f" % (buyer.name, seller.name, pair.token, pair.currency, quantity, bid, ask, expected_profit)
@@ -601,6 +602,13 @@ sleep(1, 'STARTUP,SANITY_CHECK_OPEN')
 
 while open_trades_collection.find_one():
     trade = open_trades_collection.find_one()
+
+    if trade['recovery_attempts'] > MAX_RECOVERY_ATTEMPTS:
+        record_event("CANCELLING RECOVERY,MAX ATTEMPTS")
+        open_trades_collection.delete_one({'_id':trade['_id']})
+        break
+    else:
+        open_trades_collection.update({'_id':trade['_id']}, {'$set':{'recovery_attempts':trade['recovery_attempts']+1}})
 
     for exch in exchanges:
         # we must get fresh balances from the exchanges involved in the recovery
