@@ -17,7 +17,7 @@ TRANSFER_THRESHOLD_HIGH=Decimal('2.5')
 DRAWDOWN_AMOUNT=Decimal('.42') # how much to leave on an exchange we are withdrawing from
 DRAWUP_AMOUNT=Decimal('1.75') # how much to target on an exchange we are transferring to
 BALANCE_ACCURACY=Decimal('0.02')
-LIQUI_NAV_PERCENTAGE_MAX=DECIMAL('0.15')
+LIQUI_NAV_PERCENTAGE_MAX=Decimal('0.17')
 
 UPDATE_TARGET_BALANCE = False
 UPDATE_ALL_TARGET_BALANCE = False
