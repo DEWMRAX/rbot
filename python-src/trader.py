@@ -625,8 +625,7 @@ while open_trades_collection.find_one():
     pair = pair_factory(trade['token'], trade['currency'])
     balance = total_balance(pair.token)
 
-    record_event("RECOVERY BEGIN,%s,%s,%s,%s,%s,%s,%s,%s" % (trade['buyer'], trade['seller'], trade['token'], trade['currency'], balance, trade['token_balance'], trade['bid'], trade['ask']))
-
+    record_event("RECOVERY BEGIN,%d,%s,%s,%s,%s,%s,%s,%s,%s" % (trade['recovery_attempts'], trade['buyer'], trade['seller'], trade['token'], trade['currency'], balance, trade['token_balance'], trade['bid'], trade['ask']))
     target_balance = Decimal(trade['token_balance'])
 
     if abs(target_balance - balance) * Decimal(.98) > Decimal(trade['quantity']):
