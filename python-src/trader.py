@@ -311,6 +311,9 @@ def check_imbalance(buyer_book, seller_book, pair):
         price_collection.update({'symbol':symbol}, {'$set':{'price':float(average_price)}}, upsert=True)
 
     while(1):
+        if pair.currency == 'USD': # not trading on USD pairs quite yet
+            break
+
         if buyer.name == seller.name:
             break
 

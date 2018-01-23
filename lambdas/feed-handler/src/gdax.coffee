@@ -9,8 +9,13 @@ format_quote = (quote) ->
 format_quotes = (quotes) ->
   format_quote quote for quote in quotes[0..LIMIT]
 
+symbol_to_gdax = (symbol) ->
+  switch symbol
+    when 'BCC' then 'BCH'
+    else symbol
+
 pair_name = (token, currency) ->
-  "#{token.toUpperCase()}-#{currency.toUpperCase()}"
+  "#{symbol_to_gdax token.toUpperCase()}-#{symbol_to_gdax currency.toUpperCase()}"
 
 sanity_check = (book) ->
   (book?.asks and book.asks.length > MIN_BOOK_DATA and book?.bids and book.bids.length > MIN_BOOK_DATA)
