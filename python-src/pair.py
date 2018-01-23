@@ -164,6 +164,9 @@ ALL_PAIRS = [
     Pair('BCC', 'USDT', friction(0.015)),
 
     Pair('BTC', 'USD', friction(100)),
+    Pair('LTC', 'USD', friction(100)),
+    Pair('ETH', 'USD', friction(100)),
+    Pair('BCC', 'USD', friction(100)),
 
     Pair('BNB', 'BTC', friction(100)),
     Pair('ELF', 'BTC', friction(100)),
