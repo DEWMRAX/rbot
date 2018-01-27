@@ -314,6 +314,9 @@ def check_imbalance(buyer_book, seller_book, pair):
         if pair.currency == 'USD': # not trading on USD pairs quite yet
             break
 
+        if pair.token in ['MYST']: # tokens temp. not trading
+            break
+
         if buyer.name == seller.name:
             break
 
