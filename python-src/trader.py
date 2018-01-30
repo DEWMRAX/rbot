@@ -54,9 +54,12 @@ def sleep(duration, reason):
 #   and that earlier exchanges are faster responding
 exchanges = [kraken.Kraken(), liqui.Liqui(), binance.Binance(), bittrex.Bittrex(), poloniex.Poloniex()]
 gdax_stub = exchange.Exchange('GDAX')
+itbit_stub = exchange.Exchange('ITBIT')
 def get_exchange_handler(name):
     if name == 'GDAX':
         return gdax_stub
+    if name == 'ITBIT':
+        return itbit_stub
     return filter(lambda exchange:exchange.name == name, exchanges)[0]
 
 if INITIALIZE_BALANCE_CACHE:
