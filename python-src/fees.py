@@ -8,5 +8,6 @@ FEES = {
     "BITTREX":Fee(25, 25),
     "BINANCE":Fee(5, 5),
     "LIQUI":Fee(10, 25),
-    "GDAX":Fee(25, 0)
+    "GDAX":Fee(25, 0),
+    "ITBIT":Fee(20, 0)
 }
