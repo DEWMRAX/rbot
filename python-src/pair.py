@@ -5,7 +5,7 @@ from order import Order
 # targetting ~$2,000 for max_notional
 MAX_NOTIONAL={"BTC":Decimal('.2'), "ETH":Decimal('4'), "USDT":Decimal('2000'), "USD":Decimal('1')}
 MIN_NOTIONAL={"BTC":Decimal('.002'), "ETH":Decimal('.04'), "USDT":Decimal('40'), "USD":Decimal('10000000')}
-MIN_QUANTITY={"ELF":Decimal('1000000000'), "BNB":Decimal('100000000'), "VEN":Decimal('2'), "REQ":Decimal('10'), "XRP":Decimal('2'), "LSK":Decimal('0.5'), "MANA":Decimal('10'), "XLM":Decimal('5'), "NEO":Decimal('0.1'), "DCR":Decimal('0.1'), "ADA":Decimal('3'), "ZEC":Decimal('0.01'), "POWR":Decimal('5'), "XMR":Decimal('0.02'), "ARK":Decimal('1'), "RCN":Decimal('20'), "KMD":Decimal('2'), "ENG":Decimal('20'), "AST":Decimal('10'), "MTL":Decimal('.3'), "SALT":Decimal('.5'), "FUN":Decimal('50'), "KNC":Decimal('3'), "DNT":Decimal('1'), "OAX":Decimal('.01'), "STRAT":Decimal('.01'), "SYS":Decimal('.01'), "ZRX":Decimal('1'), "BCC":Decimal('.01'), "MCO":Decimal('.01'), "STORJ":Decimal('.01'), "ADX":Decimal('.01'), "OMG":Decimal('.01'), "QTUM":Decimal('.01'), "CVC":Decimal('.01'), "DGD":Decimal('.01'), "QRL":Decimal('.01'), "BNT":Decimal('.01'), "PTOY":Decimal('.01'), "SNGLS":Decimal('.01'), "SNT":Decimal('.01'), "MYST":Decimal('.01'), "BAT":Decimal('50'), "ANT":Decimal('.01'), "DASH":Decimal('.01'), "SC":Decimal('1'), "LBC":Decimal('0.1'), "EDG":Decimal('0.1'), "TRST":Decimal('0.1'), "WAVES":Decimal('0.1'), "ETH":Decimal('.01'), "GNT":Decimal('0.1'), "ICN":Decimal('2'), "MLN":Decimal('0.1'), "LTC":Decimal('0.1'), "REP":Decimal('0.3'), "BTC":Decimal('0.001'), "FCT":Decimal('0.1'), "XEM":Decimal('0.1'), "RLC":Decimal('0.1'), "MAID":Decimal('0.1'), "AMP":Decimal('0.1')}
+MIN_QUANTITY={"AION":Decimal('2'), "ELF":Decimal('1000000000'), "BNB":Decimal('100000000'), "VEN":Decimal('2'), "REQ":Decimal('10'), "XRP":Decimal('2'), "LSK":Decimal('0.5'), "MANA":Decimal('10'), "XLM":Decimal('5'), "NEO":Decimal('0.1'), "DCR":Decimal('0.1'), "ADA":Decimal('3'), "ZEC":Decimal('0.01'), "POWR":Decimal('5'), "XMR":Decimal('0.02'), "ARK":Decimal('1'), "RCN":Decimal('20'), "KMD":Decimal('2'), "ENG":Decimal('20'), "AST":Decimal('10'), "SALT":Decimal('.5'), "FUN":Decimal('50'), "KNC":Decimal('3'), "DNT":Decimal('1'), "OAX":Decimal('.01'), "STRAT":Decimal('.01'), "SYS":Decimal('.01'), "ZRX":Decimal('1'), "BCC":Decimal('.01'), "STORJ":Decimal('.01'), "ADX":Decimal('.01'), "OMG":Decimal('.01'), "QTUM":Decimal('.01'), "CVC":Decimal('.01'), "DGD":Decimal('.01'), "QRL":Decimal('.01'), "BNT":Decimal('.01'), "SNGLS":Decimal('.01'), "SNT":Decimal('.01'), "MYST":Decimal('.01'), "BAT":Decimal('50'), "ANT":Decimal('.01'), "DASH":Decimal('.01'), "SC":Decimal('1'), "LBC":Decimal('0.1'), "TRST":Decimal('0.1'), "WAVES":Decimal('0.1'), "ETH":Decimal('.01'), "GNT":Decimal('0.1'), "ICN":Decimal('2'), "MLN":Decimal('0.1'), "LTC":Decimal('0.1'), "REP":Decimal('0.3'), "BTC":Decimal('0.001'), "XEM":Decimal('0.1'), "RLC":Decimal('0.1'), "MAID":Decimal('0.1'), "AMP":Decimal('0.1')}
 
 class Pair(namedtuple('Pair', ['token','currency','network_friction'])):
     __slots__ = ()
@@ -72,8 +72,6 @@ ALL_PAIRS = [
     Pair('ENG', 'ETH', friction(0.009)),
     Pair('AST', 'BTC', friction(0.012)),
     Pair('AST', 'ETH', friction(0.009)),
-    Pair('MTL', 'BTC', friction(0.009)),
-    Pair('MTL', 'ETH', friction(0.007)),
 
     Pair('SALT', 'BTC', friction(0.009)),
     Pair('SALT', 'ETH', friction(0.007)),
@@ -88,8 +86,6 @@ ALL_PAIRS = [
 
     Pair('ZRX', 'BTC', friction(0.008)),
     Pair('ZRX', 'ETH', friction(0.006)),
-    Pair('MCO', 'BTC', friction(0.01)),
-    Pair('MCO', 'ETH', friction(0.007)),
     Pair('STORJ', 'BTC', friction(0.008)),
     Pair('STORJ', 'ETH', friction(0.006)),
     Pair('ADX', 'BTC', friction(0.01)),
@@ -107,8 +103,6 @@ ALL_PAIRS = [
     Pair('QRL', 'ETH', friction(0.007)),
     Pair('BNT', 'BTC', friction(0.008)),
     Pair('BNT', 'ETH', friction(0.006)),
-    Pair('PTOY', 'BTC', friction(0.01)),
-    Pair('PTOY', 'ETH', friction(0.007)),
     Pair('SNGLS', 'BTC', friction(0.008)),
     Pair('SNGLS', 'ETH', friction(0.006)),
     Pair('SNT', 'BTC', friction(0.01)),
@@ -132,8 +126,6 @@ ALL_PAIRS = [
 
     Pair('RLC', 'BTC', friction(0.01)),
     Pair('RLC', 'ETH', friction(0.007)),
-    Pair('EDG', 'BTC', friction(0.01)),
-    Pair('EDG', 'ETH', friction(0.007)),
     Pair('TRST', 'BTC', friction(0.008)),
     Pair('TRST', 'ETH', friction(0.006)),
 
@@ -147,7 +139,6 @@ ALL_PAIRS = [
     Pair('GNT', 'ETH', friction(0.006)),
 
     Pair('WAVES', 'BTC', friction(0.01)),
-    Pair('FCT', 'BTC', friction(0.015)), # often withdrawal problems
     Pair('XEM', 'BTC', friction(0.009)),
 
     Pair('LTC', 'BTC', friction(0.008)),
@@ -173,9 +164,12 @@ ALL_PAIRS = [
 
     Pair('VEN', 'BTC', friction(0.008)),
     Pair('VEN', 'ETH', friction(0.008)),
+
+    Pair('AION', 'BTC', friction(0.008)),
+    Pair('AION', 'ETH', friction(0.008)),
 ]
 
-ALL_SYMBOLS=['BTC','ETH','GNT','ICN','LTC','MLN','REP','USDT','TRST','WAVES','EDG','FCT','XEM','RLC','MAID','AMP','DASH','SC','LBC','MYST','BAT','ANT','QRL','BNT','PTOY','SNGLS','SNT','MCO','STORJ','ADX','OMG','QTUM','CVC','DGD','BCC','ZRX','STRAT','SYS','DNT','OAX','KNC','FUN','SALT','ENG','AST','MTL','RCN','KMD','ARK','XMR','POWR','ZEC','ADA','REQ','XRP','LSK','MANA','XLM','NEO','DCR','BNB','VEN','ELF']
+ALL_SYMBOLS=['BTC','ETH','GNT','ICN','LTC','MLN','REP','USDT','TRST','WAVES','XEM','RLC','MAID','AMP','DASH','SC','LBC','MYST','BAT','ANT','QRL','BNT','SNGLS','SNT','STORJ','ADX','OMG','QTUM','CVC','DGD','BCC','ZRX','STRAT','SYS','DNT','OAX','KNC','FUN','SALT','ENG','AST','RCN','KMD','ARK','XMR','POWR','ZEC','ADA','REQ','XRP','LSK','MANA','XLM','NEO','DCR','BNB','VEN','ELF','AION']
 
 pair_map = dict()
 

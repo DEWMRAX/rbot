@@ -14,7 +14,7 @@ class Liqui(Exchange):
 
         self.prices = {}
 
-        self.symbols = ['BTC','ETH','GNT','ICN','LTC','MLN','REP','USDT','TRST','WAVES','EDG','RLC','DASH','MYST','BAT','ANT','QRL','BNT','PTOY','SNGLS','SNT','MCO','STORJ','ADX','OMG','CVC','DGD','BCC','ZRX','DNT','OAX','KNC','SALT','ENG','AST','REQ','MANA','VEN']
+        self.symbols = ['BTC','ETH','GNT','ICN','LTC','MLN','REP','USDT','TRST','WAVES','RLC','DASH','MYST','BAT','ANT','QRL','BNT','SNGLS','SNT','STORJ','ADX','OMG','CVC','DGD','BCC','ZRX','DNT','OAX','KNC','SALT','ENG','AST','REQ','MANA','VEN','AION']
 
         self.tickers = liqui.common.market_info
 
@@ -39,7 +39,6 @@ class Liqui(Exchange):
             "ICN":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "TRST":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "WAVES":"3PMgCcb5ZHQ54seUzAowQyyC8rJ1xPYQAoY",
-            "EDG":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "RLC":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "DASH":"Xsk3d6UnT2UPFckdEoJjfkyh1a1PkQh1MQ",
             "MYST":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
@@ -47,10 +46,8 @@ class Liqui(Exchange):
             "ANT":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "QRL":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "BNT":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
-            "PTOY":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "SNGLS":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "SNT":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
-            "MCO":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "STORJ":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "ADX":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "OMG":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
@@ -66,6 +63,7 @@ class Liqui(Exchange):
             "REQ":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "MANA":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "VEN":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
+            "AION":"0xed631591f77bc43539606e7e7f1110ea4f821f02",
             "KNC":"0xed631591f77bc43539606e7e7f1110ea4f821f02"
         }[symbol]
 

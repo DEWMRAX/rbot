@@ -46,7 +46,7 @@ class Binance(Exchange):
         with open('binance.keys', 'r') as api_key:
             self.api = api(api_key.readline().strip(), api_key.readline().strip())
 
-        self.symbols = ['BTC','ETH','USDT','LTC','BNT','OAX','SNT','DNT','MCO','QTUM','ICN','OMG','ZRX','STRAT','SNGLS','KNC','FUN','SALT','DASH','ENG','AST','MTL','STORJ','RCN','KMD','ARK','XMR','BCC','POWR','ZEC','BAT','ADA','ADX','DGD','REQ','XRP','LSK','MANA','XLM','NEO','BNB','VEN','ELF']
+        self.symbols = ['BTC','ETH','USDT','LTC','BNT','OAX','SNT','DNT','QTUM','ICN','OMG','ZRX','STRAT','SNGLS','KNC','FUN','SALT','DASH','ENG','AST','STORJ','RCN','KMD','ARK','XMR','BCC','POWR','ZEC','BAT','ADA','ADX','DGD','REQ','XRP','LSK','MANA','XLM','NEO','BNB','VEN','ELF','RLC','AION']
         self.fees = {}
 
         account_info = self.api.account_info()
@@ -63,7 +63,6 @@ class Binance(Exchange):
             "OAX":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
             "SNT":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
             "DNT":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
-            "MCO":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
             "QTUM":"Qb8TkuiYHiiMULAnwvNwxiiX7ZysRDMGuU",
             "ICN":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
             "BTC":"1B6pVbhmQ6un24QB7DCSNoEmbe91bZ41YJ",
@@ -78,7 +77,6 @@ class Binance(Exchange):
             "SALT":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
             "ENG":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
             "AST":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
-            "MTL":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
             "RCN":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
             "KMD":"R9n3zB5Xybkb9aj83LouA8qX6KwWUAXYea",
             "STORJ":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
@@ -99,6 +97,8 @@ class Binance(Exchange):
             "XLM":"GAHK7EEG2WWHVKDNT4CEQFZGKF2LGDSW2IVM4S5DP42RBW3K6BTODB4A",
             "NEO":"AHrEFA4dPbQfwNssFiHvTh4ZTDXViB8JxS",
             "VEN":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
+            "RLC":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
+            "AION":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522",
             "DGD":"0xfd0b4f1e367ce7e0ee598652f27a58a10f0aa522"
         }[symbol]
 

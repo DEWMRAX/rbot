@@ -13,7 +13,7 @@ class Bittrex(Exchange):
             secrets = json.load(secrets_file)
             self.api = api(secrets['key'], secrets['secret'])
 
-        self.symbols = ['EDG','TRST','WAVES','BTC','ETH','LTC','MLN','REP','GNT','USDT','FCT','XEM','RLC','MAID','AMP','DASH','SC','LBC','MYST','BAT','ANT','QRL','BNT','PTOY','SNGLS','SNT','MCO','STORJ','ADX','OMG','QTUM','CVC','DGD','BCC','STRAT','SYS','FUN','DNT','SALT','MTL','RCN','KMD','ARK','XMR','POWR','ZEC','ADA','XRP','LSK','MANA','XLM','NEO','DCR']
+        self.symbols = ['TRST','WAVES','BTC','ETH','LTC','MLN','REP','GNT','USDT','XEM','RLC','MAID','AMP','DASH','SC','LBC','BAT','ANT','QRL','BNT','SNT','STORJ','ADX','OMG','QTUM','CVC','BCC','STRAT','SYS','FUN','DNT','SALT','RCN','KMD','ARK','XMR','POWR','ZEC','ADA','XRP','LSK','MANA','XLM','NEO','DCR']
 
         self.markets = self.api.get_markets()
 
@@ -31,14 +31,12 @@ class Bittrex(Exchange):
             "WAVES":"3PPercZ2N4RaEcgWGE3ppFeDZzwxxJ4jLWU",
             "INCNT":"3P3CEauB4vwJNfCdpkYzCFXvr5iz7N1z1T7",
             "TRST":"0xc1938b09db973739098d4afd9ebe45e539b60d29",
-            "EDG":"0xad878233c39a74c6e6b248d9fca8cb2b7cf3c24b",
             "ETH":"0xe034bcf55701d4ba643c79637036f3de794225cb",
             "LTC":"LSFhS1A2RG34AgXd8PMUD3XBqM9G1shfPY",
             "MLN":"0xb9b54c03e36200d7ab0f12e66cdc4e37d7972ef7",
             "REP":"0x2073ea7de92efcc4fa50f8da5e95b0b6f761da67",
             "GNT":"0x9673282d255b24fddf1f20056efd64f60dcead3a",
             "USDT":"1PbG9Z11fZPzsX6Q4LymjYSPsgpdu8qpZz",
-            "FCT":"FA2RA1t4iy9eskH5wdm3m1f2oqJb3DKV4PwQh9qRrHi4uDTMkR9P",
             "XEM":"ND2JRPQIWXHKAA26INVGA7SREEUMX5QAI6VU7HNR",
             "LUN":"0xa63866d33cf3b520a0e1585d6e090ef0db06d424",
             "RLC":"0xebe2ec0bd6ee1a60c06bc7d19a9a09ff9468c983",
@@ -47,29 +45,23 @@ class Bittrex(Exchange):
             "DASH":"XeUKacotW9k4azRT6ryuFNQihyptpbRVV9",
             "SC":"e19692e310176b4d80fafc90dd17a16e525bd7dfd6215c91cd67ab4068c99f7e1920a04844e9",
             "LBC":"bJiieHLhhSayAXQAHNXcKJF2XC1oELg9Wd",
-            "MYST":"0xf10a1951b291344d610def7a37691e5134ee1202",
             "BAT":"0x9be2499f084bf1d77529db53746256c71be2fc62",
             "ANT":"0xe443971e4dde9e8cf3837c1ff8942f6ba2e65bbc",
             "1ST":"0x08489cbde7352162d46027a61abb3700abc01b89",
             "HMQ":"0x684a5c9af9e0400bce47eafb9169a373f18455c2",
             "QRL":"0xe23c1001e05d0a7d115bc322bd9cf9b548e1d7d5",
             "BNT":"0x4c37e79d6735a3f3993b8c137c043a52ef8f2c86",
-            "PTOY":"0x704dfefd38404751b37528178fe8038c327567d7",
-            "SNGLS":"0x418684cfe6bcba5d1bf27e17271778097bac451a",
             "SNT":"0x90bb6c2cf13761d3071365ca1ada85387eb31569",
-            "MCO":"0x0bf450a1729474605f45e8b582209a8c291d7cef",
             "STORJ":"0xe59f7d8149c8836caf8c13b8f71cb3765bd008e4",
             "ADX":"0xdc53401db51d306c3995f2b15d5f821a33ae119c",
             "OMG":"0xb75484c5c4456ccc9ace88ca79d98ed38c1e0c38",
             "QTUM":"QbDy528rVZFKGWQUpvSkiDMFm49P7LZLV6",
             "CVC":"0x77a8586078cf6f21f4c93b55f98134d6b1ab4500",
-            "DGD":"0x8f59c61955f2155a43cda71342f42788d8401e1a",
             "BCC":"1JbhFhk9guXyZuiYWJo1wVsNNPwenguhFn",
             "STRAT":"SVkyfcMzo3VJxCaA5WjoG4nJLNTeWh44tf",
             "SYS":"SNHvSbxWxjG8qvSjsaqzVajjQRHpJgZRi3",
             "FUN":"0x4a10875dce29877c383f308e0c120937ba5bb41f",
             "SALT":"0x7f1971f94af46c902ce979a425a0e575ffbea426",
-            "MTL":"0x2da3b3601826defd0e5e19f551ac537a85772b3d",
             "RCN":"0xe01598aaa7f328f7e80abfdf358e8bfc21bd738a",
             "KMD":"RFm1kynPjs1iU4UepVTNtzdcMWie1QJZHC",
             "ARK":"AeajBvW8LfZiCRtbPdx5usZStL4cdWqquo",
