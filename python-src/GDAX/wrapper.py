@@ -58,7 +58,6 @@ class GDAX(Exchange):
             else:
                 self.fees[ticker] = Decimal('0.0025')
 
-
     def pair_name(self, pair):
         return "%s-%s" % (symbol_to_gdax(pair.token), symbol_to_gdax(pair.currency))
 
