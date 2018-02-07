@@ -5,6 +5,7 @@ poloniex = require './poloniex'
 kraken = require './kraken'
 gdax = require './gdax'
 itbit = require './itbit'
+bitflyer = require './bitflyer'
 
 AWS = require 'aws-sdk'
 AWS.config.update
@@ -28,6 +29,7 @@ exports.handler = (event, context, callback) ->
     when 'KRAKEN' then kraken
     when 'GDAX' then gdax
     when 'ITBIT' then itbit
+    when 'BITFLYER' then bitflyer
 
   await feed_handler.get_book token, currency, callback, defer book
 
