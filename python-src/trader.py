@@ -178,6 +178,7 @@ def balances_detail():
     return ','.join(map(lambda exch:','.join(map(lambda symbol: "%0.8f" % exch.get_balance(symbol), ALL_SYMBOLS)), exchanges))
 
 def execute_trade(buyer, seller, pair, quantity, expected_profit, bid, ask):
+    assert(DISABLE_TRADING == False)
 
     starting_currency_balance = total_balance(pair.currency)
     starting_token_balance = total_balance(pair.token)
@@ -449,6 +450,8 @@ def refresh_all_markets(pair, reason):
     return query_pair(pair)
 
 def buy_at_market(reason, pair, _amount, expected_price=None):
+    assert(DISABLE_TRADING == False)
+
     amount = _amount / Decimal('.9975') # buy enough to cover exchange fee
 
     record_event("MKT BUY,%s,%s,%s,%0.8f" % (reason, pair.token, pair.currency, amount))
@@ -484,6 +487,7 @@ def buy_at_market(reason, pair, _amount, expected_price=None):
     return best_exch
 
 def sell_at_market(reason, pair, amount, expected_price=None):
+    assert(DISABLE_TRADING == False)
 
     record_event("MKT SELL,%s,%s,%s,%0.8f" % (reason, pair.token, pair.currency, amount))
     books = refresh_all_markets(pair, 'MKT SELL')
