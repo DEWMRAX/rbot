@@ -63,7 +63,7 @@ class BitFlyer(Exchange):
 
     def any_open_orders(self):
         assert(len(PAIRS) == 1)
-        return len(self.api.getchildorders(product_code='BTC_USD')) > 0
+        return len(self.api.getchildorders(product_code='BTC_USD', child_order_state='ACTIVE')) > 0
 
     def cancel_all_orders(self):
         assert(len(PAIRS) == 1)
