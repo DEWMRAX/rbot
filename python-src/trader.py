@@ -309,10 +309,13 @@ def check_imbalance(buyer_book, seller_book, pair):
         price_collection.update({'symbol':symbol}, {'$set':{'price':float(average_price)}}, upsert=True)
 
     while(1):
+        if DISABLE_TRADING:
+            break
+
         if pair.currency == 'USD': # not trading on USD pairs quite yet
             break
 
-        if pair.token in ['MYST']: # tokens temp. not trading
+        if pair.token in ['']: # tokens temp. not trading
             break
 
         if buyer.name == seller.name:
@@ -384,9 +387,6 @@ def check_imbalance(buyer_book, seller_book, pair):
     total_profit *= PRICE[pair.currency]
 
     trace += "ACTIONABLE IMBALANCE of %0.8f on %s WITH TOTAL PROFIT %0.8f\n" % (total_quantity, pair, total_profit)
-
-    if DISABLE_TRADING:
-        total_profit = total_quantity = Decimal(0)
 
     if total_quantity * ask_price < pair.min_notional():
         trace += "risk check MIN_NOTIONAL, skipping trade %0.8f\n" % (total_quantity * ask_price)
