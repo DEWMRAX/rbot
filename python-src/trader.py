@@ -3,7 +3,7 @@ from collections import namedtuple
 from decimal import Decimal
 from pymongo import MongoClient
 
-import poloniex, bittrex, binance, liqui, kraken, exchange
+import poloniex, bittrex, binance, liqui, kraken, gdax, itbit, bitflyer, exchange
 from book import query_all, query_pair
 from feed_manager import invoke_one, invoke_all
 from logger import record_event, record_trade
@@ -19,6 +19,7 @@ DRAWUP_AMOUNT=Decimal('1.75') # how much to target on an exchange we are transfe
 BALANCE_ACCURACY=Decimal('0.02')
 LIQUI_NAV_PERCENTAGE_MAX=Decimal('0.01')
 
+DISABLE_TRADING = True
 UPDATE_TARGET_BALANCE = False
 UPDATE_ALL_TARGET_BALANCE = False
 REPAIR_BALANCES = False
@@ -52,18 +53,8 @@ def sleep(duration, reason):
 
 # order determines execution ordering, assumes more liquidity at the latter exchange
 #   and that earlier exchanges are faster responding
-exchanges = [kraken.Kraken(), liqui.Liqui(), binance.Binance(), bittrex.Bittrex(), poloniex.Poloniex()]
-gdax_stub = exchange.Exchange('GDAX')
-itbit_stub = exchange.Exchange('ITBIT')
-bitflyer_stub = exchange.Exchange('BITFLYER')
+exchanges = [itbit.ItBit(), bitflyer.BitFlyer(), kraken.Kraken(), binance.Binance(), gdax.GDAX(), bittrex.Bittrex(), poloniex.Poloniex()]
 def get_exchange_handler(name):
-    if name == 'GDAX':
-        return gdax_stub
-    if name == 'ITBIT':
-        return itbit_stub
-    if name == 'BITFLYER':
-        return bitflyer_stub
-
     return filter(lambda exchange:exchange.name == name, exchanges)[0]
 
 if INITIALIZE_BALANCE_CACHE:
@@ -251,7 +242,7 @@ def execute_trade(buyer, seller, pair, quantity, expected_profit, bid, ask):
     record_event("AI_CLOSE,%s" % info)
 
 def eligible_books_filter(books):
-    return filter(lambda book:book.exchange_name not in [] and book.age < MAX_BOOK_AGE and get_exchange_handler(book.exchange_name).active, books)
+    return filter(lambda book:book.exchange_name not in ['LIQUI'] and book.age < MAX_BOOK_AGE and get_exchange_handler(book.exchange_name).active, books)
 
 def best_bidder(books):
     eligible_books = eligible_books_filter(books)
@@ -393,6 +384,9 @@ def check_imbalance(buyer_book, seller_book, pair):
     total_profit *= PRICE[pair.currency]
 
     trace += "ACTIONABLE IMBALANCE of %0.8f on %s WITH TOTAL PROFIT %0.8f\n" % (total_quantity, pair, total_profit)
+
+    if DISABLE_TRADING:
+        total_profit = total_quantity = Decimal(0)
 
     if total_quantity * ask_price < pair.min_notional():
         trace += "risk check MIN_NOTIONAL, skipping trade %0.8f\n" % (total_quantity * ask_price)
@@ -700,9 +694,9 @@ while True:
         record_event("RISK_CHECK,PANIC! AT THE DISCO")
         sys.exit(1)
 
-    if last_balance_check_time + 300 < int(time.time()):
-        check_symbol_balance_loop()
-        last_balance_check_time = int(time.time())
+    # if last_balance_check_time + 300 < int(time.time()):
+    #     check_symbol_balance_loop()
+    #     last_balance_check_time = int(time.time())
 
     if REPAIR_BALANCES:
         sys.exit(1)
@@ -724,7 +718,12 @@ while True:
             best_trade = trade
 
     if best_trade is None:
-        sleep(2, 'NO_TRADE')
+        if DISABLE_TRADING:
+            sleep(60, 'NO_TRADING')
+            for exch in exchanges:
+                exch.protected_refresh_balances()
+        else:
+            sleep(2, 'NO_TRADE')
     else:
         print best_trade.trace
         record_event("TRADE,%s,%s,%s,%.8f,%.8f,%.8f,%.8f" %

@@ -169,7 +169,7 @@ ALL_PAIRS = [
     Pair('AION', 'ETH', friction(0.008)),
 ]
 
-ALL_SYMBOLS=['BTC','ETH','GNT','ICN','LTC','MLN','REP','USDT','TRST','WAVES','XEM','RLC','MAID','AMP','DASH','SC','LBC','MYST','BAT','ANT','QRL','BNT','SNGLS','SNT','STORJ','ADX','OMG','QTUM','CVC','DGD','BCC','ZRX','STRAT','SYS','DNT','OAX','KNC','FUN','SALT','ENG','AST','RCN','KMD','ARK','XMR','POWR','ZEC','ADA','REQ','XRP','LSK','MANA','XLM','NEO','DCR','BNB','VEN','ELF','AION']
+ALL_SYMBOLS=['USD','BTC','ETH','GNT','ICN','LTC','MLN','REP','USDT','TRST','WAVES','XEM','RLC','MAID','AMP','DASH','SC','LBC','MYST','BAT','ANT','QRL','BNT','SNGLS','SNT','STORJ','ADX','OMG','QTUM','CVC','DGD','BCC','ZRX','STRAT','SYS','DNT','OAX','KNC','FUN','SALT','ENG','AST','RCN','KMD','ARK','XMR','POWR','ZEC','ADA','REQ','XRP','LSK','MANA','XLM','NEO','DCR','BNB','VEN','ELF','AION']
 
 pair_map = dict()
 

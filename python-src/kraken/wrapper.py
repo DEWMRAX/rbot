@@ -17,6 +17,8 @@ def symbol_from_kraken(symbol):
         return symbol
     elif symbol == "BCH":
         return "BCC"
+    elif symbol == "ZUSD":
+        return "USD"
     else:
         return symbol[1:]
 
@@ -27,6 +29,8 @@ def symbol_to_kraken(symbol):
         return symbol
     elif symbol == "BCC":
         return "BCH"
+    elif symbol == "USD":
+        return "ZUSD"
     else:
         return "X%s" % symbol
 
@@ -52,7 +56,7 @@ class Kraken(Exchange):
         with open('kraken_info.json') as f:
             self.tickers = json.loads(f.read())['result'].items()
 
-        self.symbols = ['BTC', 'ETH', 'LTC', 'ICN', 'MLN', 'REP', 'DASH', 'BCC', 'XMR', 'ZEC', 'XRP', 'XLM']
+        self.symbols = ['USD', 'BTC', 'ETH', 'LTC', 'ICN', 'MLN', 'REP', 'BCC', 'XMR', 'ZEC', 'XRP', 'XLM']
         for pair,info in self.tickers:
             if '.' in pair: # some duplicate entries have a period, unsure why
                 continue
@@ -87,7 +91,6 @@ class Kraken(Exchange):
             "ICN":"0xc404050987865b643855eb14313f2abf5a63f046",
             "LTC":"LZKevLmwWEZTJcZigaNwAmoavH9zi1fRGW",
             "REP":"0x24161fdfe1d96043f3f7459b444cbbc8c188c8cc",
-            "DASH":"XuQdnZqUvkgqgoyP9oizv3tS1nxpLuugyk",
             "BCC":"1BhN1Mpwa6j7JsEWyWuckYAmnR8iukijmx",
             "XMR":"4GdoN7NCTi8a5gZug7PrwZNKjvHFmKeV11L6pNJPgj5QNEHsN6eeX3DaAQFwZ1ufD4LYCZKArktt113W7QjWvQ7CWG18YB7CuKmUY4QxAH",
             "ZEC":"t1a4ErZkCfqfckwojUh6iRheDSHHVQcNQdk",
