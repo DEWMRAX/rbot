@@ -47,7 +47,8 @@ class ItBit(Exchange):
 
     def deposit_address(self, symbol):
         addr_map = {
-            'BTC':'3Jqpg73du2dy1R9gXFN3PDSzdqjA8z76By'
+            'BTC':'3Jqpg73du2dy1R9gXFN3PDSzdqjA8z76By',
+            'USD':'SILVERGATE'
         }
 
         return addr_map[symbol]

@@ -39,7 +39,8 @@ class BitFlyer(Exchange):
 
     def deposit_address(self, symbol):
         addr_map = {
-            'BTC':'36VsjQkwn7cPFAEp5iDV9wPKLN8Nzacthb'
+            'BTC':'36VsjQkwn7cPFAEp5iDV9wPKLN8Nzacthb',
+            'USD':'SILVERGATE'
         }
 
         return addr_map[symbol]

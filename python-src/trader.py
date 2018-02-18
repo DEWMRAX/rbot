@@ -123,7 +123,7 @@ if UPDATE_TARGET_BALANCE:
     for exch in exchanges:
         exch.unprotected_refresh_balances()
 
-    symbol_list = ALL_SYMBOLS if UPDATE_ALL_TARGET_BALANCE else ['BTC','ETH','USDT']
+    symbol_list = ALL_SYMBOLS if UPDATE_ALL_TARGET_BALANCE else ['BTC','ETH','USDT','USD']
 
     for symbol in symbol_list:
         balance = "%0.8f" % total_balance_incl_pending(symbol)
@@ -243,7 +243,7 @@ def execute_trade(buyer, seller, pair, quantity, expected_profit, bid, ask):
     record_event("AI_CLOSE,%s" % info)
 
 def eligible_books_filter(books):
-    return filter(lambda book:book.exchange_name not in ['LIQUI'] and book.age < MAX_BOOK_AGE and get_exchange_handler(book.exchange_name).active, books)
+    return filter(lambda book:book.exchange_name not in ['LIQUI'] and book.age < MAX_BOOK_AGE and get_exchange_handler(book.exchange_name).active and book.pair.split('-')[0] in get_exchange_handler(book.exchange_name).symbols, books)
 
 def best_bidder(books):
     eligible_books = eligible_books_filter(books)
@@ -311,9 +311,6 @@ def check_imbalance(buyer_book, seller_book, pair):
 
     while(1):
         if DISABLE_TRADING:
-            break
-
-        if pair.currency == 'USD': # not trading on USD pairs quite yet
             break
 
         if pair.token in ['']: # tokens temp. not trading
@@ -536,7 +533,7 @@ def check_symbol_balance(symbol, target, targets):
     elif balance > target or near_equals(target, balance, BALANCE_ACCURACY): # no pending transfers
         open_transfers_collection.update_many({'symbol':symbol}, {'$set':{'active':False}})
 
-        if not near_equals(target, balance, BALANCE_ACCURACY) and symbol not in ['BTC','ETH','USDT']:
+        if not near_equals(target, balance, BALANCE_ACCURACY) and symbol not in ['BTC','ETH','USDT','USD']:
             if REPAIR_BALANCES:
                 sell_at_market('REPAIR', pair_factory(symbol, 'BTC'), balance-target)
             else:
@@ -566,6 +563,9 @@ def check_symbol_balance(symbol, target, targets):
 
             amount_str = "%0.4f" % transfer_amount
             record_event("WITHDRAW_ATTEMPT,%s,%s,%s,%s" % (highest_exchange.name, lowest_exchange.name, symbol, amount_str))
+            if DISABLE_TRADING:
+                record_event("WITHDRAW_HOLD,DISABLE_TRADING")
+                return False
             if lowest_exchange.name == 'LIQUI' and exchange_nav_as_percentage_of_total(get_exchange_handler('LIQUI')) > LIQUI_NAV_PERCENTAGE_MAX:
                 record_event("WITHDRAW_HOLD,%s,%0.3f" % (lowest_exchange.name, exchange_nav_as_percentage_of_total(get_exchange_handler('LIQUI'))))
             elif highest_exchange.active and lowest_exchange.active:
@@ -698,9 +698,9 @@ while True:
         record_event("RISK_CHECK,PANIC! AT THE DISCO")
         sys.exit(1)
 
-    # if last_balance_check_time + 300 < int(time.time()):
-    #     check_symbol_balance_loop()
-    #     last_balance_check_time = int(time.time())
+    if last_balance_check_time + 300 < int(time.time()):
+        check_symbol_balance_loop()
+        last_balance_check_time = int(time.time())
 
     if REPAIR_BALANCES:
         sys.exit(1)

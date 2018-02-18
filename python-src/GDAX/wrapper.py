@@ -67,6 +67,7 @@ class GDAX(Exchange):
             'LTC':'LcjF3N5KU3QVisZtD1FzdCFdj1x3vGz3Yv',
             'ETH':'0xE2332C48a43cD0f9E802fF347F148F5924f0E1Cc',
             'BCC':'1FwKuosXyAqQy845bDsDoAsWhWsSPg3WmL',
+            'USD':'SILVERGATE'
         }
 
         return addr_map[symbol]

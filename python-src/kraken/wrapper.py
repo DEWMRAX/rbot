@@ -84,6 +84,9 @@ class Kraken(Exchange):
         return self.pair_name_map[str(pair)]
 
     def deposit_address(self, symbol):
+        if symbol == 'USD':
+            return 'SILVERGATE'
+
         addr_map = {
             "BTC":"3DraSxHFsbMd2vPFXfF9Q62ruzpt2wcKdt",
             "MLN":"0xe43598b00615def726d2668458fc6a21865691c3",
@@ -132,9 +135,10 @@ class Kraken(Exchange):
             event += "," + dest.deposit_message(symbol)
         record_event(event)
 
-        key_name = dest.name.lower() + "_" + symbol.lower()
-        print "KRAKEN WITHDRAWAL"
-        print self.query_private('Withdraw', {'asset':asset_name(symbol), 'key':key_name, 'amount':amount})
+        if symbol != 'USD':
+            key_name = dest.name.lower() + "_" + symbol.lower()
+            print "KRAKEN WITHDRAWAL"
+            print self.query_private('Withdraw', {'asset':asset_name(symbol), 'key':key_name, 'amount':amount})
 
     def refresh_balances(self):
         balances = self.query_private('Balance', {})['result']
