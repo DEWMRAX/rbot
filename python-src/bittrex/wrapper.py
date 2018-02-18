@@ -13,7 +13,7 @@ class Bittrex(Exchange):
             secrets = json.load(secrets_file)
             self.api = api(secrets['key'], secrets['secret'])
 
-        self.symbols = ['TRST','WAVES','BTC','ETH','LTC','MLN','REP','GNT','USDT','XEM','RLC','MAID','AMP','DASH','SC','LBC','BAT','ANT','QRL','BNT','SNT','STORJ','ADX','OMG','QTUM','CVC','BCC','STRAT','SYS','FUN','DNT','SALT','RCN','KMD','ARK','XMR','POWR','ZEC','ADA','XRP','LSK','MANA','XLM','NEO','DCR']
+        self.symbols = ['TRST','WAVES','BTC','ETH','LTC','MLN','REP','GNT','USDT','XEM','RLC','MAID','AMP','DASH','SC','LBC','BAT','ANT','QRL','BNT','SNT','STORJ','ADX','OMG','QTUM','CVC','BCC','STRAT','SYS','DNT','SALT','RCN','KMD','ARK','XMR','POWR','ZEC','ADA','XRP','LSK','MANA','XLM','NEO','DCR']
 
         self.markets = self.api.get_markets()
 
@@ -60,7 +60,6 @@ class Bittrex(Exchange):
             "BCC":"1JbhFhk9guXyZuiYWJo1wVsNNPwenguhFn",
             "STRAT":"SVkyfcMzo3VJxCaA5WjoG4nJLNTeWh44tf",
             "SYS":"SNHvSbxWxjG8qvSjsaqzVajjQRHpJgZRi3",
-            "FUN":"0xccf4d4848b96476f6c448160fb085c7f6c5cc188",
             "SALT":"0xccf4d4848b96476f6c448160fb085c7f6c5cc188",
             "RCN":"0xccf4d4848b96476f6c448160fb085c7f6c5cc188",
             "KMD":"RFm1kynPjs1iU4UepVTNtzdcMWie1QJZHC",
