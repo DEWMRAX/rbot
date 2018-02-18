@@ -72,7 +72,7 @@ class Kraken(Exchange):
                 # assert(vol == 500000)
                 self.fees[uniform_ticker] = 0 # trading temporarily free at kraken #Decimal(fee) / 100
                 self.price_decimals[uniform_ticker] = info['pair_decimals']
-                self.lot_decimals[uniform_ticker] = min(info['lot_decimals'], info['pair_decimals'])
+                self.lot_decimals[uniform_ticker] = info['lot_decimals']
 
     def query_private(self, method, args):
         return self.api.query_private(method, args, self.conn)
