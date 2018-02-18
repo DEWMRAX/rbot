@@ -68,9 +68,9 @@ class Kraken(Exchange):
                 uniform_ticker = "%s-%s" % (token, currency)
                 self.pair_name_map[uniform_ticker] = pair
 
-                # [vol,fee] = info['fees'][4]
-                # assert(vol == 500000)
-                self.fees[uniform_ticker] = 0 # trading temporarily free at kraken #Decimal(fee) / 100
+                [vol,fee] = info['fees'][4]
+                assert(vol == 500000)
+                self.fees[uniform_ticker] = Decimal(fee) / 100
                 self.price_decimals[uniform_ticker] = info['pair_decimals']
                 self.lot_decimals[uniform_ticker] = info['lot_decimals']
 

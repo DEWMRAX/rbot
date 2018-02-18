@@ -19,7 +19,7 @@ DRAWUP_AMOUNT=Decimal('1.75') # how much to target on an exchange we are transfe
 BALANCE_ACCURACY=Decimal('0.02')
 LIQUI_NAV_PERCENTAGE_MAX=Decimal('0.01')
 
-DISABLE_TRADING = True
+DISABLE_TRADING = False
 UPDATE_TARGET_BALANCE = False
 UPDATE_ALL_TARGET_BALANCE = False
 REPAIR_BALANCES = False
@@ -563,9 +563,10 @@ def check_symbol_balance(symbol, target, targets):
 
             amount_str = "%0.4f" % transfer_amount
             record_event("WITHDRAW_ATTEMPT,%s,%s,%s,%s" % (highest_exchange.name, lowest_exchange.name, symbol, amount_str))
-            if DISABLE_TRADING:
-                record_event("WITHDRAW_HOLD,DISABLE_TRADING")
-                return False
+
+            record_event("WITHDRAW_HOLD,DISABLE_TRANSFERS")
+            return False
+
             if lowest_exchange.name == 'LIQUI' and exchange_nav_as_percentage_of_total(get_exchange_handler('LIQUI')) > LIQUI_NAV_PERCENTAGE_MAX:
                 record_event("WITHDRAW_HOLD,%s,%0.3f" % (lowest_exchange.name, exchange_nav_as_percentage_of_total(get_exchange_handler('LIQUI'))))
             elif highest_exchange.active and lowest_exchange.active:
