@@ -88,15 +88,15 @@ class Kraken(Exchange):
             return 'SILVERGATE'
 
         addr_map = {
-            "BTC":"3DraSxHFsbMd2vPFXfF9Q62ruzpt2wcKdt",
-            "MLN":"0xe43598b00615def726d2668458fc6a21865691c3",
-            "ETH":"0x7ed125961654434849c074a3edcd55900e29d916",
-            "ICN":"0xc404050987865b643855eb14313f2abf5a63f046",
-            "LTC":"LZKevLmwWEZTJcZigaNwAmoavH9zi1fRGW",
-            "REP":"0x24161fdfe1d96043f3f7459b444cbbc8c188c8cc",
-            "BCC":"1BhN1Mpwa6j7JsEWyWuckYAmnR8iukijmx",
-            "XMR":"4GdoN7NCTi8a5gZug7PrwZNKjvHFmKeV11L6pNJPgj5QNEHsN6eeX3DaAQFwZ1ufD4LYCZKArktt113W7QjWvQ7CWG18YB7CuKmUY4QxAH",
-            "ZEC":"t1a4ErZkCfqfckwojUh6iRheDSHHVQcNQdk",
+            "BTC":"38kTfMQmD53d3DED35PtahwwX84jYPUtJe",
+            "MLN":"0x230b1c7981df97ac05aa5a85eb7fe8ae3a40bfd8",
+            "ETH":"0xEbcEA4f26374764b0A564BFa36A362A4693fa5f3",
+            "ICN":"0x2f6434e86066e225aa2872e4b880d6da14fc5503",
+            "LTC":"LWY6VsRVhAY7LDmbV9xQJvuXNxC4HpPVeb",
+            "REP":"0xed68535e57ddc72ed099a4ccb536c51ea5b07664",
+            "BCC":"1C641sGmnpE9yRgfzThmKdsDdUz8QHd9H4",
+            "XMR":"4GdoN7NCTi8a5gZug7PrwZNKjvHFmKeV11L6pNJPgj5QNEHsN6eeX3DaAQFwZ1ufD4LYCZKArktt113W7QjWvQ7CWDM25ByQyJ4VcAfaDe",
+            "ZEC":"t1bRnuSuykATwXtNVUkYdJ5nyd9kgppEz5p",
             "XRP":"rLHzPsX6oXkzU2qL12kHCH8G8cnZv1rBJh",
             "XLM":"GA5XIGA5C7QTPTWXQHY6MCJRMTRZDOSHR6EFIBNDQTCQHG262N4GGKTM"
         }
@@ -124,8 +124,8 @@ class Kraken(Exchange):
     def deposit_message(self, symbol):
         msg_map = {
             "XMR":"",
-            "XRP":"3732985062",
-            "XLM":"1843521132"
+            "XRP":"1642413265",
+            "XLM":"1031647566"
         }
         return msg_map[symbol]
 
