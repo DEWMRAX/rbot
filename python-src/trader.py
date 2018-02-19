@@ -564,9 +564,6 @@ def check_symbol_balance(symbol, target, targets):
             amount_str = "%0.4f" % transfer_amount
             record_event("WITHDRAW_ATTEMPT,%s,%s,%s,%s" % (highest_exchange.name, lowest_exchange.name, symbol, amount_str))
 
-            record_event("WITHDRAW_HOLD,DISABLE_TRANSFERS")
-            return False
-
             if lowest_exchange.name == 'LIQUI' and exchange_nav_as_percentage_of_total(get_exchange_handler('LIQUI')) > LIQUI_NAV_PERCENTAGE_MAX:
                 record_event("WITHDRAW_HOLD,%s,%0.3f" % (lowest_exchange.name, exchange_nav_as_percentage_of_total(get_exchange_handler('LIQUI'))))
             elif highest_exchange.active and lowest_exchange.active:
