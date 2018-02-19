@@ -46,7 +46,8 @@ class Exchange():
             self.unprotected_refresh_balances()
         except:
             for doc in cached_balances.find({'exchange':self.name}):
-                self.balance[doc['symbol']] = Decimal(doc['balance'])
+                if doc['symbol'] in self.symbols:
+                    self.balance[doc['symbol']] = Decimal(doc['balance'])
 
             record_event("PERM_INACTIVE,%s" % self.name)
             self.permanent_inactive = True
