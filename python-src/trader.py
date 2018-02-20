@@ -10,7 +10,7 @@ from logger import record_event, record_trade
 from order import Order
 from pair import ALL_PAIRS, ALL_SYMBOLS, pair_factory
 
-MAX_BOOK_AGE = 8
+MAX_BOOK_AGE = 6
 MAX_RECOVERY_ATTEMPTS = 10
 TRANSFER_THRESHOLD_LOW=Decimal('.22')
 TRANSFER_THRESHOLD_HIGH=Decimal('2.5')
@@ -53,7 +53,7 @@ def sleep(duration, reason):
 
 # order determines execution ordering, assumes more liquidity at the latter exchange
 #   and that earlier exchanges are faster responding
-exchanges = [itbit.ItBit(), bitflyer.BitFlyer(), kraken.Kraken(), binance.Binance(), GDAX.GDAX(), bittrex.Bittrex(), poloniex.Poloniex()]
+exchanges = [itbit.ItBit(), bitflyer.BitFlyer(), kraken.Kraken(), GDAX.GDAX(), bittrex.Bittrex(), poloniex.Poloniex(), binance.Binance()]
 def get_exchange_handler(name):
     return filter(lambda exchange:exchange.name == name, exchanges)[0]
 
@@ -330,7 +330,7 @@ def check_imbalance(buyer_book, seller_book, pair):
             break
 
         total_fee = buyer.get_fee(pair) + seller.get_fee(pair)
-        friction = total_fee + Decimal('0.001')
+        friction = total_fee + Decimal('0.0005')
 
         top_quantity = min(bid.quantity, ask.quantity, max_quantity - total_quantity)
 
