@@ -10,7 +10,7 @@ from logger import record_event, record_trade
 from order import Order
 from pair import ALL_PAIRS, ALL_SYMBOLS, pair_factory
 
-MAX_BOOK_AGE = 5
+MAX_BOOK_AGE = 4
 MAX_RECOVERY_ATTEMPTS = 10
 TRANSFER_THRESHOLD_LOW=Decimal('.22')
 TRANSFER_THRESHOLD_HIGH=Decimal('2.5')
