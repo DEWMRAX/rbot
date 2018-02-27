@@ -10,7 +10,7 @@ from logger import record_event, record_trade
 from order import Order
 from pair import ALL_PAIRS, ALL_SYMBOLS, pair_factory
 
-MAX_BOOK_AGE = 2
+MAX_BOOK_AGE = 6
 MAX_RECOVERY_ATTEMPTS = 10
 TRANSFER_THRESHOLD_LOW=Decimal('.22')
 TRANSFER_THRESHOLD_HIGH=Decimal('2.5')
@@ -330,7 +330,7 @@ def check_imbalance(buyer_book, seller_book, pair):
             break
 
         total_fee = buyer.get_fee(pair) + seller.get_fee(pair)
-        friction = total_fee + Decimal('0.0003')
+        friction = total_fee + Decimal('0.002')
 
         top_quantity = min(bid.quantity, ask.quantity, max_quantity - total_quantity)
 
