@@ -38,20 +38,20 @@ def timestamp_to_libra(t):
 os.remove(FILE_PATH) if os.path.exists(FILE_PATH) else None
 
 with open(FILE_PATH, 'a') as f:
-    f.write("type,base_asset,base_amount,counter_asset,counter_amount,rate,fee_asset,fee_amount,tx_ts,exchange_name,exchange_order_id,exchange_tx_id")
+    f.write("type,base_asset,base_amount,counter_asset,counter_amount,rate,fee_asset,fee_amount,tx_ts,exchange_name,exchange_order_id,exchange_tx_id\n")
 
 def print_history(trades):
     with open(FILE_PATH, 'a') as f:
         for trade in trades:
-            base_asset = symbol_to_libra(trade.pair.split('-')[0])
-            counter_asset = symbol_to_libra(trade.pair.split('-')[1])
+            base_asset = symbol_to_libra(trade.pair.split('_')[0])
+            counter_asset = symbol_to_libra(trade.pair.split('_')[1])
             base_amount = Decimal(trade.amount)
             rate = Decimal(trade.rate)
             counter_amount = base_amount * rate
             fee_amount = base_amount * Decimal('0.0025')
             ts = timestamp_to_libra(trade.timestamp)
             typ = type_to_libra(trade.type)
-            f.write("%s,%s,%0.8f,%s,%0.8f,%0.8f,%s,%0.8f,%s,liqui,%s,%s", typ, base_asset, base_amount, counter_asset, counter_amount, rate, base_asset, fee_amount, ts, trade.order_id, trade.transaction_id)
+            f.write("%s,%s,%0.8f,%s,%0.8f,%0.8f,%s,%0.8f,%s,liqui,%s,%s\n" % (typ, base_asset, base_amount, counter_asset, counter_amount, rate, base_asset, fee_amount, ts, trade.order_id, trade.transaction_id))
 
 while(i == 0 or len(trades) > 0):
     print "PAGE %d" % i
