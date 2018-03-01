@@ -66,7 +66,7 @@ class TradeHistoryItem(object):
                  "is_your_order", "timestamp")
         for n in items:
             setattr(self, n, info.get(n))
-        self.timestamp = datetime.fromtimestamp(self.timestamp)
+        # self.timestamp = datetime.fromtimestamp(self.timestamp)
 
 
 class OrderItem(object):
