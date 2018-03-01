@@ -228,8 +228,8 @@ def execute_trade(buyer, seller, pair, quantity, expected_profit, bid, ask):
     open_trades_collection.delete_one({'_id':open_trades_id})
 
     sleep(2, 'BALANCE_UPDATE') # give exchanges (bittrex) chance to update balances
-    buyer.unprotected_refresh_balances()
-    seller.unprotected_refresh_balances()
+    buyer.unprotected_refresh_balances(symbols=[pair.token, pair.currency])
+    seller.unprotected_refresh_balances(symbols=[pair.token, pair.currency])
 
     ending_currency_balance = total_balance(pair.currency)
     actual_profit = (ending_currency_balance - starting_currency_balance) * Decimal(1000) * PRICE[pair.currency]
@@ -575,7 +575,7 @@ def check_symbol_balance(symbol, target, targets):
                 # force update balance for any exchanges with automated transfers
                 if highest_exchange.name != 'LIQUI':
                     sleep(1, 'WITHDRAW_LOOP,BALANCE_REFRESH')
-                    highest_exchange.unprotected_refresh_balances()
+                    highest_exchange.unprotected_refresh_balances(symbols=[symbol])
                 return True
             else:
                 record_event("WITHDRAW_SKIPPED,EXCHANGE_DOWN")
@@ -737,4 +737,4 @@ while True:
         sleep(8, 'TRADED')
 
         for exch in exchanges:
-            exch.protected_refresh_balances()
+            exch.protected_refresh_balances(symbols=[best_trade.pair.token, best_trade.pair.currency])

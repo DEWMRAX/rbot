@@ -53,12 +53,12 @@ class Exchange():
             self.permanent_inactive = True
             self.active = False
 
-    def protected_refresh_balances(self):
+    def protected_refresh_balances(self, symbols=None):
         if self.permanent_inactive:
             return
 
         try:
-            self.unprotected_refresh_balances()
+            self.unprotected_refresh_balances(symbols)
         except:
             for doc in cached_balances.find({'exchange':self.name}):
                 self.balance[doc['symbol']] = Decimal(doc['balance'])
@@ -66,11 +66,11 @@ class Exchange():
             record_event("INACTIVE,%s" % self.name)
             self.active = False
 
-    def unprotected_refresh_balances(self):
+    def unprotected_refresh_balances(self, symbols=None):
         if self.permanent_inactive:
             raise Exception("%s is inactive but requested balance refresh" % self.name)
 
-        self.refresh_balances()
+        self.refresh_balances(symbols)
 
         for symbol in self.balance:
             cached_balances.update({'symbol':symbol, 'exchange':self.name}, {'$set':{'balance':"%0.8f" % self.balance[symbol]}}, upsert=True)
