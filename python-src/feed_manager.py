@@ -21,9 +21,7 @@ with open('../markets.csv') as f:
 lambda_client = boto3.client('lambda')
 
 def invoke_one(market, reason, waiting_time):
-    if market.startswith('LIQUI'):
-        record_event("SKIPPING,%s" % market)
-    elif time.time() > last_invoked[market] + INVOKE_THROTTLE:
+    if time.time() > last_invoked[market] + INVOKE_THROTTLE and not market.startswith('LIQUI'):
         last_invoked[market] = time.time()
         record_event("INVOKING,%s,%s,%0.4f" % (market, reason, waiting_time))
         t = Thread(target=lambda_client.invoke, name=market, kwargs=dict(InvocationType='Event', FunctionName=market))
