@@ -42,3 +42,5 @@ while True:
         market = market
         if book_age[market] > STALE_AGE:
             invoke_one(market, 'STALE', book_age[market])
+
+    time.sleep(1)
