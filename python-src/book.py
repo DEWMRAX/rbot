@@ -30,7 +30,7 @@ class Book():
     def __str__(self):
         return self.name
 
-    def print_depth(self):
+    def print_depth(self, depth):
         print
         print "%s %s" % (self.exchange_name, self.pair)
 
