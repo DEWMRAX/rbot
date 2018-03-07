@@ -3,12 +3,12 @@ from collections import namedtuple
 Fee = namedtuple('Fee', ['maker','taker'])
 
 FEES = {
-    "POLO":Fee(15, 25),
-    "KRAKEN":Fee(10, 20),
-    "BITTREX":Fee(25, 25),
-    "BINANCE":Fee(5, 5),
-    "LIQUI":Fee(10, 25),
-    "GDAX":Fee(25, 0),
-    "ITBIT":Fee(20, 0),
+    "POLO":Fee(15, 21),
+    "KRAKEN":Fee(10, 14),
+    "BITTREX":Fee(25, 21),
+    "BINANCE":Fee(5, 3),
+    "LIQUI":Fee(10, 21),
+    "GDAX":Fee(25, 15),
+    "ITBIT":Fee(20, 15),
     "BITFLYER":Fee(20, 0)
 }
