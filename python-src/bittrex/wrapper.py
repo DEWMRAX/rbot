@@ -134,12 +134,18 @@ class Bittrex(Exchange):
 
         else:
             if not order_info['Closed']:
-                time.sleep(3)
                 self.api.cancel(order_id)
+                time.sleep(1)
 
-            print 'second print'
             order_info = self.api.get_order(order_id)
+            print 'second print'
             print order_info
+
+            if not order_info['Closed']:
+                time.sleep(2)
+                order_info = self.api.get_order(order_id)
+                print 'third print'
+                print order_info
 
             assert(order_info['Closed'])
 
