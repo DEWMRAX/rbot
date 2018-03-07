@@ -18,7 +18,7 @@ last_invoked = defaultdict(lambda: 0)
 lambda_client = boto3.client('lambda')
 
 def invoke_one(market, reason, waiting_time, throttle=True):
-    if (throttle and time.time() > last_invoked[market] + INVOKE_THROTTLE) and not market.startswith('LIQUI'):
+    if (time.time() > last_invoked[market] + INVOKE_THROTTLE or not throttle) and not market.startswith('LIQUI'):
         last_invoked[market] = time.time()
         record_event("INVOKING,%s,%s,%0.4f" % (market, reason, waiting_time))
         t = Thread(target=lambda_client.invoke, name=market, kwargs=dict(InvocationType='Event', FunctionName=market))
