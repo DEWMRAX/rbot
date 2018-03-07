@@ -5,7 +5,7 @@ from pymongo import MongoClient
 
 import poloniex, bittrex, binance, liqui, kraken, GDAX, itbit, bitflyer, exchange
 from book import query_all, query_pair
-from feed_manager import invoke_one, invoke_all
+from feed_manager import invoke_all
 from logger import record_event, record_trade
 from order import Order
 from pair import ALL_PAIRS, ALL_SYMBOLS, pair_factory
