@@ -90,7 +90,7 @@ class Kraken(Exchange):
         addr_map = {
             "BTC":"38kTfMQmD53d3DED35PtahwwX84jYPUtJe",
             "MLN":"0x230b1c7981df97ac05aa5a85eb7fe8ae3a40bfd8",
-            "ETH":"0xEbcEA4f26374764b0A564BFa36A362A4693fa5f3",
+            "ETH":"0xebcea4f26374764b0a564bfa36a362a4693fa5f3",
             "ICN":"0x2f6434e86066e225aa2872e4b880d6da14fc5503",
             "LTC":"LWY6VsRVhAY7LDmbV9xQJvuXNxC4HpPVeb",
             "REP":"0xed68535e57ddc72ed099a4ccb536c51ea5b07664",
