@@ -26,7 +26,7 @@ def invoke_one(market, reason, waiting_time, throttle=True):
 
 def invoke_all(markets, reason):
     for market in markets:
-        invoke_one(market, reason, 0, throttle=False)
+        invoke_one(str(market), reason, 0, throttle=False)
 
 if __name__ == '__main__':
     with open('../markets.csv') as f:
