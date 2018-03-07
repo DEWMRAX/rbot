@@ -18,6 +18,9 @@ last_invoked = defaultdict(lambda: 0)
 lambda_client = boto3.client('lambda')
 
 def invoke_one(market, reason, waiting_time, throttle=True):
+    if market.endswith('BTC-USD') and not market.startswith('GDAX'):
+        return
+
     if (time.time() > last_invoked[market] + INVOKE_THROTTLE or not throttle) and not market.startswith('LIQUI'):
         last_invoked[market] = time.time()
         record_event("INVOKING,%s,%s,%0.4f" % (market, reason, waiting_time))
