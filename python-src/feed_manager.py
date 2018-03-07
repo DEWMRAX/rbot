@@ -28,7 +28,9 @@ def invoke_one(market, reason, waiting_time):
         t.start()
 
 while True:
+    record_event("QUERY_ALL_START")
     books = query_all()
+    record_event("QUERY_ALL_END")
 
     for pair, pair_books in books.items():
         for book in pair_books:
@@ -43,4 +45,5 @@ while True:
         if book_age[market] > STALE_AGE:
             invoke_one(market, 'STALE', book_age[market])
 
+    record_event("SLEEPING,1")
     time.sleep(1)
