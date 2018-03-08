@@ -53,7 +53,7 @@ def sleep(duration, reason):
 
 # order determines execution ordering, assumes more liquidity at the latter exchange
 #   and that earlier exchanges are faster responding
-exchanges = [itbit.ItBit(), bitflyer.BitFlyer(), binance.Binance(), bittrex.Bittrex(), kraken.Kraken(), GDAX.GDAX(), poloniex.Poloniex()]
+exchanges = [itbit.ItBit(), bitflyer.BitFlyer(), bittrex.Bittrex(), binance.Binance(), kraken.Kraken(), GDAX.GDAX(), poloniex.Poloniex()]
 def get_exchange_handler(name):
     return filter(lambda exchange:exchange.name == name, exchanges)[0]
 
@@ -336,7 +336,7 @@ def check_imbalance(buyer_book, seller_book, pair):
             break
 
         total_fee = buyer.get_fee(pair) + seller.get_fee(pair)
-        friction = total_fee + Decimal('0.001')
+        friction = total_fee + Decimal('0.0015')
 
         top_quantity = min(bid.quantity, ask.quantity, max_quantity - total_quantity)
 
