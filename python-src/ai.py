@@ -42,7 +42,7 @@ def near_crossed(books):
 
     if bidder and seller:
         # Fudge the ask down so we consider nearly actionable crosses ACTIVE for refresh
-        if effective_ask(seller) * Decimal(0.998) <= effective_bid(bidder):
+        if effective_ask(seller) * Decimal(0.999) <= effective_bid(bidder):
             return True
 
     return False
