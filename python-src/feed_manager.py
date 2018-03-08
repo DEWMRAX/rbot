@@ -1,4 +1,4 @@
-from ai import check_imbalance
+from ai import near_crossed
 from book import query_all
 from logger import record_event
 from collections import defaultdict
@@ -43,7 +43,7 @@ if __name__ == '__main__':
         for pair, pair_books in books.items():
             for book in pair_books:
                 book_age[book.name] = book.age
-            if check_imbalance(pair_books) > Decimal(0):
+            if near_crossed(pair_books):
                 for book in pair_books:
                     if book.age > ACTIVE_AGE:
                         invoke_one(book.name, 'ACTIVE', book.age)

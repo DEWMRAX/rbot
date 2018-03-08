@@ -1,14 +1,17 @@
 from collections import namedtuple
 
-Fee = namedtuple('Fee', ['maker','taker'])
+class Fee():
+    def __init__(self, maker, taker):
+        self.maker = Decimal(maker) / Decimal(10000)
+        self.taker = Decimal(maker) / Decimal(10000)
 
 FEES = {
-    "POLO":Fee(15, 21),
-    "KRAKEN":Fee(10, 14),
-    "BITTREX":Fee(25, 21),
-    "BINANCE":Fee(5, 3),
-    "LIQUI":Fee(10, 21),
-    "GDAX":Fee(25, 15),
-    "ITBIT":Fee(20, 15),
-    "BITFLYER":Fee(20, 0)
+    "POLO":Fee(15, 25),
+    "KRAKEN":Fee(8, 18),
+    "BITTREX":Fee(25, 25),
+    "BINANCE":Fee(5, 5),
+    "LIQUI":Fee(10, 25),
+    "GDAX":Fee(0, 25),
+    "ITBIT":Fee(0, 20),
+    "BITFLYER":Fee(0, 0)
 }

@@ -6,7 +6,7 @@ from fees import FEES
 from boto3.dynamodb.conditions import Key
 import boto3
 
-BOOK_DEPTH = 5
+BOOK_DEPTH = 10
 
 def book_age(book):
     return Decimal(time()) - book['timestamp'] / 1000
@@ -25,7 +25,7 @@ class Book():
         self.age = book_age(doc)
         self.pair = doc['pair']
         self.name = "%s-%s" % (self.exchange_name, self.pair)
-        self.taker_fee = Decimal(FEES[self.exchange_name].taker) / Decimal(10000)
+        self.taker_fee = FEES[self.exchange_name].taker
 
     def __str__(self):
         return self.name
