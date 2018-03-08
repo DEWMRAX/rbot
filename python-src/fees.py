@@ -1,4 +1,5 @@
 from collections import namedtuple
+from decimal import Decimal
 
 class Fee():
     def __init__(self, maker, taker):
