@@ -245,6 +245,9 @@ def execute_trade(buyer, seller, pair, quantity, expected_profit, bid, ask):
 def eligible_books_filter(books):
     return filter(lambda book:book.exchange_name not in ['LIQUI'] and book.age < MAX_BOOK_AGE and get_exchange_handler(book.exchange_name).active and book.pair.split('-')[0] in get_exchange_handler(book.exchange_name).symbols, books)
 
+def effective_bid(book):
+    return book.bids[0].price * (Decimal(1) - book.taker_fee)
+
 def best_bidder(books):
     eligible_books = eligible_books_filter(books)
     if len(eligible_books) == 0:
@@ -254,10 +257,13 @@ def best_bidder(books):
     for book in eligible_books:
         if len(best.bids) == 0:
             best = book
-        elif len(book.bids) > 0 and book.bids[0].price > best.bids[0].price:
+        elif len(book.bids) > 0 and effective_bid(book) > effective_bid(best):
             best = book
 
     return best
+
+def effective_ask(book):
+    return book.asks[0].price * (Decimal(1) + book.taker_fee)
 
 def best_seller(books):
     eligible_books = eligible_books_filter(books)
@@ -268,7 +274,7 @@ def best_seller(books):
     for book in eligible_books:
         if len(best.asks) == 0:
             best = book
-        elif len(book.asks) > 0 and book.asks[0].price < best.asks[0].price:
+        elif len(book.asks) > 0 and effective_ask(book) < effective_ask(best):
             best = book
 
     return best
