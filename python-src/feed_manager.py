@@ -18,7 +18,7 @@ last_invoked = defaultdict(lambda: 0)
 lambda_client = boto3.client('lambda')
 
 def invoke_one(market, reason, waiting_time, throttle=True):
-    if market.endswith('USD') and not market.startswith('GDAX'):
+    if market.endswith('USD') and not market.startswith('KRAKEN'):
         return
 
     if (time.time() > last_invoked[market] + INVOKE_THROTTLE or not throttle) and not market.startswith('LIQUI'):
