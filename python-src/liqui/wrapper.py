@@ -3,6 +3,7 @@ from decimal import *
 from exchange import Exchange
 from order import Order
 from logger import record_event
+from fees import FEES
 import time
 
 class Liqui(Exchange):
@@ -22,7 +23,7 @@ class Liqui(Exchange):
             (token, currency) = ticker.upper().split('_')
             uniform_ticker = "%s-%s" % (token, currency)
             if token in self.symbols and currency in self.symbols:
-                self.fees[uniform_ticker] = Decimal(info[u'fee']) * Decimal('0.01')
+                self.fees[uniform_ticker] = FEES[self.name].taker
 
     def pair_name(self, market):
         return "%s_%s" % (market.token.lower(), market.currency.lower())

@@ -2,6 +2,7 @@ from decimal import *
 from exchange import Exchange
 from order import Order
 from logger import record_event
+from fees import FEES
 import json
 import time
 
@@ -36,7 +37,7 @@ class ItBit(Exchange):
             self.api = itBitApiConnection(secrets['key'], secrets['secret'], secrets['userId'])
 
         self.symbols = ['USD','BTC']
-        self.fees['BTC-USD'] = Decimal('0.002')
+        self.fees['BTC-USD'] = FEES[self.name].taker
 
         wallets = self.api.get_all_wallets().json()
         assert(len(wallets) == 1)

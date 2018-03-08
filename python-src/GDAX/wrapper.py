@@ -2,6 +2,7 @@ from decimal import *
 from exchange import Exchange
 from order import Order
 from logger import record_event
+from fees import FEES
 import json
 import time
 
@@ -56,7 +57,7 @@ class GDAX(Exchange):
             if ticker.startswith('LTC') or ticker.startswith('ETH'):
                 self.fees[ticker] = Decimal('0.003')
             else:
-                self.fees[ticker] = Decimal('0.0025')
+                self.fees[ticker] = FEES[self.name].taker
 
     def pair_name(self, pair):
         return "%s-%s" % (symbol_to_gdax(pair.token), symbol_to_gdax(pair.currency))

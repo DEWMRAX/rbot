@@ -2,6 +2,7 @@ from decimal import *
 from exchange import Exchange
 from order import Order
 from logger import record_event
+from fees import FEES
 import json
 import time
 
@@ -32,7 +33,7 @@ class BitFlyer(Exchange):
             self.api = API(str(secrets['key']), str(secrets['secret']), timeout=5)
 
         self.symbols = ['USD','BTC']
-        self.fees['BTC-USD'] = Decimal('0.00') #Decimal('0.002')
+        self.fees['BTC-USD'] = FEES[self.name].taker
 
     def pair_name(self, pair):
         return "%s_%s" % (symbol_to_bitflyer(pair.token), symbol_to_bitflyer(pair.currency))

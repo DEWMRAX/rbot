@@ -3,6 +3,7 @@ from decimal import *
 from exchange import Exchange
 from order import Order
 from logger import record_event
+from fees import FEES
 import json
 import time
 
@@ -20,7 +21,7 @@ class Bittrex(Exchange):
         for market in self.markets:
             uniform_ticker = "%s-%s" % (market['MarketCurrency'], market['BaseCurrency'])
             if market['MarketCurrency'] in self.symbols and market['BaseCurrency'] in self.symbols:
-                self.fees[uniform_ticker] = Decimal('0.0025')
+                self.fees[uniform_ticker] = FEES[self.name].taker
 
     def pair_name(self, market):
         return "%s-%s" % (market.currency, market.token)

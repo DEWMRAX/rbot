@@ -1,6 +1,7 @@
 from decimal import *
 from exchange import Exchange
 from logger import record_event
+from fees import FEES
 from binance.api import api
 import json
 
@@ -52,7 +53,7 @@ class Binance(Exchange):
         account_info = self.api.account_info()
 
         for ticker in PAIRS:
-            self.fees[ticker] = Decimal('0.001')
+            self.fees[ticker] = FEES[self.name].taker
 
     def pair_name(self, pair):
         return "%s%s" % (pair.token.upper(), pair.currency.upper())

@@ -5,6 +5,7 @@ from kraken.connection import Connection
 from exchange import Exchange
 from order import Order
 from logger import record_event
+from fees import FEES
 import json
 import pprint
 import sys
@@ -70,7 +71,7 @@ class Kraken(Exchange):
 
                 [vol,fee] = info['fees'][4]
                 assert(vol == 500000)
-                self.fees[uniform_ticker] = Decimal(fee) / 100
+                self.fees[uniform_ticker] = FEES[self.name].taker
                 self.price_decimals[uniform_ticker] = info['pair_decimals']
                 self.lot_decimals[uniform_ticker] = info['lot_decimals']
 

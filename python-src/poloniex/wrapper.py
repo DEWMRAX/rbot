@@ -3,6 +3,7 @@ from decimal import *
 from exchange import Exchange
 from order import Order
 from logger import record_event
+from fees import FEES
 import time
 import json
 
@@ -37,7 +38,7 @@ class Poloniex(Exchange):
             (token, currency) = parse_ticker(ticker)
             if token in self.symbols and currency in self.symbols:
                 uniform_ticker = "%s-%s" % (token, currency)
-                self.fees[uniform_ticker] = Decimal('0.0025')
+                self.fees[uniform_ticker] = FEES[self.name].taker
 
     def pair_name(self, pair):
         return "%s_%s" % (symbol_to_polo(pair.currency), symbol_to_polo(pair.token))
