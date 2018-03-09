@@ -7,8 +7,8 @@ from threading import Thread
 import boto3
 import time
 
-STALE_AGE = 30
-ACTIVE_AGE = 1
+STALE_AGE = 20
+ACTIVE_AGE = 0
 INVOKE_THROTTLE = 2
 
 # lambda-name => timestamp of last update
