@@ -698,7 +698,7 @@ while True:
     record_event("BTCVALUE,%s" % balances_string_in_btc())
     record_event("HEARTBEAT,%s" % balances_string())
 
-    if arbitrage_revenue() < Decimal(-100):
+    if arbitrage_revenue() < Decimal(-10):
         record_event("RISK_CHECK,PANIC! AT THE DISCO")
         sys.exit(1)
 
