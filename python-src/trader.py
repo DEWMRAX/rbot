@@ -336,7 +336,7 @@ def check_imbalance(buyer_book, seller_book, pair):
             break
 
         total_fee = buyer.get_fee(pair) + seller.get_fee(pair)
-        friction = total_fee + Decimal('0.0015')
+        friction = total_fee + Decimal('0.001')
 
         top_quantity = min(bid.quantity, ask.quantity, max_quantity - total_quantity)
 
