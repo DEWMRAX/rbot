@@ -6,6 +6,8 @@ from logger import record_event
 
 cached_balances = MongoClient().arbot.cached_balances
 
+NO_INACTIVE = ['KRAKEN']
+
 class Exchange():
     def __init__(self, name):
         self.balance = dict()
@@ -44,7 +46,10 @@ class Exchange():
     def initial_refresh_balances(self):
         try:
             self.unprotected_refresh_balances()
-        except:
+        except Exception as e:
+            if self.name in NO_INACTIVE:
+                raise(e)
+
             for doc in cached_balances.find({'exchange':self.name}):
                 if doc['symbol'] in self.symbols:
                     self.balance[doc['symbol']] = Decimal(doc['balance'])
@@ -59,7 +64,10 @@ class Exchange():
 
         try:
             self.unprotected_refresh_balances()
-        except:
+        except Exception as e:
+            if self.name in NO_INACTIVE:
+                raise(e)
+
             for doc in cached_balances.find({'exchange':self.name}):
                 self.balance[doc['symbol']] = Decimal(doc['balance'])
 
