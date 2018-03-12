@@ -336,13 +336,13 @@ def check_imbalance(buyer_book, seller_book, pair):
             break
 
         total_fee = buyer.get_fee(pair) + seller.get_fee(pair)
-        friction = total_fee + Decimal('0.001')
+        friction = total_fee + Decimal('0.001') + pair.network_friction
 
         top_quantity = min(bid.quantity, ask.quantity, max_quantity - total_quantity)
 
-        if buyer.get_balance(pair.token) - total_quantity - top_quantity < seller.get_balance(pair.token) + total_quantity + top_quantity:
-            friction_multiplier = Decimal(1) - ((buyer.get_balance(pair.token) - total_quantity - top_quantity) / (seller.get_balance(pair.token) + total_quantity + top_quantity))
-            friction = friction + (friction_multiplier * pair.network_friction)
+        # if buyer.get_balance(pair.token) - total_quantity - top_quantity < seller.get_balance(pair.token) + total_quantity + top_quantity:
+        #     friction_multiplier = Decimal(1) - ((buyer.get_balance(pair.token) - total_quantity - top_quantity) / (seller.get_balance(pair.token) + total_quantity + top_quantity))
+        #     friction = friction + (friction_multiplier * pair.network_friction)
 
         benefit = bid.price - ask.price
         pct_benefit = benefit / bid.price
