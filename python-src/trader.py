@@ -10,7 +10,7 @@ from logger import record_event, record_trade
 from order import Order
 from pair import ALL_PAIRS, ALL_SYMBOLS, pair_factory
 
-MAX_BOOK_AGE = 2.5
+MAX_BOOK_AGE = 5
 MAX_RECOVERY_ATTEMPTS = 10
 TRANSFER_THRESHOLD_LOW=Decimal('.22')
 TRANSFER_THRESHOLD_HIGH=Decimal('2.5')
@@ -722,6 +722,8 @@ while True:
             continue
 
         trade = check_imbalance(buyer, seller, pair)
+        if pair.token == 'ICN' and pair.currency == 'BTC':
+            print trade.trace
         if trade.profit > 0 and (best_trade is None or best_trade.profit < trade.profit):
             best_trade = trade
 
