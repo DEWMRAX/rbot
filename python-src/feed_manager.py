@@ -11,6 +11,8 @@ STALE_AGE = 20
 ACTIVE_AGE = 0
 INVOKE_THROTTLE = 2
 
+MAKER_SYMBOL = 'ICN'
+
 # lambda-name => timestamp of last update
 book_age = defaultdict(lambda: 99999999)
 last_invoked = defaultdict(lambda: 0)
@@ -43,7 +45,8 @@ if __name__ == '__main__':
         for pair, pair_books in books.items():
             for book in pair_books:
                 book_age[book.name] = book.age
-            if near_crossed(pair_books):
+
+            if near_crossed(pair_books) or pair.startswith(MAKER_SYMBOL):
                 for book in pair_books:
                     if book.age > ACTIVE_AGE:
                         invoke_one(book.name, 'ACTIVE', book.age)
