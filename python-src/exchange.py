@@ -25,6 +25,10 @@ class Exchange():
     def get_fee(self, pair):
         return self.fees[str(pair)]
 
+    def get_maker_fee(self, pair):
+        assert(str(pair) in self.fees)
+        return FEES[self.name].maker
+
     def get_balance(self, symbol):
         if symbol in self.balance:
             return self.balance[symbol]
