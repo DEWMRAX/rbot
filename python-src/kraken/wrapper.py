@@ -153,6 +153,11 @@ class Kraken(Exchange):
     def order_info(self, txid):
         return self.query_private('QueryOrders', {'txid':txid})['result'][txid]
 
+    def order_infos(self, txids):
+        assert(len(txids) <= 20)
+
+        return self.query_private('QueryOrders', {'txid':txids.join(',')})['result']
+
     def trade_ioc(self, pair, side, price, amount, reason):
         ret = dict()
         try:
