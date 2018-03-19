@@ -547,7 +547,7 @@ def check_symbol_balance(symbol, target, targets):
             else:
                 record_event("WITHDRAW EXTRA BALANCE,%s,%0.4f,%0.4f,%0.4f" % (symbol, target, balance, balance-target))
 
-        participating_exchanges = filter(lambda exch:symbol in exch.symbols, exchanges)
+        participating_exchanges = filter(lambda exch:symbol in exch.symbols and not exch.name in ['GDAX','ITBIT','BITFLYER'], exchanges)
         lowest_exchange = min(participating_exchanges, key=lambda exch:exch.balance[symbol] / targets[exch.name])
         highest_exchange = max(participating_exchanges, key=lambda exch:exch.balance[symbol] / targets[exch.name])
         if lowest_exchange.balance[symbol] / targets[lowest_exchange.name] < TRANSFER_THRESHOLD_LOW or \
