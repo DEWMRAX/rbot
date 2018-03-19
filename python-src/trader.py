@@ -53,7 +53,7 @@ def sleep(duration, reason):
 
 # order determines execution ordering, assumes more liquidity at the latter exchange
 #   and that earlier exchanges are faster responding
-exchanges = [itbit.ItBit(), bitflyer.BitFlyer(), bittrex.Bittrex(), binance.Binance(), kraken.Kraken(), GDAX.GDAX(), poloniex.Poloniex()]
+exchanges = [bittrex.Bittrex(), binance.Binance(), kraken.Kraken(), poloniex.Poloniex()]
 def get_exchange_handler(name):
     return filter(lambda exchange:exchange.name == name, exchanges)[0]
 
