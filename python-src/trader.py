@@ -523,6 +523,8 @@ def sell_at_market(reason, pair, amount, expected_price=None):
 # target is total target, targets is exchange-name mapped individual targets
 def check_symbol_balance(symbol, target, targets):
     balance = total_balance(symbol)
+    if balance < Decimal(1):
+        return False
 
     if balance < target and not near_equals(target, balance, BALANCE_ACCURACY):
         tinfo = open_transfers_collection.find_one({'symbol':symbol, 'active':True})
