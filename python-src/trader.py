@@ -747,7 +747,7 @@ while True:
 
         execute_trade(best_trade.buyer, best_trade.seller, best_trade.pair, best_trade.quantity, best_trade.profit, best_trade.bid_price, best_trade.ask_price)
 
-        sleep(8, 'TRADED')
+        sleep(4, 'TRADED')
 
         for exch in exchanges:
             exch.protected_refresh_balances()
