@@ -570,6 +570,9 @@ def check_symbol_balance(symbol, target, targets):
                 return False
 
             amount_str = "%0.4f" % transfer_amount
+            if symbol in ['NEO']:
+                amount_str = "%0.0f" % transfer_amount
+
             record_event("WITHDRAW_ATTEMPT,%s,%s,%s,%s" % (highest_exchange.name, lowest_exchange.name, symbol, amount_str))
 
             if lowest_exchange.name == 'LIQUI' and exchange_nav_as_percentage_of_total(get_exchange_handler('LIQUI')) > LIQUI_NAV_PERCENTAGE_MAX:
