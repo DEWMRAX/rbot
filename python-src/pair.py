@@ -54,7 +54,7 @@ ALL_PAIRS = [
     Pair('ZEC', 'ETH', friction(0.007)),
     Pair('ZEC', 'USDT', friction(0.013)),
 
-    Pair('POWR', 'BTC', friction(0.0014)),
+    Pair('POWR', 'BTC', friction(0.011)),
     Pair('POWR', 'ETH', friction(0.011)),
 
     Pair('XMR', 'BTC', friction(0.006)),
@@ -86,8 +86,8 @@ ALL_PAIRS = [
 
     Pair('ZRX', 'BTC', friction(0.008)),
     Pair('ZRX', 'ETH', friction(0.006)),
-    Pair('STORJ', 'BTC', friction(0.008)),
-    Pair('STORJ', 'ETH', friction(0.006)),
+    Pair('STORJ', 'BTC', friction(0.013)),
+    Pair('STORJ', 'ETH', friction(0.011)),
     Pair('ADX', 'BTC', friction(0.01)),
     Pair('ADX', 'ETH', friction(0.007)),
     Pair('OMG', 'BTC', friction(0.01)),
