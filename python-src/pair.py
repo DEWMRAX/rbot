@@ -82,6 +82,7 @@ ALL_PAIRS = [
     Pair('KNC', 'ETH', friction(0.006)),
 
     Pair('DNT', 'ETH', friction(0.01)),
+    Pair('DNT', 'BTC', friction(0.01)),
     Pair('OAX', 'ETH', friction(0.01)),
 
     Pair('ZRX', 'BTC', friction(0.008)),
