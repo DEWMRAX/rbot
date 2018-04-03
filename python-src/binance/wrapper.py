@@ -132,6 +132,8 @@ class Binance(Exchange):
         if message: # api withdrawals with message are not supported?
             event += "," + message
             record_event(event)
+            print "BINANCE TAGGED WITHDRAWAL"
+            print self.api.withdraw(symbol, amount, address, message, key_name)
         else:
             record_event(event)
             print "BINANCE WITHDRAWAL"

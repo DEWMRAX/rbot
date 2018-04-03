@@ -75,6 +75,9 @@ class api(object):
     def withdraw(self, asset, amount, address, name):
         return self.private('withdraw', {'asset':asset, 'amount':amount, 'address':address, 'name':name})
 
+    def withdraw_tag(self, asset, amount, address, tag, name):
+        return self.private('withdraw', {'asset':asset, 'amount':amount, 'address':address, 'addressTag':tag, 'name':name})
+
     def deposit_address(self, asset):
         return self.private('depositAddress', {'asset':asset})['address']
 
