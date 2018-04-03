@@ -133,7 +133,7 @@ class Binance(Exchange):
             event += "," + message
             record_event(event)
             print "BINANCE TAGGED WITHDRAWAL"
-            print self.api.withdraw(symbol, amount, address, message, key_name)
+            print self.api.withdraw_tag(symbol, amount, address, message, key_name)
         else:
             record_event(event)
             print "BINANCE WITHDRAWAL"
