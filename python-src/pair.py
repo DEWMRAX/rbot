@@ -47,8 +47,9 @@ ALL_PAIRS = [
 
     Pair('DCR', 'BTC', friction(0.007)),
 
-    Pair('ADA', 'BTC', friction(0.005)),
-    Pair('ADA', 'ETH', friction(0.005)),
+    Pair('ADA', 'BTC', friction(0.006)),
+    Pair('ADA', 'ETH', friction(0.006)),
+    Pair('ADA', 'USDT', friction(0.007)),
 
     Pair('ZEC', 'BTC', friction(0.007)),
     Pair('ZEC', 'ETH', friction(0.007)),
