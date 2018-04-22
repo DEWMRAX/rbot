@@ -572,6 +572,8 @@ def check_symbol_balance(symbol, target, targets):
             amount_str = "%0.4f" % transfer_amount
             if symbol in ['NEO']:
                 amount_str = "%0.0f" % transfer_amount
+                if highest_exchange.name == 'BITTREX':
+                    amount_str += ".025"
 
             record_event("WITHDRAW_ATTEMPT,%s,%s,%s,%s" % (highest_exchange.name, lowest_exchange.name, symbol, amount_str))
 
