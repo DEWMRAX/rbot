@@ -10,7 +10,7 @@ from logger import record_event, record_trade
 from order import Order
 from pair import ALL_PAIRS, ALL_SYMBOLS, pair_factory
 
-MAX_BOOK_AGE = 5
+MAX_BOOK_AGE = 3.33
 MAX_RECOVERY_ATTEMPTS = 10
 TRANSFER_THRESHOLD_LOW=Decimal('.22')
 TRANSFER_THRESHOLD_HIGH=Decimal('2.5')
@@ -54,7 +54,7 @@ def sleep(duration, reason):
 
 # order determines execution ordering, assumes more liquidity at the latter exchange
 #   and that earlier exchanges are faster responding
-exchanges = [itbit.ItBit(), bitflyer.BitFlyer(), bittrex.Bittrex(), binance.Binance(), kraken.Kraken(), GDAX.GDAX(), poloniex.Poloniex()]
+exchanges = [bittrex.Bittrex(), binance.Binance(), kraken.Kraken(), poloniex.Poloniex()]
 def get_exchange_handler(name):
     return filter(lambda exchange:exchange.name == name, exchanges)[0]
 
@@ -111,7 +111,7 @@ def total_balance_incl_pending(symbol):
     confirmed = total_balance(symbol)
     target = TOTAL_TARGET_BALANCE[symbol]
 
-    if (confirmed > target or near_equals(confirmed, target, '0.05')):
+    if (confirmed > target or near_equals(confirmed, target, BALANCE_ACCURACY)):
         return confirmed
 
     transfer = open_transfers_collection.find_one({'symbol':symbol, 'active':True})
@@ -524,6 +524,8 @@ def sell_at_market(reason, pair, amount, expected_price=None):
 # target is total target, targets is exchange-name mapped individual targets
 def check_symbol_balance(symbol, target, targets):
     balance = total_balance(symbol)
+    if balance < Decimal(1):
+        return False
 
     if balance < target and not near_equals(target, balance, BALANCE_ACCURACY):
         tinfo = open_transfers_collection.find_one({'symbol':symbol, 'active':True})
@@ -546,7 +548,7 @@ def check_symbol_balance(symbol, target, targets):
             else:
                 record_event("WITHDRAW EXTRA BALANCE,%s,%0.4f,%0.4f,%0.4f" % (symbol, target, balance, balance-target))
 
-        participating_exchanges = filter(lambda exch:symbol in exch.symbols, exchanges)
+        participating_exchanges = filter(lambda exch:symbol in exch.symbols and not exch.name in ['GDAX','ITBIT','BITFLYER'], exchanges)
         lowest_exchange = min(participating_exchanges, key=lambda exch:exch.balance[symbol] / targets[exch.name])
         highest_exchange = max(participating_exchanges, key=lambda exch:exch.balance[symbol] / targets[exch.name])
         if lowest_exchange.balance[symbol] / targets[lowest_exchange.name] < TRANSFER_THRESHOLD_LOW or \
@@ -569,6 +571,11 @@ def check_symbol_balance(symbol, target, targets):
                 return False
 
             amount_str = "%0.4f" % transfer_amount
+            if symbol in ['NEO']:
+                amount_str = "%0.0f" % transfer_amount
+                if highest_exchange.name == 'BITTREX':
+                    amount_str += ".025"
+
             record_event("WITHDRAW_ATTEMPT,%s,%s,%s,%s" % (highest_exchange.name, lowest_exchange.name, symbol, amount_str))
 
             if lowest_exchange.name == 'LIQUI' and exchange_nav_as_percentage_of_total(get_exchange_handler('LIQUI')) > LIQUI_NAV_PERCENTAGE_MAX:
