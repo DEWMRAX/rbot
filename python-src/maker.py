@@ -741,7 +741,7 @@ while True:
 
                 vol_closed = Decimal(record['vol_closed'])
                 if Decimal(order_info['vol_exec']) - vol_closed > pair.min_quantity():
-                    closed_amount = make_from.trade_ioc(pair, opp_side, Decimal(record['from_price']) * Decimal(1.1), order_info['vol_exec']) - vol_closed, 'MAKER_CLOSEOUT')
+                    closed_amount = make_from.trade_ioc(pair, opp_side, Decimal(record['from_price']) * Decimal(1.1), Decimal(order_info['vol_exec']) - vol_closed, 'MAKER_CLOSEOUT')
                     vol_closed = vol_closed + closed_amount
                     record['vol_closed'] = "%0.8f" % vol_closed
                     maker_orders_collection.update({'order_id':record['order_id']}, {'$set':{'vol_closed':record['vol_closed']}})
