@@ -620,7 +620,6 @@ print "Starting up"
 print
 
 make_at = get_exchange_handler('KRAKEN')
-make_from = get_exchange_handler('BINANCE')
 open_orders = list(maker_orders_collection.find({}))
 
 markup = Decimal('0.0055')
@@ -648,14 +647,14 @@ sleep(1, 'STARTUP,SANITY_CHECK_OPEN')
 for exch in exchanges:
     exch.protected_refresh_balances()
 
-pair_list = [pair_factory('ICN','ETH'), pair_factory('ICN','BTC')]
-maker_size = {'ICN':Decimal('350')}
+pair_list = [pair_factory('ICN','ETH'), pair_factory('XLM','BTC'), pair_factory('XMR','BTC')]
+maker_size = {'ICN':Decimal('350'), 'XLM':Decimal('1500'), 'XMR':Decimal('2')}
 min_currency_balance = {'BTC':Decimal('0.5'), 'ETH':Decimal('5')}
 
 while True:
     record_event("MAKER_HEARTBEAT,%s" % balances_string())
 
-    need_bal_refresh = False
+    need_bal_refresh = []
 
     open_orders = list(maker_orders_collection.find({}))
     order_infos = [] if len(open_orders) == 0 else make_at.order_infos(map(lambda o:o['order_id'], open_orders))
@@ -669,20 +668,37 @@ while True:
 
             records = filter(lambda r:r['pair'] == str(pair) and r['side'] == side, open_orders)
 
-            if len(records) == 0:
-                books = query_pair(pair)
-                from_book = filter(lambda b:b.exchange_name == make_from.name, books)[0]
-                at_book = filter(lambda b:b.exchange_name == make_at.name, books)[0]
+            books = query_pair(pair)
+            at_book = filter(lambda b:b.exchange_name == make_at.name, books)[0]
 
+            order_size = maker_size[pair.token] if len(records) == 0 else Decimal(records[0]['size']) - Decimal(records[0]['vol_closed'])
+
+            from_book = None
+            make_from = None
+            from_price = None
+            if side == 'buy':
+                eligible_filter = lambda b:get_exchange_handler(b.exchange_name).get_balance(pair.token) >= order_size
+                eligible_books = filter(lambda b:b.exchange_name != make_at.name and eligible_filter(b), books)
+                if len(eligible_books):
+                    prices = map(lambda book:(book, simulate_market_order(get_exchange_handler(book.exchange_name), book.bids, order_size)), eligible_books)
+                    prices = map(lambda (book, (exch, total, price)): (book, exch, price * (Decimal(1) - exch.get_fee(pair))), prices)
+                    (from_book, make_from, from_price) = max(prices, key=lambda (book, exch, price):price)
+            else:
+                eligible_filter = lambda b:get_exchange_handler(b.exchange_name).get_balance(pair.currency) > min_currency_balance[pair.currency]
+                eligible_books = filter(lambda b:b.exchange_name != make_at.name and eligible_filter(b), books)
+                if len(eligible_books):
+                    prices = map(lambda book:(book, simulate_market_order(get_exchange_handler(book.exchange_name), book.asks, order_size)), eligible_books)
+                    prices = map(lambda (book, (exch, total, price)): (book, exch, price * (Decimal(1) + exch.get_fee(pair))), prices)
+                    (from_book, make_from, from_price) = min(prices, key=lambda (book, exch, price):price)
+
+            if len(records) == 0:
                 # TODO some sort of reserved balance logic?
-                make_price = Decimal(0)
-                from_price = Decimal(0)
+                make_price = None
+
                 if side == 'buy':
-                    if make_from.get_balance(pair.token) < Decimal(2) * size:
+                    if make_from is None or make_from.get_balance(pair.token) < size:
                         record_event("MAKER_UNABLE_CREATE_LOW_TOKEN_BALANCE,%s,%s,%s" % (pair.token, pair.currency, side))
                     else:
-                        (unused, unused, from_price) = simulate_market_order(make_from, from_book.bids, size)
-
                         print "Final price for selling %0.0f at %s: %0.8f" % (size, make_from.name, from_price)
                         make_price = from_price * (Decimal(1) - markup)
                         print "Unfixed Make market buy order at %s at: %0.8f" % (make_at.name, make_price)
@@ -690,18 +706,16 @@ while True:
                         print "Fixed Make market buy order at %s at: %0.8f" % (make_at.name, make_price)
                 else:
                     assert(side == 'sell')
-                    if make_from.get_balance(pair.currency) < min_currency_balance[pair.currency]:
+                    if make_from is None or make_from.get_balance(pair.currency) < min_currency_balance[pair.currency]:
                         record_event("MAKER_UNABLE_CREATE_LOW_CURRENCY_BALANCE,%s,%s,%s" % (pair.token, pair.currency, side))
                     else:
-                        (unused, unused, from_price) = simulate_market_order(make_from, from_book.asks, size)
-
                         print "Final price for buying %0.0f at %s: %0.8f" % (size, make_from.name, from_price)
                         make_price = from_price * (Decimal(1) + markup)
                         print "Unfixed Make market sell order at %s at: %0.8f" % (make_at.name, make_price)
                         make_price = make_price.quantize(Decimal(1)/Decimal(10**precision), rounding=ROUND_CEILING)
                         print "Fixed Make market sell order at %s at: %0.8f" % (make_at.name, make_price)
 
-                if make_price > Decimal(0):
+                if make_price:
                     print "Submitting %s order to %s for %0.8f at %0.8f" % (side, make_at.name, size, make_price)
 
                     txid = make_at.query_private('AddOrder', {
@@ -741,12 +755,12 @@ while True:
 
                 vol_closed = Decimal(record['vol_closed'])
                 if Decimal(order_info['vol_exec']) - vol_closed > pair.min_quantity():
-                    market_price = Decimal(record['from_price']) * (Decimal(1.1) if opp_side == 'buy' else Decimal(0.9))
+                    market_price = from_price * (Decimal(1.05) if opp_side == 'buy' else Decimal(0.95))
                     closed_amount = make_from.trade_ioc(pair, opp_side, market_price, Decimal(order_info['vol_exec']) - vol_closed, 'MAKER_CLOSEOUT')
                     vol_closed = vol_closed + closed_amount
                     record['vol_closed'] = "%0.8f" % vol_closed
                     maker_orders_collection.update({'order_id':record['order_id']}, {'$set':{'vol_closed':record['vol_closed']}})
-                    need_bal_refresh = True
+                    need_bal_refresh += [make_from]
                 print "Total Closed qty: %0.8f" % vol_closed
 
                 if Decimal(order_info['vol_exec']) - vol_closed > pair.min_quantity():
@@ -764,28 +778,25 @@ while True:
                     books = query_pair(pair)
                     from_book = filter(lambda b:b.exchange_name == make_from.name, books)[0]
 
-                    size_remaining = Decimal(record['size']) - Decimal(record['vol_closed'])
                     if opp_side == 'buy':
-                        (unused, unused, final_price) = simulate_market_order(make_from, from_book.asks, size_remaining)
                         if make_at.get_balance(pair.currency) < min_currency_balance[pair.currency]:
                             record_maker("MAKER_CANCEL_LOW_CURRENCY_BALANCE", record, order_info)
                             make_at.cancel(order_id)
-                        elif final_price * (Decimal(1) + minimum_markup) > Decimal(record['at_price']):
+                        elif from_price * (Decimal(1) + minimum_markup) > Decimal(record['at_price']):
                             record_maker("MAKER_CANCEL_LOW_MARKUP", record, order_info)
                             make_at.cancel(order_id)
-                        elif final_price * (Decimal(1) + maximum_markup) < Decimal(record['at_price']):
+                        elif from_price * (Decimal(1) + maximum_markup) < Decimal(record['at_price']):
                             record_maker("MAKER_CANCEL_HIGH_MARKUP", record, order_info)
                             make_at.cancel(order_id)
                     else:
                         assert(opp_side == 'sell')
-                        (unused, unused, final_price) = simulate_market_order(make_from, from_book.bids, size_remaining)
                         if make_at.get_balance(pair.token) < maker_size[pair.token]:
                             record_maker("MAKER_CANCEL_LOW_TOKEN_BALANCE", record, order_info)
                             make_at.cancel(order_id)
-                        elif final_price * (Decimal(1) - minimum_markup) < Decimal(record['at_price']):
+                        elif from_price * (Decimal(1) - minimum_markup) < Decimal(record['at_price']):
                             record_maker("MAKER_CANCEL_LOW_MARKUP", record, order_info)
                             make_at.cancel(order_id)
-                        elif final_price * (Decimal(1) - maximum_markup) > Decimal(record['at_price']):
+                        elif from_price * (Decimal(1) - maximum_markup) > Decimal(record['at_price']):
                             record_maker("MAKER_CANCEL_HIGH_MARKUP", record, order_info)
                             make_at.cancel(order_id)
 
