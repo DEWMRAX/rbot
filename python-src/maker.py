@@ -647,8 +647,15 @@ sleep(1, 'STARTUP,SANITY_CHECK_OPEN')
 for exch in exchanges:
     exch.protected_refresh_balances()
 
-pair_list = [pair_factory('ICN','ETH'), pair_factory('XLM','BTC'), pair_factory('XMR','BTC')]
-maker_size = {'ICN':Decimal('350'), 'XLM':Decimal('1500'), 'XMR':Decimal('2')}
+pair_list = [pair_factory('ICN','BTC'), pair_factory('ICN','ETH'),
+             pair_factory('REP','BTC'), pair_factory('REP','ETH'),
+             pair_factory('MLN','BTC'),
+             pair_factory('ETH','BTC'),
+             pair_factory('BCC','BTC'),
+             pair_factory('LTC','BTC'),
+             pair_factory('XLM','BTC'),
+             pair_factory('XMR','BTC')]
+maker_size = {'ICN':Decimal('350'), 'MLN':Decimal('4'), 'REP':Decimal('10'), 'ETH':Decimal('5'), 'BCC':Decimal('1'), 'LTC':Decimal('4'), 'XRP':Decimal('300'), 'XLM':Decimal('1500'), 'XMR':Decimal('2'), 'ZEC':Decimal('1')}
 min_currency_balance = {'BTC':Decimal('0.5'), 'ETH':Decimal('5')}
 
 while True:
@@ -659,6 +666,9 @@ while True:
     open_orders = list(maker_orders_collection.find({}))
     order_infos = [] if len(open_orders) == 0 else make_at.order_infos(map(lambda o:o['order_id'], open_orders))
 
+    all_books = query_all()
+    need_books_refresh = False
+
     for pair in pair_list:
         precision = make_at.price_decimals[str(pair)]
         size = maker_size[pair.token]
@@ -668,7 +678,11 @@ while True:
 
             records = filter(lambda r:r['pair'] == str(pair) and r['side'] == side, open_orders)
 
-            books = query_pair(pair)
+            if need_books_refresh:
+                all_books = query_all()
+                need_books_refresh = False
+
+            books = all_books[str(pair)]
             at_book = filter(lambda b:b.exchange_name == make_at.name, books)[0]
 
             order_size = maker_size[pair.token] if len(records) == 0 else Decimal(records[0]['size']) - Decimal(records[0]['vol_closed'])
@@ -741,6 +755,7 @@ while True:
 
                     record_maker("MAKER_CREATE", record)
                     maker_orders_collection.insert_one(record)
+                    need_books_refresh = True
             else:
                 assert(len(records) == 1)
                 record = records[0]
@@ -761,11 +776,16 @@ while True:
                     record['vol_closed'] = "%0.8f" % vol_closed
                     maker_orders_collection.update({'order_id':record['order_id']}, {'$set':{'vol_closed':record['vol_closed']}})
                     need_bal_refresh += [make_from]
+                    need_books_refresh = True
                 print "Total Closed qty: %0.8f" % vol_closed
 
                 if Decimal(order_info['vol_exec']) - vol_closed > pair.min_quantity():
                     print "UNABLE TO CLOSE THE FILL???"
                     record_maker('MAKER_UNABLE_CLOSE_FILL', record, order_info)
+
+                def do_cancel():
+                    make_at.cancel(order_id)
+                    need_books_refresh = True
 
                 if not (order_info['status'] == 'pending' or order_info['status'] == 'open'):
                     record_maker("MAKER_DONE", record, order_info)
@@ -773,7 +793,7 @@ while True:
                 else:
                     if vol_closed > Decimal('0.8') * maker_size[pair.token]:
                         record_maker("MAKER_CANCEL_MOSTLY_FILLED", record, order_info)
-                        make_at.cancel(order_id)
+                        do_cancel()
 
                     books = query_pair(pair)
                     from_book = filter(lambda b:b.exchange_name == make_from.name, books)[0]
@@ -781,28 +801,29 @@ while True:
                     if opp_side == 'buy':
                         if make_at.get_balance(pair.currency) < min_currency_balance[pair.currency]:
                             record_maker("MAKER_CANCEL_LOW_CURRENCY_BALANCE", record, order_info)
-                            make_at.cancel(order_id)
+                            do_cancel()
                         elif from_price * (Decimal(1) + minimum_markup) > Decimal(record['at_price']):
                             record_maker("MAKER_CANCEL_LOW_MARKUP", record, order_info)
-                            make_at.cancel(order_id)
+                            do_cancel()
                         elif from_price * (Decimal(1) + maximum_markup) < Decimal(record['at_price']):
                             record_maker("MAKER_CANCEL_HIGH_MARKUP", record, order_info)
-                            make_at.cancel(order_id)
+                            do_cancel()
                     else:
                         assert(opp_side == 'sell')
                         if make_at.get_balance(pair.token) < maker_size[pair.token]:
                             record_maker("MAKER_CANCEL_LOW_TOKEN_BALANCE", record, order_info)
-                            make_at.cancel(order_id)
+                            do_cancel()
                         elif from_price * (Decimal(1) - minimum_markup) < Decimal(record['at_price']):
                             record_maker("MAKER_CANCEL_LOW_MARKUP", record, order_info)
-                            make_at.cancel(order_id)
+                            do_cancel()
                         elif from_price * (Decimal(1) - maximum_markup) > Decimal(record['at_price']):
                             record_maker("MAKER_CANCEL_HIGH_MARKUP", record, order_info)
-                            make_at.cancel(order_id)
+                            do_cancel()
 
     if need_bal_refresh:
+        for exch in need_bal_refresh:
+            exch.refresh_balances()
         make_at.refresh_balances()
-        make_from.refresh_balances()
 
     sleep(1, 'MAKER_LOOP')
 
