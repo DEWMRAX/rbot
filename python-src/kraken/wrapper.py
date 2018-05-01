@@ -57,7 +57,7 @@ class Kraken(Exchange):
         with open('kraken_info.json') as f:
             self.tickers = json.loads(f.read())['result'].items()
 
-        self.symbols = ['USD', 'BTC', 'ETH', 'LTC', 'ICN', 'MLN', 'REP', 'BCC', 'XMR', 'ZEC', 'XRP', 'XLM']
+        self.symbols = ['USD', 'BTC', 'ETH', 'LTC', 'ICN', 'MLN', 'REP', 'BCC', 'XMR', 'ZEC', 'XRP', 'XLM', 'GNO']
         for pair,info in self.tickers:
             if '.' in pair: # some duplicate entries have a period, unsure why
                 continue
@@ -69,8 +69,6 @@ class Kraken(Exchange):
                 uniform_ticker = "%s-%s" % (token, currency)
                 self.pair_name_map[uniform_ticker] = pair
 
-                [vol,fee] = info['fees'][4]
-                assert(vol == 500000)
                 self.fees[uniform_ticker] = FEES[self.name].taker
                 self.price_decimals[uniform_ticker] = info['pair_decimals']
                 self.lot_decimals[uniform_ticker] = info['lot_decimals']
@@ -99,6 +97,7 @@ class Kraken(Exchange):
             "XMR":"4GdoN7NCTi8a5gZug7PrwZNKjvHFmKeV11L6pNJPgj5QNEHsN6eeX3DaAQFwZ1ufD4LYCZKArktt113W7QjWvQ7CWDM25ByQyJ4VcAfaDe",
             "ZEC":"t1bRnuSuykATwXtNVUkYdJ5nyd9kgppEz5p",
             "XRP":"rLHzPsX6oXkzU2qL12kHCH8G8cnZv1rBJh",
+            "GNO":"0x28e019139a20024559e228b70256ae369807d985",
             "XLM":"GA5XIGA5C7QTPTWXQHY6MCJRMTRZDOSHR6EFIBNDQTCQHG262N4GGKTM"
         }
         method_map = {
@@ -113,6 +112,7 @@ class Kraken(Exchange):
             "XMR":"Monero",
             "ZEC":"Zcash (Transparent)",
             "XRP":"Ripple XRP",
+            "GNO":"GNO",
             "XLM":"Stellar XLM"
         }
 

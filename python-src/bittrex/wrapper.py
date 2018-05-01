@@ -14,7 +14,7 @@ class Bittrex(Exchange):
             secrets = json.load(secrets_file)
             self.api = api(secrets['key'], secrets['secret'])
 
-        self.symbols = ['TRST','WAVES','BTC','ETH','LTC','MLN','REP','GNT','USDT','XEM','RLC','AMP','DASH','SC','LBC','BAT','ANT','QRL','BNT','SNT','STORJ','ADX','OMG','QTUM','CVC','BCC','STRAT','SYS','DNT','SALT','RCN','KMD','ARK','XMR','POWR','ZEC','ADA','XRP','LSK','MANA','XLM','NEO','DCR','ZRX','PART']
+        self.symbols = ['TRST','WAVES','BTC','ETH','LTC','MLN','REP','GNT','USDT','XEM','RLC','AMP','DASH','SC','LBC','BAT','ANT','QRL','BNT','SNT','STORJ','ADX','OMG','QTUM','CVC','BCC','STRAT','SYS','DNT','SALT','RCN','KMD','ARK','XMR','POWR','ZEC','ADA','XRP','LSK','MANA','XLM','NEO','DCR','ZRX','PART','GNO']
 
         self.markets = self.api.get_markets()
 
@@ -74,6 +74,7 @@ class Bittrex(Exchange):
             "NEO":"AVVqJ1vuTYLERXtnftNmbfM7xUFFMbyszn",
             "DCR":"DsVn72taPNoYN5V82zRRRCBKyje2Tq1qYV5",
             "ZRX":"0x5ba6b3b16e45914e592eac770bea6339b490f35f",
+            "GNO":"0x5ba6b3b16e45914e592eac770bea6339b490f35f",
             "DNT":"0x5ba6b3b16e45914e592eac770bea6339b490f35f"
         }
 

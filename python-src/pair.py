@@ -5,7 +5,7 @@ from order import Order
 # targetting ~$2,000 for max_notional
 MAX_NOTIONAL={"BTC":Decimal('.2'), "ETH":Decimal('4'), "USDT":Decimal('2000'), "USD":Decimal('2000')}
 MIN_NOTIONAL={"BTC":Decimal('.002'), "ETH":Decimal('.04'), "USDT":Decimal('40'), "USD":Decimal('50')}
-MIN_QUANTITY={"BTC":Decimal('0.002'), "AION":Decimal('2'), "NANO":Decimal('1000000000'), "PART":Decimal('1000000000'), "ELF":Decimal('1000000000'), "BNB":Decimal('100000000'), "VEN":Decimal('2'), "REQ":Decimal('10'), "XRP":Decimal('30'), "LSK":Decimal('0.5'), "MANA":Decimal('10'), "XLM":Decimal('300'), "NEO":Decimal('0.1'), "DCR":Decimal('0.1'), "ADA":Decimal('3'), "ZEC":Decimal('0.03'), "POWR":Decimal('5'), "XMR":Decimal('0.1'), "ARK":Decimal('1'), "RCN":Decimal('20'), "KMD":Decimal('2'), "ENG":Decimal('20'), "AST":Decimal('10'), "SALT":Decimal('.5'), "FUN":Decimal('50'), "KNC":Decimal('3'), "DNT":Decimal('1'), "OAX":Decimal('.01'), "STRAT":Decimal('.01'), "SYS":Decimal('.01'), "ZRX":Decimal('1'), "BCC":Decimal('.01'), "STORJ":Decimal('.01'), "ADX":Decimal('.01'), "OMG":Decimal('.01'), "QTUM":Decimal('.01'), "CVC":Decimal('.01'), "DGD":Decimal('.01'), "QRL":Decimal('.01'), "BNT":Decimal('.01'), "SNGLS":Decimal('.01'), "SNT":Decimal('.01'), "BAT":Decimal('50'), "ANT":Decimal('.01'), "DASH":Decimal('.03'), "SC":Decimal('1'), "LBC":Decimal('0.1'), "TRST":Decimal('0.1'), "WAVES":Decimal('0.1'), "ETH":Decimal('.02'), "GNT":Decimal('0.1'), "ICN":Decimal('2'), "MLN":Decimal('0.1'), "LTC":Decimal('0.1'), "REP":Decimal('0.3'), "BTC":Decimal('0.001'), "XEM":Decimal('0.1'), "RLC":Decimal('0.1'), "AMP":Decimal('0.1')}
+MIN_QUANTITY={"BTC":Decimal('0.002'), "GNO":Decimal('0.05'), "AION":Decimal('2'), "NANO":Decimal('1000000000'), "PART":Decimal('1000000000'), "ELF":Decimal('1000000000'), "BNB":Decimal('100000000'), "VEN":Decimal('2'), "REQ":Decimal('10'), "XRP":Decimal('30'), "LSK":Decimal('0.5'), "MANA":Decimal('10'), "XLM":Decimal('300'), "NEO":Decimal('0.1'), "DCR":Decimal('0.1'), "ADA":Decimal('3'), "ZEC":Decimal('0.03'), "POWR":Decimal('5'), "XMR":Decimal('0.1'), "ARK":Decimal('1'), "RCN":Decimal('20'), "KMD":Decimal('2'), "ENG":Decimal('20'), "AST":Decimal('10'), "SALT":Decimal('.5'), "FUN":Decimal('50'), "KNC":Decimal('3'), "DNT":Decimal('1'), "OAX":Decimal('.01'), "STRAT":Decimal('.01'), "SYS":Decimal('.01'), "ZRX":Decimal('1'), "BCC":Decimal('.01'), "STORJ":Decimal('.01'), "ADX":Decimal('.01'), "OMG":Decimal('.01'), "QTUM":Decimal('.01'), "CVC":Decimal('.01'), "DGD":Decimal('.01'), "QRL":Decimal('.01'), "BNT":Decimal('.01'), "SNGLS":Decimal('.01'), "SNT":Decimal('.01'), "BAT":Decimal('50'), "ANT":Decimal('.01'), "DASH":Decimal('.03'), "SC":Decimal('1'), "LBC":Decimal('0.1'), "TRST":Decimal('0.1'), "WAVES":Decimal('0.1'), "ETH":Decimal('.02'), "GNT":Decimal('0.1'), "ICN":Decimal('2'), "MLN":Decimal('0.1'), "LTC":Decimal('0.1'), "REP":Decimal('0.3'), "BTC":Decimal('0.001'), "XEM":Decimal('0.1'), "RLC":Decimal('0.1'), "AMP":Decimal('0.1')}
 
 class Pair(namedtuple('Pair', ['token','currency','network_friction'])):
     __slots__ = ()
@@ -57,6 +57,9 @@ ALL_PAIRS = [
 
     Pair('POWR', 'BTC', friction(0.011)),
     Pair('POWR', 'ETH', friction(0.011)),
+
+    Pair('GNO', 'BTC', friction(0.011)),
+    Pair('GNO', 'ETH', friction(0.011)),
 
     Pair('XMR', 'BTC', friction(0.006)),
     Pair('XMR', 'ETH', friction(0.006)),
@@ -170,7 +173,7 @@ ALL_PAIRS = [
     Pair('AION', 'ETH', friction(0.008)),
 ]
 
-ALL_SYMBOLS=['USD','BTC','ETH','GNT','ICN','LTC','MLN','REP','USDT','TRST','WAVES','XEM','RLC','AMP','DASH','SC','LBC','BAT','ANT','QRL','BNT','SNGLS','SNT','STORJ','ADX','OMG','QTUM','CVC','DGD','BCC','ZRX','STRAT','SYS','DNT','OAX','KNC','FUN','SALT','ENG','AST','RCN','KMD','ARK','XMR','POWR','ZEC','ADA','REQ','XRP','LSK','MANA','XLM','NEO','DCR','BNB','VEN','ELF','AION','PART','NANO']
+ALL_SYMBOLS=['USD','BTC','ETH','GNT','ICN','LTC','MLN','REP','USDT','TRST','WAVES','XEM','RLC','AMP','DASH','SC','LBC','BAT','ANT','QRL','BNT','SNGLS','SNT','STORJ','ADX','OMG','QTUM','CVC','DGD','BCC','ZRX','STRAT','SYS','DNT','OAX','KNC','FUN','SALT','ENG','AST','RCN','KMD','ARK','XMR','POWR','ZEC','ADA','REQ','XRP','LSK','MANA','XLM','NEO','DCR','BNB','VEN','ELF','AION','PART','NANO','GNO']
 
 pair_map = dict()
 

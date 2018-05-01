@@ -8,7 +8,7 @@ class Fee():
 
 FEES = {
     "POLO":Fee(15, 25),
-    "KRAKEN":Fee(8, 18),
+    "KRAKEN":Fee(6, 16),
     "BITTREX":Fee(25, 25),
     "BINANCE":Fee(5, 5),
     "LIQUI":Fee(10, 25),
