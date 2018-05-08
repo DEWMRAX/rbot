@@ -12,15 +12,15 @@ from pair import ALL_PAIRS, ALL_SYMBOLS, pair_factory
 
 MAX_BOOK_AGE = 3.33
 MAX_RECOVERY_ATTEMPTS = 2
-TRANSFER_THRESHOLD_LOW=Decimal('.22')
+TRANSFER_THRESHOLD_LOW=Decimal('.27')
 TRANSFER_THRESHOLD_HIGH=Decimal('2.5')
 DRAWDOWN_AMOUNT=Decimal('.42') # how much to leave on an exchange we are withdrawing from
 DRAWUP_AMOUNT=Decimal('1.75') # how much to target on an exchange we are transferring to
 BALANCE_ACCURACY=Decimal('0.02')
 LIQUI_NAV_PERCENTAGE_MAX=Decimal('0.01')
 
-MAKER_MARKUP = Decimal('0.0025')
-MAKER_CROSS_MARKUP = Decimal('0.004')
+MAKER_MARKUP = Decimal('0.003')
+MAKER_CROSS_MARKUP = Decimal('0.0045')
 MINIMUM_MARKUP = Decimal('0.0017')
 MAXIMUM_MARKUP = Decimal('0.015')
 MAKER_PAIR_LIST = [
