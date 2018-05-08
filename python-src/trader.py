@@ -20,6 +20,7 @@ BALANCE_ACCURACY=Decimal('0.02')
 LIQUI_NAV_PERCENTAGE_MAX=Decimal('0.01')
 
 MAKER_MARKUP = Decimal('0.0025')
+MAKER_CROSS_MARKUP = Decimal('0.004')
 MINIMUM_MARKUP = Decimal('0.0017')
 MAXIMUM_MARKUP = Decimal('0.015')
 MAKER_PAIR_LIST = [
@@ -883,6 +884,7 @@ while True:
                 if len(records) == 0:
                     # TODO some sort of reserved balance logic?
                     make_price = None
+                    oflags = 'fciq,post'
 
                     if side == 'buy':
                         if make_from is None or make_from.get_balance(pair.token) < size:
@@ -890,9 +892,13 @@ while True:
                         else:
                             print "Final price for selling %0.0f at %s: %0.8f" % (size, make_from.name, from_price)
                             make_price = from_price * (Decimal(1) - MAKER_MARKUP)
-                            print "Unfixed Make market buy order at %s at: %0.8f" % (make_at.name, make_price)
                             make_price = make_price.quantize(Decimal(1)/Decimal(10**precision), rounding=ROUND_FLOOR)
-                            print "Fixed Make market buy order at %s at: %0.8f" % (make_at.name, make_price)
+
+                            if len(at_book.asks) and make_price >= at_book.asks[0]:
+                                print "Make market buy order would cross book at %0.8f, expanding markup" % (make_price)
+                                make_price = from_price * (Decimal(1) - MAKER_CROSS_MARKUP)
+                                make_price = make_price.quantize(Decimal(1)/Decimal(10**precision), rounding=ROUND_FLOOR)
+                                oflags = 'fciq'
                     else:
                         assert(side == 'sell')
                         if make_from is None or make_from.get_balance(pair.currency) < MAKER_MIN_CURRENCY_BALANCE[pair.currency]:
@@ -900,9 +906,13 @@ while True:
                         else:
                             print "Final price for buying %0.0f at %s: %0.8f" % (size, make_from.name, from_price)
                             make_price = from_price * (Decimal(1) + MAKER_MARKUP)
-                            print "Unfixed Make market sell order at %s at: %0.8f" % (make_at.name, make_price)
                             make_price = make_price.quantize(Decimal(1)/Decimal(10**precision), rounding=ROUND_CEILING)
-                            print "Fixed Make market sell order at %s at: %0.8f" % (make_at.name, make_price)
+
+                            if len(at_book.bids) and make_price <= at_book.bids[0]:
+                                print "Make market sell order would cross book at %0.8f, expanding markup" % (make_price)
+                                make_price = from_price * (Decimal(1) + MAKER_CROSS_MARKUP)
+                                make_price = make_price.quantize(Decimal(1)/Decimal(10**precision), rounding=ROUND_CEILING)
+                                oflags = 'fciq'
 
                     if make_price:
                         print "Submitting %s order to %s for %0.8f at %0.8f" % (side, make_at.name, size, make_price)
@@ -914,7 +924,7 @@ while True:
                             'price' : ("%0." + str(make_at.price_decimals[str(pair)]) + "f") % make_price,
                             'volume' : ("%0." + str(make_at.lot_decimals[str(pair)]) + "f") % size,
                             'expiretm' : '+60',
-                            'oflags' : 'post'
+                            'oflags' : oflags
                         })
                         print 'KRAKEN ORDER RETURN'
                         print order_return
@@ -938,7 +948,7 @@ while True:
                             maker_orders_collection.insert_one(record)
                             need_books_refresh = True
                         else:
-                            err_message = order_return['error'] if error in order_return else ''
+                            err_message = order_return['error'] if 'error' in order_return else ''
                             record_event("MAKER_CREATE_FAIL,%s,%s,%s" % (pair.token, pair.currency, err_message))
                 else:
                     assert(len(records) == 1)
