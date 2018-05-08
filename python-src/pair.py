@@ -12,6 +12,12 @@ class Pair(namedtuple('Pair', ['token','currency','network_friction'])):
     def __str__(self):
         return "%s-%s" % (self.token, self.currency)
 
+    def __eq__(self, other):
+        return str(self) == str(other)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     def max_notional(self):
         return MAX_NOTIONAL[self.currency]
 

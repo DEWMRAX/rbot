@@ -1,6 +1,6 @@
 import datetime, sys, time
 from collections import namedtuple
-from decimal import Decimal
+from decimal import Decimal, Context, ROUND_FLOOR, ROUND_CEILING
 from pymongo import MongoClient
 
 import poloniex, bittrex, binance, liqui, kraken, GDAX, itbit, bitflyer, exchange
@@ -11,13 +11,31 @@ from order import Order
 from pair import ALL_PAIRS, ALL_SYMBOLS, pair_factory
 
 MAX_BOOK_AGE = 3.33
-MAX_RECOVERY_ATTEMPTS = 10
+MAX_RECOVERY_ATTEMPTS = 2
 TRANSFER_THRESHOLD_LOW=Decimal('.22')
 TRANSFER_THRESHOLD_HIGH=Decimal('2.5')
 DRAWDOWN_AMOUNT=Decimal('.42') # how much to leave on an exchange we are withdrawing from
 DRAWUP_AMOUNT=Decimal('1.75') # how much to target on an exchange we are transferring to
 BALANCE_ACCURACY=Decimal('0.02')
 LIQUI_NAV_PERCENTAGE_MAX=Decimal('0.01')
+
+MAKER_MARKUP = Decimal('0.0025')
+MINIMUM_MARKUP = Decimal('0.0017')
+MAXIMUM_MARKUP = Decimal('0.015')
+MAKER_PAIR_LIST = [
+    pair_factory('XLM','BTC'),
+    pair_factory('GNO','BTC'), pair_factory('GNO','ETH'),
+    pair_factory('MLN','BTC')
+]
+#pair_factory('ICN','BTC'), pair_factory('ICN','ETH'),
+# pair_factory('REP','BTC'), pair_factory('REP','ETH'),
+# pair_factory('ZEC','BTC'),
+# pair_factory('XRP','BTC'),
+# pair_factory('XMR','BTC'),
+# pair_factory('ETH','BTC'),
+# pair_factory('BCC','BTC'),
+MAKER_SIZE = {'GNO':Decimal('3'), 'ICN':Decimal('350'), 'MLN':Decimal('4'), 'REP':Decimal('10'), 'ETH':Decimal('5'), 'BCC':Decimal('1'), 'LTC':Decimal('4'), 'XRP':Decimal('300'), 'XLM':Decimal('1500'), 'XMR':Decimal('2'), 'ZEC':Decimal('1')}
+MAKER_MIN_CURRENCY_BALANCE = {'BTC':Decimal('0.4'), 'ETH':Decimal('5')}
 
 DISABLE_TRADING = False
 UPDATE_TARGET_BALANCE = False
@@ -39,6 +57,7 @@ open_trades_collection = MongoClient().arbot.trades
 open_transfers_collection = MongoClient().arbot.transfers
 target_balance_collection = MongoClient().arbot.targets
 price_collection = MongoClient().arbot.prices
+maker_orders_collection = MongoClient().arbot.maker_orders
 
 def panic(response):
     print response.status
@@ -56,6 +75,7 @@ def sleep(duration, reason):
 exchanges = [bittrex.Bittrex(), binance.Binance(), kraken.Kraken(), poloniex.Poloniex()]
 def get_exchange_handler(name):
     return filter(lambda exchange:exchange.name == name, exchanges)[0]
+make_at = get_exchange_handler('KRAKEN')
 
 if INITIALIZE_BALANCE_CACHE:
     for exchange in exchanges:
@@ -77,11 +97,14 @@ def get_exchanges(pair):
 def total_balance(symbol):
     return sum(map(lambda exch:exch.get_balance(symbol), exchanges))
 
-OVERRIDE_TARGET_BALANCE = {'LIQUI':{
-    'BTC': Decimal(0.8),
-    'ETH': Decimal(17),
-    'LTC': Decimal(7),
-    'BCC': Decimal(1.7)
+OVERRIDE_TARGET_BALANCE = {
+    'LIQUI':{
+        'BTC': Decimal(0.8),
+        'ETH': Decimal(17),
+        'LTC': Decimal(7),
+        'BCC': Decimal(1.7)},
+    'KRAKEN':{
+        'BTC':Decimal(5)
 }}
 def has_override(exchange, symbol):
     return exchange.name in OVERRIDE_TARGET_BALANCE and symbol in OVERRIDE_TARGET_BALANCE[exchange.name]
@@ -279,6 +302,22 @@ def best_seller(books):
 
     return best
 
+def get_free_balance(exch, symbol):
+    total = exch.get_balance(symbol)
+    if exch.name != make_at.name:
+        return total
+
+    open_orders = list(maker_orders_collection.find({}))
+    for order in open_orders:
+        (token, currency) = order['pair'].split('-')
+        remaining_qty = Decimal(order['size']) - Decimal(order['vol_closed'])
+        if token == symbol and order['side'] == 'sell':
+            total = total - remaining_qty
+        elif currency == symbol and order['side'] == 'buy':
+            total = total - (Decimal(order['at_price']) * remaining_qty)
+
+    return total
+
 # Trade is the return type of check_imbalance
 Trade = namedtuple('Trade', ['pair', 'profit', 'quantity', 'bid_price', 'ask_price', 'trace', 'buyer', 'seller'])
 def check_imbalance(buyer_book, seller_book, pair):
@@ -294,9 +333,9 @@ def check_imbalance(buyer_book, seller_book, pair):
     total_quantity = Decimal(0)
     total_profit = Decimal(0)
 
-    # Only using 90% of balance in these calculations to leave wiggle room in case we need to do recovery and then the market moves
-    max_notional = min(pair.max_notional(), seller.get_balance(pair.currency) * Decimal('0.9'))
-    max_quantity = min(max_notional / bid_price, buyer.get_balance(pair.token) * Decimal('0.9'))
+    # Only using 80% of balance in these calculations to leave wiggle room in case we need to do recovery and then the market moves
+    max_notional = min(pair.max_notional(), get_free_balance(seller, pair.currency) * Decimal('0.8'))
+    max_quantity = min(max_notional / bid_price, get_free_balance(buyer, pair.token) * Decimal('0.8'))
 
     trace = ""
 
@@ -605,21 +644,49 @@ def check_symbol_balance_loop():
             record_event("WITHDRAW_FAIL,%s" % symbol)
             sleep(1, 'WITHDRAW_LOOP')
 
+def record_maker(title, record, order_info=None, (our_depth, covering_qty)=(None,None)):
+    if order_info is None:
+        vol_exec = "?"
+    else:
+        vol_exec = "%0.8f" % Decimal(order_info['vol_exec'])
+
+    if our_depth is None:
+        record_event("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s" % (title, record['at'], record['from'], record['pair'], record['side'], record['size'], vol_exec, record['vol_closed'], record['at_price'], record['from_price'], record['order_id']))
+    else:
+        record_event("%s,%s,%s,%s,%s,%d,%0.2f,%s,%s,%s,%s,%s,%s" % (title, record['at'], record['from'], record['pair'], record['side'], our_depth, covering_qty, record['size'], vol_exec, record['vol_closed'], record['at_price'], record['from_price'], record['order_id']))
+
+# returns (n, qty), n is number of price levels above ours, qty is total qty at and above our price level
+def find_our_order(book, our_price):
+    total_quantity = 0
+
+    for i in range(0, len(book)):
+        total_quantity += book[i].quantity
+        if book[i].price == our_price:
+            return (i, total_quantity)
+
+    return (99, total_quantity)
+
 record_event('START')
 print
 print "Starting up"
 print
+
+open_orders = list(maker_orders_collection.find({}))
 
 for exch in exchanges:
     exch.initial_refresh_balances()
 sleep(1, 'STARTUP,INITIAL_REFRESH')
 
 for exch in exchanges:
-    exch.protected_cancel_all_orders()
+    if exch.name != make_at.name:
+        exch.protected_cancel_all_orders()
+    else:
+        make_at.protected_cancel_all_orders(map(lamda o:o['order_id'], open_orders))
 sleep(1, 'STARTUP,CANCEL_ALL')
 
 for exch in exchanges:
-    sanity_check_open(exch)
+    if exch.name != make_at.name:
+        sanity_check_open(exch)
 sleep(1, 'STARTUP,SANITY_CHECK_OPEN')
 
 while open_trades_collection.find_one():
@@ -694,6 +761,8 @@ for exch in exchanges:
     exch.protected_refresh_balances()
 
 last_balance_check_time = 0
+last_balance_check_revenue = arbitrage_revenue()
+last_loop_traded_pair = None
 
 while True:
     print
@@ -709,9 +778,10 @@ while True:
         record_event("RISK_CHECK,PANIC! AT THE DISCO")
         sys.exit(1)
 
-    if last_balance_check_time + 300 < int(time.time()):
+    if last_balance_check_time + 300 < int(time.time()) or last_balance_check_revenue + 6 < arbitrage_revenue():
         check_symbol_balance_loop()
         last_balance_check_time = int(time.time())
+        last_balance_check_revenue = arbitrage_revenue()
 
     if REPAIR_BALANCES:
         sys.exit(1)
@@ -722,6 +792,10 @@ while True:
         pair = pair_factory(token, currency)
         if pair is None:
             continue
+        if any(map(lambda p:p==pair, MAKER_PAIR_LIST)):
+            continue
+        if last_loop_traded_pair == pair:
+            continue
 
         buyer = best_bidder(pair_books)
         seller = best_seller(pair_books)
@@ -729,10 +803,10 @@ while True:
             continue
 
         trade = check_imbalance(buyer, seller, pair)
-        if pair.token == 'ICN' and pair.currency == 'BTC':
-            print trade.trace
         if trade.profit > 0 and (best_trade is None or best_trade.profit < trade.profit):
             best_trade = trade
+
+    last_loop_traded_pair = None
 
     if best_trade is None:
         if DISABLE_TRADING:
@@ -740,7 +814,7 @@ while True:
             for exch in exchanges:
                 exch.protected_refresh_balances()
         else:
-            sleep(2, 'NO_TRADE')
+            sleep(1, 'NO_TRADE')
     else:
         print best_trade.trace
         record_event("TRADE,%s,%s,%s,%.8f,%.8f,%.8f,%.8f" %
@@ -748,8 +822,196 @@ while True:
              best_trade.profit, best_trade.quantity, best_trade.bid_price, best_trade.ask_price))
 
         execute_trade(best_trade.buyer, best_trade.seller, best_trade.pair, best_trade.quantity, best_trade.profit, best_trade.bid_price, best_trade.ask_price)
+        last_loop_traded_pair = best_trade.pair
 
-        sleep(4, 'TRADED')
+        sleep(1, 'TRADED')
 
         for exch in exchanges:
             exch.protected_refresh_balances()
+
+    if not DISABLE_TRADING:
+        record_event("MAKER_HEARTBEAT,%s" % balances_string())
+
+        need_bal_refresh = []
+
+        open_orders = list(maker_orders_collection.find({}))
+        order_infos = [] if len(open_orders) == 0 else make_at.order_infos(map(lambda o:o['order_id'], open_orders))
+
+        all_books = query_all()
+        need_books_refresh = False
+
+        for pair in MAKER_PAIR_LIST:
+            precision = make_at.price_decimals[str(pair)]
+            size = MAKER_SIZE[pair.token]
+
+            for side in ['buy','sell']:
+                opp_side = 'sell' if side == 'buy' else 'buy'
+
+                records = filter(lambda r:r['pair'] == str(pair) and r['side'] == side, open_orders)
+
+                if need_books_refresh:
+                    all_books = query_all()
+                    need_books_refresh = False
+
+                books = all_books[str(pair)]
+                at_book = filter(lambda b:b.exchange_name == make_at.name, books)[0]
+
+                order_size = MAKER_SIZE[pair.token] if len(records) == 0 else Decimal(records[0]['size']) - Decimal(records[0]['vol_closed'])
+
+                from_book = None
+                make_from = None
+                from_price = None
+                if side == 'buy':
+                    eligible_filter = lambda b:get_exchange_handler(b.exchange_name).get_balance(pair.token) >= order_size
+                    eligible_books = filter(lambda b:b.exchange_name != make_at.name and eligible_filter(b), books)
+                    if len(eligible_books):
+                        prices = map(lambda book:(book, simulate_market_order(get_exchange_handler(book.exchange_name), book.bids, order_size)), eligible_books)
+                        prices = filter(lambda (book, (exch, total, price)): exch is not None, prices)
+                        if len(prices):
+                            prices = map(lambda (book, (exch, total, price)): (book, exch, price * (Decimal(1) - exch.get_fee(pair))), prices)
+                            (from_book, make_from, from_price) = max(prices, key=lambda (book, exch, price):price)
+                else:
+                    eligible_filter = lambda b:get_exchange_handler(b.exchange_name).get_balance(pair.currency) > MAKER_MIN_CURRENCY_BALANCE[pair.currency]
+                    eligible_books = filter(lambda b:b.exchange_name != make_at.name and eligible_filter(b), books)
+                    if len(eligible_books):
+                        prices = map(lambda book:(book, simulate_market_order(get_exchange_handler(book.exchange_name), book.asks, order_size)), eligible_books)
+                        prices = filter(lambda (book, (exch, total, price)): exch is not None, prices)
+                        if len(prices):
+                            prices = map(lambda (book, (exch, total, price)): (book, exch, price * (Decimal(1) + exch.get_fee(pair))), prices)
+                            (from_book, make_from, from_price) = min(prices, key=lambda (book, exch, price):price)
+
+                if len(records) == 0:
+                    # TODO some sort of reserved balance logic?
+                    make_price = None
+
+                    if side == 'buy':
+                        if make_from is None or make_from.get_balance(pair.token) < size:
+                            record_event("MAKER_UNABLE_CREATE,%s,%s,%s" % (pair.token, pair.currency, side))
+                        else:
+                            print "Final price for selling %0.0f at %s: %0.8f" % (size, make_from.name, from_price)
+                            make_price = from_price * (Decimal(1) - MAKER_MARKUP)
+                            print "Unfixed Make market buy order at %s at: %0.8f" % (make_at.name, make_price)
+                            make_price = make_price.quantize(Decimal(1)/Decimal(10**precision), rounding=ROUND_FLOOR)
+                            print "Fixed Make market buy order at %s at: %0.8f" % (make_at.name, make_price)
+                    else:
+                        assert(side == 'sell')
+                        if make_from is None or make_from.get_balance(pair.currency) < MAKER_MIN_CURRENCY_BALANCE[pair.currency]:
+                            record_event("MAKER_UNABLE_CREATE,%s,%s,%s" % (pair.token, pair.currency, side))
+                        else:
+                            print "Final price for buying %0.0f at %s: %0.8f" % (size, make_from.name, from_price)
+                            make_price = from_price * (Decimal(1) + MAKER_MARKUP)
+                            print "Unfixed Make market sell order at %s at: %0.8f" % (make_at.name, make_price)
+                            make_price = make_price.quantize(Decimal(1)/Decimal(10**precision), rounding=ROUND_CEILING)
+                            print "Fixed Make market sell order at %s at: %0.8f" % (make_at.name, make_price)
+
+                    if make_price:
+                        print "Submitting %s order to %s for %0.8f at %0.8f" % (side, make_at.name, size, make_price)
+
+                        order_return = make_at.query_private('AddOrder', {
+                            'pair' : make_at.pair_name(pair),
+                            'type' : side,
+                            'ordertype' : 'limit',
+                            'price' : ("%0." + str(make_at.price_decimals[str(pair)]) + "f") % make_price,
+                            'volume' : ("%0." + str(make_at.lot_decimals[str(pair)]) + "f") % size,
+                            'expiretm' : '+60',
+                            'oflags' : 'post'
+                        })
+                        print 'KRAKEN ORDER RETURN'
+                        print order_return
+
+                        if 'result' in order_return:
+                            txid = order_return['result']['txid'][0]
+
+                            record = {
+                                'at' : make_at.name,
+                                'from' : make_from.name,
+                                'pair' : str(pair),
+                                'side' : side,
+                                'size' : "%0.8f" % size,
+                                'vol_closed' : '0',
+                                'at_price' : "%0.8f" % make_price,
+                                'from_price' : "%0.8f" % from_price,
+                                'order_id' : txid
+                            }
+
+                            record_maker("MAKER_CREATE", record)
+                            maker_orders_collection.insert_one(record)
+                            need_books_refresh = True
+                        else:
+                            err_message = order_return['error'] if error in order_return else ''
+                            record_event("MAKER_CREATE_FAIL,%s,%s,%s" % (pair.token, pair.currency, err_message))
+                else:
+                    assert(len(records) == 1)
+                    record = records[0]
+                    order_id = record['order_id']
+                    print "Reviewing active %s order on %s, id: %s" % (side, str(pair), order_id)
+                    print record
+                    print
+                    order_info = order_infos[order_id]
+                    print order_info
+
+                    at_book_side = at_book.bids if side == 'buy' else at_book.asks
+
+                    record_maker("MAKER_REVIEW", record, order_info, find_our_order(at_book_side, Decimal(order_info['descr']['price'])))
+
+                    vol_closed = Decimal(record['vol_closed'])
+                    if Decimal(order_info['vol_exec']) - vol_closed > pair.min_quantity():
+                        market_price = from_price * (Decimal(1.01) if opp_side == 'buy' else Decimal(0.99))
+                        closed_amount = make_from.trade_ioc(pair, opp_side, market_price, Decimal(order_info['vol_exec']) - vol_closed, 'MAKER_CLOSEOUT')
+                        vol_closed = vol_closed + closed_amount
+                        record['vol_closed'] = "%0.8f" % vol_closed
+                        maker_orders_collection.update({'order_id':record['order_id']}, {'$set':{'vol_closed':record['vol_closed']}})
+                        need_bal_refresh += [make_from]
+                        need_books_refresh = True
+                        record_trade("MAKER,%s,%s,%s,%s,%s,%0.4f,%0.4f" % (make_from.name, make_at.name, side.upper(), pair.token, pair.currency, closed_amount, vol_closed))
+
+                    print "Total Closed qty: %0.8f" % vol_closed
+
+                    if Decimal(order_info['vol_exec']) - vol_closed > pair.min_quantity():
+                        print "UNABLE TO CLOSE THE FILL???"
+                        record_maker('MAKER_UNABLE_CLOSE_FILL', record, order_info)
+
+                    def do_cancel():
+                        make_at.cancel(order_id)
+                        need_books_refresh = True
+
+                    if not (order_info['status'] == 'pending' or order_info['status'] == 'open'):
+                        record_maker("MAKER_DONE", record, order_info)
+                        maker_orders_collection.delete_many({'order_id':order_id})
+                    else:
+                        if vol_closed > Decimal('0.8') * MAKER_SIZE[pair.token]:
+                            record_maker("MAKER_CANCEL_MOSTLY_FILLED", record, order_info)
+                            do_cancel()
+
+                        if from_price is None:
+                            record_maker("MAKER_CANCEL_NO_FROM", record, order_info)
+                            do_cancel()
+                        else:
+                            if opp_side == 'buy':
+                                if make_at.get_balance(pair.currency) < MAKER_MIN_CURRENCY_BALANCE[pair.currency]:
+                                    record_maker("MAKER_CANCEL_LOW_CURRENCY_BALANCE", record, order_info)
+                                    do_cancel()
+                                elif from_price * (Decimal(1) + MINIMUM_MARKUP) > Decimal(record['at_price']):
+                                    record_maker("MAKER_CANCEL_LOW_MARKUP", record, order_info)
+                                    do_cancel()
+                                elif from_price * (Decimal(1) + MAXIMUM_MARKUP) < Decimal(record['at_price']):
+                                    record_maker("MAKER_CANCEL_HIGH_MARKUP", record, order_info)
+                                    do_cancel()
+                            else:
+                                assert(opp_side == 'sell')
+                                if make_at.get_balance(pair.token) < MAKER_SIZE[pair.token]:
+                                    record_maker("MAKER_CANCEL_LOW_TOKEN_BALANCE", record, order_info)
+                                    do_cancel()
+                                elif from_price * (Decimal(1) - MINIMUM_MARKUP) < Decimal(record['at_price']):
+                                    record_maker("MAKER_CANCEL_LOW_MARKUP", record, order_info)
+                                    do_cancel()
+                                elif from_price * (Decimal(1) - MAXIMUM_MARKUP) > Decimal(record['at_price']):
+                                    record_maker("MAKER_CANCEL_HIGH_MARKUP", record, order_info)
+                                    do_cancel()
+
+        if need_bal_refresh:
+            for exch in need_bal_refresh:
+                exch.refresh_balances()
+            make_at.refresh_balances()
+
+        sleep(1, 'MAKER_LOOP')
