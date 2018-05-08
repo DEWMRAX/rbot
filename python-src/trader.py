@@ -681,7 +681,7 @@ for exch in exchanges:
     if exch.name != make_at.name:
         exch.protected_cancel_all_orders()
     else:
-        make_at.protected_cancel_all_orders(map(lamda o:o['order_id'], open_orders))
+        make_at.protected_cancel_all_orders(map(lambda o:o['order_id'], open_orders))
 sleep(1, 'STARTUP,CANCEL_ALL')
 
 for exch in exchanges:
