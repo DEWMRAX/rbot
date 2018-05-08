@@ -43,7 +43,7 @@ UPDATE_TARGET_BALANCE = False
 UPDATE_ALL_TARGET_BALANCE = False
 REPAIR_BALANCES = False
 INITIALIZE_BALANCE_CACHE = False
-CREATE_MAKER = True
+MAKER_CREATE = True
 
 if len(sys.argv) > 1:
     if sys.argv[1] == 'repair_balances':
