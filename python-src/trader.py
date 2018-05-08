@@ -43,6 +43,7 @@ UPDATE_TARGET_BALANCE = False
 UPDATE_ALL_TARGET_BALANCE = False
 REPAIR_BALANCES = False
 INITIALIZE_BALANCE_CACHE = False
+CREATE_MAKER = True
 
 if len(sys.argv) > 1:
     if sys.argv[1] == 'repair_balances':
@@ -679,10 +680,13 @@ for exch in exchanges:
 sleep(1, 'STARTUP,INITIAL_REFRESH')
 
 for exch in exchanges:
-    if exch.name != make_at.name:
-        exch.protected_cancel_all_orders()
+    if MAKER_CREATE:
+        if exch.name != make_at.name:
+            exch.protected_cancel_all_orders()
+        else:
+            make_at.cancel_all_orders(map(lambda o:o['order_id'], open_orders))
     else:
-        make_at.cancel_all_orders(map(lambda o:o['order_id'], open_orders))
+        exch.protected_cancel_all_orders()
 sleep(1, 'STARTUP,CANCEL_ALL')
 
 for exch in exchanges:
@@ -887,7 +891,7 @@ while True:
                     oflags = 'fciq,post'
 
                     if side == 'buy':
-                        if make_from is None or make_from.get_balance(pair.token) < size:
+                        if make_from is None or make_from.get_balance(pair.token) < size or not MAKER_CREATE:
                             record_event("MAKER_UNABLE_CREATE,%s,%s,%s" % (pair.token, pair.currency, side))
                         else:
                             print "Final price for selling %0.0f at %s: %0.8f" % (size, make_from.name, from_price)
@@ -901,7 +905,7 @@ while True:
                                 oflags = 'fciq'
                     else:
                         assert(side == 'sell')
-                        if make_from is None or make_from.get_balance(pair.currency) < MAKER_MIN_CURRENCY_BALANCE[pair.currency]:
+                        if make_from is None or make_from.get_balance(pair.currency) < MAKER_MIN_CURRENCY_BALANCE[pair.currency] or not MAKER_CREATE:
                             record_event("MAKER_UNABLE_CREATE,%s,%s,%s" % (pair.token, pair.currency, side))
                         else:
                             print "Final price for buying %0.0f at %s: %0.8f" % (size, make_from.name, from_price)
