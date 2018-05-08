@@ -35,8 +35,8 @@ ALL_PAIRS = [
     Pair('REQ', 'BTC', friction(0.009)),
     Pair('REQ', 'ETH', friction(0.009)),
 
-    Pair('XRP', 'BTC', friction(0.008)),
-    Pair('XRP', 'ETH', friction(0.008)),
+    Pair('XRP', 'BTC', friction(0.005)),
+    Pair('XRP', 'ETH', friction(0.005)),
     Pair('XRP', 'USDT', friction(0.01)),
 
     Pair('LSK', 'BTC', friction(0.007)),
@@ -44,8 +44,8 @@ ALL_PAIRS = [
     Pair('MANA', 'BTC', friction(0.007)),
     Pair('MANA', 'ETH', friction(0.007)),
 
-    Pair('XLM', 'BTC', friction(0.007)),
-    Pair('XLM', 'ETH', friction(0.007)),
+    Pair('XLM', 'BTC', friction(0.004)),
+    Pair('XLM', 'ETH', friction(0.004)),
 
     Pair('NEO', 'BTC', friction(0.007)),
     Pair('NEO', 'ETH', friction(0.007)),
@@ -64,8 +64,8 @@ ALL_PAIRS = [
     Pair('POWR', 'BTC', friction(0.011)),
     Pair('POWR', 'ETH', friction(0.011)),
 
-    Pair('GNO', 'BTC', friction(0.011)),
-    Pair('GNO', 'ETH', friction(0.011)),
+    Pair('GNO', 'BTC', friction(0.01)),
+    Pair('GNO', 'ETH', friction(0.01)),
 
     Pair('XMR', 'BTC', friction(0.006)),
     Pair('XMR', 'ETH', friction(0.006)),
@@ -140,7 +140,7 @@ ALL_PAIRS = [
     Pair('ICN', 'BTC', friction(0.01)),
     Pair('ICN', 'ETH', friction(0.007)),
     Pair('MLN', 'BTC', friction(0.01)),
-    Pair('MLN', 'ETH', friction(0.007)),
+    Pair('MLN', 'ETH', friction(0.01)),
     Pair('REP', 'BTC', friction(0.01)),
     Pair('REP', 'ETH', friction(0.007)),
     Pair('GNT', 'BTC', friction(0.008)),
