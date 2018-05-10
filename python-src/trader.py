@@ -898,6 +898,7 @@ while True:
                     if side == 'buy':
                         if make_from is None or make_from.get_balance(pair.currency) < MAKER_MIN_CURRENCY_BALANCE[pair.currency] or not MAKER_CREATE:
                             record_event("MAKER_UNABLE_CREATE,%s,%s,%s" % (pair.token, pair.currency, side))
+                            make_from = None
                         else:
                             print "Final price for selling %0.0f at %s: %0.8f" % (size, make_from.name, from_price)
                             make_price = from_price * (Decimal(1) - MAKER_MARKUP - pair.network_friction)
@@ -912,6 +913,7 @@ while True:
                         assert(side == 'sell')
                         if make_from is None or make_from.get_balance(pair.token) < size or not MAKER_CREATE:
                             record_event("MAKER_UNABLE_CREATE,%s,%s,%s" % (pair.token, pair.currency, side))
+                            make_from = None
                         else:
                             print "Final price for buying %0.0f at %s: %0.8f" % (size, make_from.name, from_price)
                             make_price = from_price * (Decimal(1) + MAKER_MARKUP + pair.network_friction)
@@ -923,7 +925,7 @@ while True:
                                 make_price = make_price.quantize(Decimal(1)/Decimal(10**precision), rounding=ROUND_CEILING)
                                 oflags = 'fciq'
 
-                    if make_price:
+                    if make_from:
                         print "Submitting %s order to %s for %0.8f at %0.8f" % (side, make_at.name, size, make_price)
 
                         order_return = make_at.query_private('AddOrder', {
