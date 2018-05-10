@@ -36,7 +36,7 @@ MAKER_PAIR_LIST = [
 # pair_factory('XMR','BTC'),
 # pair_factory('ETH','BTC'),
 # pair_factory('BCC','BTC'),
-MAKER_SIZE = {'BTC':Decimal('0.05'), 'GNO':Decimal('3'), 'ICN':Decimal('350'), 'MLN':Decimal('4'), 'REP':Decimal('10'), 'ETH':Decimal('5'), 'BCC':Decimal('1'), 'LTC':Decimal('4'), 'XRP':Decimal('300'), 'XLM':Decimal('1500'), 'XMR':Decimal('2'), 'ZEC':Decimal('1')}
+MAKER_SIZE = {'BTC':Decimal('0.2'), 'GNO':Decimal('3'), 'ICN':Decimal('350'), 'MLN':Decimal('4'), 'REP':Decimal('10'), 'ETH':Decimal('5'), 'BCC':Decimal('1'), 'LTC':Decimal('4'), 'XRP':Decimal('300'), 'XLM':Decimal('1500'), 'XMR':Decimal('2'), 'ZEC':Decimal('1')}
 MAKER_MIN_CURRENCY_BALANCE = {'BTC':Decimal('0.4'), 'ETH':Decimal('5'), 'USD':Decimal(2000)}
 
 DISABLE_TRADING = False
