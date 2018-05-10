@@ -48,6 +48,8 @@ INITIALIZE_BALANCE_CACHE = False
 MAKER_CREATE = True
 
 if len(sys.argv) > 1:
+    if sys.argv[1] == 'nomaker':
+        MAKER_CREATE = False
     if sys.argv[1] == 'repair_balances':
         REPAIR_BALANCES = True
     if sys.argv[1] == 'initialize_balance_cache':
