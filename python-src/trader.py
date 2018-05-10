@@ -959,7 +959,7 @@ while True:
                         else:
                             err_message = order_return['error'] if 'error' in order_return else ''
                             record_event("MAKER_CREATE_FAIL,%s,%s,%s" % (pair.token, pair.currency, err_message))
-                else:
+                else: # TODO make_from could be null here!
                     assert(len(records) == 1)
                     record = records[0]
                     order_id = record['order_id']
@@ -973,47 +973,47 @@ while True:
 
                     record_maker("MAKER_REVIEW", record, order_info, find_our_order(at_book_side, Decimal(order_info['descr']['price'])))
 
-                    vol_closed = Decimal(record['vol_closed'])
-                    if Decimal(order_info['vol_exec']) - vol_closed > pair.min_quantity():
-                        market_price = from_price * (Decimal(1.01) if opp_side == 'buy' else Decimal(0.99))
-                        closed_amount = make_from.trade_ioc(pair, opp_side, market_price, Decimal(order_info['vol_exec']) - vol_closed, 'MAKER_CLOSEOUT')
-                        vol_closed = vol_closed + closed_amount
-                        record['vol_closed'] = "%0.8f" % vol_closed
-                        maker_orders_collection.update({'order_id':record['order_id']}, {'$set':{'vol_closed':record['vol_closed']}})
-
-                        starting_revenue = arbitrage_revenue()
-
-                        make_from.refresh_balances()
-                        make_at.refresh_balances()
-
-                        record_trade("MAKER,%s,%s,%s,%s,%s,%0.4f,%0.4f,%0.4f" % (make_from.name, make_at.name, side.upper(), pair.token, pair.currency, closed_amount, vol_closed, Decimal(2) * (arbitrage_revenue() - starting_revenue)))
-
-                        need_books_refresh = True
-
-                    print "Total Closed qty: %0.8f" % vol_closed
-
-                    if Decimal(order_info['vol_exec']) - vol_closed > pair.min_quantity():
-                        print "UNABLE TO CLOSE THE FILL???"
-                        record_maker('MAKER_UNABLE_CLOSE_FILL', record, order_info)
-
                     def do_cancel():
                         make_at.cancel(order_id)
                         need_books_refresh = True
 
-                    if not (order_info['status'] == 'pending' or order_info['status'] == 'open'):
-                        record_maker("MAKER_DONE", record, order_info)
-                        maker_orders_collection.delete_many({'order_id':order_id})
+                    if make_from is None:
+                        record_maker("MAKER_CANCEL_NO_FROM", record, order_info)
+                        do_cancel()
                     else:
-                        if vol_closed > Decimal('0.8') * MAKER_SIZE[pair.token]:
-                            record_maker("MAKER_CANCEL_MOSTLY_FILLED", record, order_info)
-                            do_cancel()
+                        vol_closed = Decimal(record['vol_closed'])
+                        if Decimal(order_info['vol_exec']) - vol_closed > pair.min_quantity():
+                            market_price = from_price * (Decimal(1.01) if opp_side == 'buy' else Decimal(0.99))
+                            closed_amount = make_from.trade_ioc(pair, opp_side, market_price, Decimal(order_info['vol_exec']) - vol_closed, 'MAKER_CLOSEOUT')
+                            vol_closed = vol_closed + closed_amount
+                            record['vol_closed'] = "%0.8f" % vol_closed
+                            maker_orders_collection.update({'order_id':record['order_id']}, {'$set':{'vol_closed':record['vol_closed']}})
 
-                        if from_price is None:
-                            record_maker("MAKER_CANCEL_NO_FROM", record, order_info)
-                            do_cancel()
+                            starting_revenue = arbitrage_revenue()
+
+                            make_from.refresh_balances()
+                            make_at.refresh_balances()
+
+                            record_trade("MAKER,%s,%s,%s,%s,%s,%0.4f,%0.4f,%0.4f" % (make_from.name, make_at.name, side.upper(), pair.token, pair.currency, closed_amount, vol_closed, Decimal(2) * (arbitrage_revenue() - starting_revenue)))
+
+                            need_books_refresh = True
+
+                        print "Total Closed qty: %0.8f" % vol_closed
+
+                        if Decimal(order_info['vol_exec']) - vol_closed > pair.min_quantity():
+                            print "UNABLE TO CLOSE THE FILL???"
+                            record_maker('MAKER_UNABLE_CLOSE_FILL', record, order_info)
+
+                        if not (order_info['status'] == 'pending' or order_info['status'] == 'open'):
+                            record_maker("MAKER_DONE", record, order_info)
+                            maker_orders_collection.delete_many({'order_id':order_id})
                         else:
+                            if vol_closed > Decimal('0.8') * MAKER_SIZE[pair.token]:
+                                record_maker("MAKER_CANCEL_MOSTLY_FILLED", record, order_info)
+                                do_cancel()
+
                             if opp_side == 'buy':
-                                if make_at.get_balance(pair.currency) < MAKER_MIN_CURRENCY_BALANCE[pair.currency]:
+                                if make_from.get_balance(pair.currency) < MAKER_MIN_CURRENCY_BALANCE[pair.currency]:
                                     record_maker("MAKER_CANCEL_LOW_CURRENCY_BALANCE", record, order_info)
                                     do_cancel()
                                 elif from_price * (Decimal(1) + MINIMUM_MARKUP) > Decimal(record['at_price']):
@@ -1024,7 +1024,7 @@ while True:
                                     do_cancel()
                             else:
                                 assert(opp_side == 'sell')
-                                if make_at.get_balance(pair.token) < MAKER_SIZE[pair.token]:
+                                if make_from.get_balance(pair.token) < MAKER_SIZE[pair.token]:
                                     record_maker("MAKER_CANCEL_LOW_TOKEN_BALANCE", record, order_info)
                                     do_cancel()
                                 elif from_price * (Decimal(1) - MINIMUM_MARKUP) < Decimal(record['at_price']):
