@@ -843,8 +843,6 @@ while True:
     if not DISABLE_TRADING:
         record_event("MAKER_HEARTBEAT,%s" % balances_string())
 
-        need_bal_refresh = []
-
         open_orders = list(maker_orders_collection.find({}))
         order_infos = [] if len(open_orders) == 0 else make_at.order_infos(map(lambda o:o['order_id'], open_orders))
 
@@ -981,9 +979,15 @@ while True:
                         vol_closed = vol_closed + closed_amount
                         record['vol_closed'] = "%0.8f" % vol_closed
                         maker_orders_collection.update({'order_id':record['order_id']}, {'$set':{'vol_closed':record['vol_closed']}})
-                        need_bal_refresh += [make_from]
+
+                        starting_revenue = arbitrage_revenue()
+
+                        make_from.refresh_balances()
+                        make_at.refresh_balances()
+
+                        record_trade("MAKER,%s,%s,%s,%s,%s,%0.4f,%0.4f,%0.4f" % (make_from.name, make_at.name, side.upper(), pair.token, pair.currency, closed_amount, vol_closed, Decimal(2) * (arbitrage_revenue() - starting_revenue)))
+
                         need_books_refresh = True
-                        record_trade("MAKER,%s,%s,%s,%s,%s,%0.4f,%0.4f" % (make_from.name, make_at.name, side.upper(), pair.token, pair.currency, closed_amount, vol_closed))
 
                     print "Total Closed qty: %0.8f" % vol_closed
 
@@ -1028,10 +1032,5 @@ while True:
                                 elif from_price * (Decimal(1) - MAXIMUM_MARKUP) > Decimal(record['at_price']):
                                     record_maker("MAKER_CANCEL_HIGH_MARKUP", record, order_info)
                                     do_cancel()
-
-        if need_bal_refresh:
-            for exch in need_bal_refresh:
-                exch.refresh_balances()
-            make_at.refresh_balances()
 
         sleep(1, 'MAKER_LOOP')
