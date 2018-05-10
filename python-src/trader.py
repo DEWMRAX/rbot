@@ -896,7 +896,7 @@ while True:
                     oflags = 'fciq,post'
 
                     if side == 'buy':
-                        if make_from is None or make_from.get_balance(pair.token) < size or not MAKER_CREATE:
+                        if make_from is None or make_from.get_balance(pair.currency) < MAKER_MIN_CURRENCY_BALANCE[pair.currency] or not MAKER_CREATE:
                             record_event("MAKER_UNABLE_CREATE,%s,%s,%s" % (pair.token, pair.currency, side))
                         else:
                             print "Final price for selling %0.0f at %s: %0.8f" % (size, make_from.name, from_price)
@@ -910,7 +910,7 @@ while True:
                                 oflags = 'fciq'
                     else:
                         assert(side == 'sell')
-                        if make_from is None or make_from.get_balance(pair.currency) < MAKER_MIN_CURRENCY_BALANCE[pair.currency] or not MAKER_CREATE:
+                        if make_from is None or make_from.get_balance(pair.token) < size or not MAKER_CREATE:
                             record_event("MAKER_UNABLE_CREATE,%s,%s,%s" % (pair.token, pair.currency, side))
                         else:
                             print "Final price for buying %0.0f at %s: %0.8f" % (size, make_from.name, from_price)
