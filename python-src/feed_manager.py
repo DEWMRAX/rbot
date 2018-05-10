@@ -11,7 +11,7 @@ STALE_AGE = 20
 ACTIVE_AGE = 0
 INVOKE_THROTTLE = 2
 
-MAKER_SYMBOLS = ['ICN','REP','MLN','XLM']
+MAKER_SYMBOLS = ['ICN','REP','MLN','XLM','BTC']
 
 # lambda-name => timestamp of last update
 book_age = defaultdict(lambda: 99999999)
