@@ -1,0 +1,33 @@
+# .bash_profile
+
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+	. ~/.bashrc
+fi
+
+# User specific environment and startup programs
+
+PYTHONPATH=$HOME/rbot/python-src
+PATH=$PATH:$HOME/.local/bin:$HOME/bin
+
+export PATH
+
+export PS1='[$USER@trader \w]$ '
+
+cd ~/rbot/python-src
+
+alias events='tail -n20 events.txt -f'
+alias wd='tail -n2000 events.txt -f | grep WITHDRAW'
+alias wdit='tail -n2000 events.txt -f | egrep "WITHDRAW IN TRANSIT|WITHDRAW LOOP|MISSING|EXTRA"'
+alias wdl='tail -n2000 events.txt -f | egrep "WITHDRAW,LIQUI|WITHDRAW LOOP|WITHDRAW,BINANCE"'
+alias logs='tail -n100 log.txt'
+alias stop='./stop.sh'
+alias start='./start.sh'
+alias zero='python trader.py zero_balances'
+alias clear-trades='python commands/clear_all_trades.py'
+alias repair='python trader.py repair_balances'
+alias inactive='tail -n10000 events.txt | grep INACTIVE'
+
+function trades(){
+	tail -n ${1:-50} trades.txt
+}
