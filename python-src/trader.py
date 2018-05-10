@@ -896,7 +896,7 @@ while True:
                     oflags = 'fciq,post'
 
                     if side == 'buy':
-                        if make_from is None or make_from.get_balance(pair.currency) < MAKER_MIN_CURRENCY_BALANCE[pair.currency] or not MAKER_CREATE:
+                        if make_from is None or make_at.get_balance(pair.currency) < MAKER_MIN_CURRENCY_BALANCE[pair.currency] or not MAKER_CREATE:
                             record_event("MAKER_UNABLE_CREATE,%s,%s,%s" % (pair.token, pair.currency, side))
                             make_from = None
                         else:
@@ -911,7 +911,7 @@ while True:
                                 oflags = 'fciq'
                     else:
                         assert(side == 'sell')
-                        if make_from is None or make_from.get_balance(pair.token) < size or not MAKER_CREATE:
+                        if make_from is None or make_at.get_balance(pair.token) < size or not MAKER_CREATE:
                             record_event("MAKER_UNABLE_CREATE,%s,%s,%s" % (pair.token, pair.currency, side))
                             make_from = None
                         else:
@@ -960,7 +960,7 @@ while True:
                             need_books_refresh = True
                         else:
                             err_message = order_return['error'] if 'error' in order_return else ''
-                            record_event("MAKER_CREATE_FAIL,%s,%s,%s" % (pair.token, pair.currency, err_message))
+                            record_event("MAKER_CREATE_FAIL,%s,%s,%s,%s" % (pair.token, pair.currency, side, err_message))
                 else: # TODO make_from could be null here!
                     assert(len(records) == 1)
                     record = records[0]
