@@ -26,7 +26,8 @@ MAXIMUM_MARKUP = Decimal('0.015')
 MAKER_PAIR_LIST = [
     pair_factory('XLM','BTC'),
     pair_factory('GNO','BTC'), pair_factory('GNO','ETH'),
-    pair_factory('MLN','BTC')
+    pair_factory('MLN','BTC'),
+    pair_factory('BTC','USD')
 ]
 #pair_factory('ICN','BTC'), pair_factory('ICN','ETH'),
 # pair_factory('REP','BTC'), pair_factory('REP','ETH'),
@@ -35,8 +36,8 @@ MAKER_PAIR_LIST = [
 # pair_factory('XMR','BTC'),
 # pair_factory('ETH','BTC'),
 # pair_factory('BCC','BTC'),
-MAKER_SIZE = {'GNO':Decimal('3'), 'ICN':Decimal('350'), 'MLN':Decimal('4'), 'REP':Decimal('10'), 'ETH':Decimal('5'), 'BCC':Decimal('1'), 'LTC':Decimal('4'), 'XRP':Decimal('300'), 'XLM':Decimal('1500'), 'XMR':Decimal('2'), 'ZEC':Decimal('1')}
-MAKER_MIN_CURRENCY_BALANCE = {'BTC':Decimal('0.4'), 'ETH':Decimal('5')}
+MAKER_SIZE = {'BTC':Decimal('0.05'), 'GNO':Decimal('3'), 'ICN':Decimal('350'), 'MLN':Decimal('4'), 'REP':Decimal('10'), 'ETH':Decimal('5'), 'BCC':Decimal('1'), 'LTC':Decimal('4'), 'XRP':Decimal('300'), 'XLM':Decimal('1500'), 'XMR':Decimal('2'), 'ZEC':Decimal('1')}
+MAKER_MIN_CURRENCY_BALANCE = {'BTC':Decimal('0.4'), 'ETH':Decimal('5'), 'USD':Decimal(2000)}
 
 DISABLE_TRADING = False
 UPDATE_TARGET_BALANCE = False
@@ -74,7 +75,7 @@ def sleep(duration, reason):
 
 # order determines execution ordering, assumes more liquidity at the latter exchange
 #   and that earlier exchanges are faster responding
-exchanges = [bittrex.Bittrex(), binance.Binance(), kraken.Kraken(), poloniex.Poloniex()]
+exchanges = [bittrex.Bittrex(), binance.Binance(), kraken.Kraken(), poloniex.Poloniex(), bitflyer.BitFlyer()]
 def get_exchange_handler(name):
     return filter(lambda exchange:exchange.name == name, exchanges)[0]
 make_at = get_exchange_handler('KRAKEN')
@@ -104,10 +105,15 @@ OVERRIDE_TARGET_BALANCE = {
         'BTC': Decimal(0.8),
         'ETH': Decimal(17),
         'LTC': Decimal(7),
-        'BCC': Decimal(1.7)},
+        'BCC': Decimal(1.7)
+    },
     'KRAKEN':{
         'BTC':Decimal(5)
-}}
+    },
+    'BITFLYER':{
+        'BTC':Decimal(1)
+    }
+}
 def has_override(exchange, symbol):
     return exchange.name in OVERRIDE_TARGET_BALANCE and symbol in OVERRIDE_TARGET_BALANCE[exchange.name]
 
