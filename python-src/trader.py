@@ -1028,7 +1028,7 @@ while True:
                                 do_cancel()
 
                             if TERMINATION_MODE is True:
-                                record_maker("MAKER_CANCEL_TERMINATION")
+                                record_maker("MAKER_CANCEL_TERMINATION", record, order_info)
                                 do_cancel()
 
                             if opp_side == 'buy':
