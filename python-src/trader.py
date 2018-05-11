@@ -1,4 +1,4 @@
-import datetime, sys, time
+import datetime, sys, time, signal
 from collections import namedtuple
 from decimal import Decimal, Context, ROUND_FLOOR, ROUND_CEILING
 from pymongo import MongoClient
@@ -45,11 +45,13 @@ UPDATE_TARGET_BALANCE = False
 UPDATE_ALL_TARGET_BALANCE = False
 REPAIR_BALANCES = False
 INITIALIZE_BALANCE_CACHE = False
-MAKER_CREATE = True
+TERMINATION_MODE = False
+
+def termination_handler(signum, frame):
+    TERMINATION_MODE = True
+signal.signal(signal.SIGTERM, termination_handler)
 
 if len(sys.argv) > 1:
-    if sys.argv[1] == 'nomaker':
-        MAKER_CREATE = False
     if sys.argv[1] == 'repair_balances':
         REPAIR_BALANCES = True
     if sys.argv[1] == 'initialize_balance_cache':
@@ -689,13 +691,10 @@ for exch in exchanges:
 sleep(1, 'STARTUP,INITIAL_REFRESH')
 
 for exch in exchanges:
-    if MAKER_CREATE:
-        if exch.name != make_at.name:
-            exch.protected_cancel_all_orders()
-        else:
-            make_at.cancel_all_orders(map(lambda o:o['order_id'], open_orders))
-    else:
+    if exch.name != make_at.name:
         exch.protected_cancel_all_orders()
+    else:
+        make_at.cancel_all_orders(map(lambda o:o['order_id'], open_orders))
 sleep(1, 'STARTUP,CANCEL_ALL')
 
 for exch in exchanges:
@@ -900,7 +899,7 @@ while True:
                     oflags = 'fciq,post'
 
                     if side == 'buy':
-                        if make_from is None or make_at.get_balance(pair.currency) < MAKER_MIN_CURRENCY_BALANCE[pair.currency] or not MAKER_CREATE:
+                        if make_from is None or make_at.get_balance(pair.currency) < MAKER_MIN_CURRENCY_BALANCE[pair.currency] or TERMINATION_MODE:
                             record_event("MAKER_UNABLE_CREATE,%s,%s,%s" % (pair.token, pair.currency, side))
                             make_from = None
                         else:
@@ -915,7 +914,7 @@ while True:
                                 oflags = 'fciq'
                     else:
                         assert(side == 'sell')
-                        if make_from is None or make_at.get_balance(pair.token) < size or not MAKER_CREATE:
+                        if make_from is None or make_at.get_balance(pair.token) < size or TERMINATION_MODE:
                             record_event("MAKER_UNABLE_CREATE,%s,%s,%s" % (pair.token, pair.currency, side))
                             make_from = None
                         else:
@@ -983,7 +982,7 @@ while True:
                         make_at.cancel(order_id)
                         need_books_refresh = True
 
-                    if make_from is None:
+                    if make_from is None or TERMINATION_MODE is True:
                         if not (order_info['status'] == 'pending' or order_info['status'] == 'open'):
                             record_maker("MAKER_DONE_NO_FROM", record, order_info)
                             maker_orders_collection.delete_many({'order_id':order_id})
@@ -1047,4 +1046,7 @@ while True:
                                     record_maker("MAKER_CANCEL_HIGH_MARKUP", record, order_info)
                                     do_cancel()
 
+        if TERMINATION_MODE and maker_orders_collection.count() == 0:
+            record_event('TERMINATION')
+            sys.exit(0)
         sleep(1, 'MAKER_LOOP')
