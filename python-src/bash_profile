@@ -17,7 +17,7 @@ export PS1='[$USER@trader \w]$ '
 cd ~/rbot/python-src
 
 alias events='tail -n20 events.txt -f'
-alias wd='tail -n2000 events.txt -f | grep WITHDRAW'
+alias wd='tail -n10000 events.txt -f | grep WITHDRAW'
 alias wdit='tail -n2000 events.txt -f | egrep "WITHDRAW IN TRANSIT|WITHDRAW LOOP|MISSING|EXTRA"'
 alias wdl='tail -n2000 events.txt -f | egrep "WITHDRAW,LIQUI|WITHDRAW LOOP|WITHDRAW,BINANCE"'
 alias logs='tail -n100 log.txt'
