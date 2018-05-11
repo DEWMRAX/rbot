@@ -48,6 +48,7 @@ INITIALIZE_BALANCE_CACHE = False
 TERMINATION_MODE = False
 
 def termination_handler(signum, frame):
+    global TERMINATION_MODE
     TERMINATION_MODE = True
 signal.signal(signal.SIGTERM, termination_handler)
 
