@@ -982,7 +982,7 @@ while True:
                         make_at.cancel(order_id)
                         need_books_refresh = True
 
-                    if make_from is None or TERMINATION_MODE is True:
+                    if make_from is None:
                         if not (order_info['status'] == 'pending' or order_info['status'] == 'open'):
                             record_maker("MAKER_DONE_NO_FROM", record, order_info)
                             maker_orders_collection.delete_many({'order_id':order_id})
@@ -1025,6 +1025,10 @@ while True:
                         else:
                             if vol_closed > Decimal('0.8') * MAKER_SIZE[pair.token]:
                                 record_maker("MAKER_CANCEL_MOSTLY_FILLED", record, order_info)
+                                do_cancel()
+
+                            if TERMINATION_MODE is True:
+                                record_maker("MAKER_CANCEL_TERMINATION")
                                 do_cancel()
 
                             if opp_side == 'buy':
