@@ -1003,7 +1003,7 @@ while True:
 
                             make_from.refresh_balances()
                             make_at.refresh_balances()
-                            sleep(1, MAKER_EXEC_REFRESH_BALANCE)
+                            sleep(1, 'MAKER_EXEC_REFRESH_BALANCE')
 
                             ending_revenue = arbitrage_revenue()
 
