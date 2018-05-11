@@ -64,8 +64,8 @@ ALL_PAIRS = [
     Pair('POWR', 'BTC', friction(0.011)),
     Pair('POWR', 'ETH', friction(0.011)),
 
-    Pair('GNO', 'BTC', friction(0.01)),
-    Pair('GNO', 'ETH', friction(0.01)),
+    Pair('GNO', 'BTC', friction(0.012)),
+    Pair('GNO', 'ETH', friction(0.012)),
 
     Pair('XMR', 'BTC', friction(0.006)),
     Pair('XMR', 'ETH', friction(0.006)),
@@ -137,7 +137,7 @@ ALL_PAIRS = [
     Pair('TRST', 'BTC', friction(0.008)),
     Pair('TRST', 'ETH', friction(0.006)),
 
-    Pair('ICN', 'BTC', friction(0.01)),
+    Pair('ICN', 'BTC', friction(0.012)),
     Pair('ICN', 'ETH', friction(0.007)),
     Pair('MLN', 'BTC', friction(0.01)),
     Pair('MLN', 'ETH', friction(0.01)),
