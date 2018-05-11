@@ -999,8 +999,11 @@ while True:
 
                             make_from.refresh_balances()
                             make_at.refresh_balances()
+                            sleep(1, MAKER_EXEC_REFRESH_BALANCE)
 
-                            record_trade("MAKER,%s,%s,%s,%s,%s,%0.4f,%0.4f,%0.4f" % (make_from.name, make_at.name, side.upper(), pair.token, pair.currency, closed_amount, vol_closed, (arbitrage_revenue() - starting_revenue)))
+                            ending_revenue = arbitrage_revenue()
+
+                            record_trade("MAKER,%s,%s,%s,%s,%s,%0.4f,%0.4f,%0.4f,%0.4f,%0.4f" % (make_from.name, make_at.name, side.upper(), pair.token, pair.currency, closed_amount, vol_closed, starting_revenue, ending_revenue, (ending_revenue - starting_revenue)))
 
                             need_books_refresh = True
 
