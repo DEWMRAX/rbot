@@ -806,8 +806,6 @@ while True:
         pair = pair_factory(token, currency)
         if pair is None:
             continue
-        if any(map(lambda p:p==pair, MAKER_PAIR_LIST)):
-            continue
         if last_loop_traded_pair == pair:
             continue
 
@@ -817,6 +815,10 @@ while True:
             continue
 
         trade = check_imbalance(buyer, seller, pair)
+
+        if any(map(lambda p:p==pair, MAKER_PAIR_LIST)):
+            continue
+
         if trade.profit > 0 and (best_trade is None or best_trade.profit < trade.profit):
             best_trade = trade
 
