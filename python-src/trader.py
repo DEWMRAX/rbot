@@ -984,8 +984,12 @@ while True:
                         need_books_refresh = True
 
                     if make_from is None:
-                        record_maker("MAKER_CANCEL_NO_FROM", record, order_info)
-                        do_cancel()
+                        if not (order_info['status'] == 'pending' or order_info['status'] == 'open'):
+                            record_maker("MAKER_DONE_NO_FROM", record, order_info)
+                            maker_orders_collection.delete_many({'order_id':order_id})
+                        else:
+                            record_maker("MAKER_CANCEL_NO_FROM", record, order_info)
+                            do_cancel()
                     else:
                         vol_closed = Decimal(record['vol_closed'])
                         if Decimal(order_info['vol_exec']) - vol_closed > pair.min_quantity():
