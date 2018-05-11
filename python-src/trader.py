@@ -991,24 +991,27 @@ while True:
                             do_cancel()
                     else:
                         vol_closed = Decimal(record['vol_closed'])
-                        if Decimal(order_info['vol_exec']) - vol_closed > pair.min_quantity():
+
+                        trade_size = Decimal(order_info['vol_exec']) - vol_closed
+                        if trade_size > pair.min_quantity():
                             market_price = from_price * (Decimal(1.01) if opp_side == 'buy' else Decimal(0.99))
-                            closed_amount = make_from.trade_ioc(pair, opp_side, market_price, Decimal(order_info['vol_exec']) - vol_closed, 'MAKER_CLOSEOUT')
-                            vol_closed = vol_closed + closed_amount
-                            record['vol_closed'] = "%0.8f" % vol_closed
-                            maker_orders_collection.update({'order_id':record['order_id']}, {'$set':{'vol_closed':record['vol_closed']}})
+                            if trade_size * market_price > pair.min_notional():
+                                closed_amount = make_from.trade_ioc(pair, opp_side, market_price, trade_size, 'MAKER_CLOSEOUT')
+                                vol_closed = vol_closed + closed_amount
+                                record['vol_closed'] = "%0.8f" % vol_closed
+                                maker_orders_collection.update({'order_id':record['order_id']}, {'$set':{'vol_closed':record['vol_closed']}})
 
-                            starting_revenue = arbitrage_revenue()
+                                starting_revenue = arbitrage_revenue()
 
-                            make_from.refresh_balances()
-                            make_at.refresh_balances()
-                            sleep(1, 'MAKER_EXEC_REFRESH_BALANCE')
+                                make_from.refresh_balances()
+                                make_at.refresh_balances()
+                                sleep(1, 'MAKER_EXEC_REFRESH_BALANCE')
 
-                            ending_revenue = arbitrage_revenue()
+                                ending_revenue = arbitrage_revenue()
 
-                            record_trade("MAKER,%s,%s,%s,%s,%s,%0.4f,%0.4f,%0.4f,%0.4f,%0.4f" % (make_from.name, make_at.name, side.upper(), pair.token, pair.currency, closed_amount, vol_closed, starting_revenue, ending_revenue, (ending_revenue - starting_revenue)))
+                                record_trade("MAKER,%s,%s,%s,%s,%s,%0.4f,%0.4f,%0.4f,%0.4f,%0.4f" % (make_from.name, make_at.name, side.upper(), pair.token, pair.currency, closed_amount, vol_closed, starting_revenue, ending_revenue, (ending_revenue - starting_revenue)))
 
-                            need_books_refresh = True
+                                need_books_refresh = True
 
                         print "Total Closed qty: %0.8f" % vol_closed
 
