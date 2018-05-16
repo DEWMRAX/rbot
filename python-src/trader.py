@@ -28,7 +28,7 @@ MAKER_PAIR_LIST = [
     pair_factory('GNO','BTC'), pair_factory('GNO','ETH'),
     pair_factory('MLN','BTC'),
     pair_factory('BTC','USD')
-    # pair_factory('ICN','BTC')
+    pair_factory('ICN','BTC'), pair_factory('ICN','ETH')
 ]
 #pair_factory('ICN','BTC'), pair_factory('ICN','ETH'),
 # pair_factory('REP','BTC'), pair_factory('REP','ETH'),
