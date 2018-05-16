@@ -137,8 +137,8 @@ ALL_PAIRS = [
     Pair('TRST', 'BTC', friction(0.008)),
     Pair('TRST', 'ETH', friction(0.006)),
 
-    Pair('ICN', 'BTC', friction(0.012)),
-    Pair('ICN', 'ETH', friction(0.007)),
+    Pair('ICN', 'BTC', friction(0.015)),
+    Pair('ICN', 'ETH', friction(0.015)),
     Pair('MLN', 'BTC', friction(0.01)),
     Pair('MLN', 'ETH', friction(0.01)),
     Pair('REP', 'BTC', friction(0.01)),
