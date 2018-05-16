@@ -22,7 +22,7 @@ LIQUI_NAV_PERCENTAGE_MAX=Decimal('0.01')
 MAKER_MARKUP = Decimal('0.0016')
 MAKER_CROSS_MARKUP = Decimal('0.001')
 MINIMUM_MARKUP = Decimal('0.0021')
-MAXIMUM_MARKUP = Decimal('0.015')
+MAXIMUM_MARKUP = Decimal('0.02')
 MAKER_PAIR_LIST = [
     pair_factory('XLM','BTC'),
     pair_factory('GNO','BTC'), pair_factory('GNO','ETH'),
