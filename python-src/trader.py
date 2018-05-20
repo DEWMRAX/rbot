@@ -46,6 +46,7 @@ UPDATE_ALL_TARGET_BALANCE = False
 REPAIR_BALANCES = False
 INITIALIZE_BALANCE_CACHE = False
 TERMINATION_MODE = False
+DISABLE_MAKER = True
 
 def termination_handler(signum, frame):
     global TERMINATION_MODE
@@ -840,12 +841,13 @@ while True:
         execute_trade(best_trade.buyer, best_trade.seller, best_trade.pair, best_trade.quantity, best_trade.profit, best_trade.bid_price, best_trade.ask_price)
         last_loop_traded_pair = best_trade.pair
 
-        sleep(1, 'TRADED')
+        # TODO temporarily quiet last traded ticker?
+        sleep(4, 'TRADED')
 
         for exch in exchanges:
             exch.protected_refresh_balances()
 
-    if not DISABLE_TRADING:
+    if (not DISABLE_TRADING) and (not DISABLE_MAKER):
         record_event("MAKER_HEARTBEAT,%s" % balances_string())
 
         open_orders = list(maker_orders_collection.find({}))
@@ -1054,7 +1056,8 @@ while True:
                                     record_maker("MAKER_CANCEL_HIGH_MARKUP", record, order_info)
                                     do_cancel()
 
-        if TERMINATION_MODE and maker_orders_collection.count() == 0:
-            record_event('TERMINATION')
-            sys.exit(0)
         sleep(1, 'MAKER_LOOP')
+
+    if TERMINATION_MODE and maker_orders_collection.count() == 0:
+        record_event('TERMINATION')
+        sys.exit(0)
