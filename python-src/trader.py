@@ -46,7 +46,7 @@ UPDATE_ALL_TARGET_BALANCE = False
 REPAIR_BALANCES = False
 INITIALIZE_BALANCE_CACHE = False
 TERMINATION_MODE = False
-DISABLE_MAKER = True
+DISABLE_MAKER = False
 
 def termination_handler(signum, frame):
     global TERMINATION_MODE
@@ -907,12 +907,12 @@ while True:
                             make_from = None
                         else:
                             print "Final price for selling %0.0f at %s: %0.8f" % (size, make_from.name, from_price)
-                            make_price = from_price * (Decimal(1) - MAKER_MARKUP - pair.network_friction)
+                            make_price = from_price * (Decimal(1) - MAKER_MARKUP - pair.maker_network_friction())
                             make_price = make_price.quantize(Decimal(1)/Decimal(10**precision), rounding=ROUND_FLOOR)
 
                             if len(at_book.asks) and make_price >= at_book.asks[0]:
                                 print "Make market buy order would cross book at %0.8f, expanding markup" % (make_price)
-                                make_price = from_price * (Decimal(1) - MAKER_MARKUP - MAKER_CROSS_MARKUP - pair.network_friction)
+                                make_price = from_price * (Decimal(1) - MAKER_MARKUP - MAKER_CROSS_MARKUP - pair.maker_network_friction())
                                 make_price = make_price.quantize(Decimal(1)/Decimal(10**precision), rounding=ROUND_FLOOR)
                                 oflags = 'fciq'
                     else:
@@ -922,12 +922,12 @@ while True:
                             make_from = None
                         else:
                             print "Final price for buying %0.0f at %s: %0.8f" % (size, make_from.name, from_price)
-                            make_price = from_price * (Decimal(1) + MAKER_MARKUP + pair.network_friction)
+                            make_price = from_price * (Decimal(1) + MAKER_MARKUP + pair.maker_network_friction())
                             make_price = make_price.quantize(Decimal(1)/Decimal(10**precision), rounding=ROUND_CEILING)
 
                             if len(at_book.bids) and make_price <= at_book.bids[0]:
                                 print "Make market sell order would cross book at %0.8f, expanding markup" % (make_price)
-                                make_price = from_price * (Decimal(1) + MAKER_MARKUP + MAKER_CROSS_MARKUP + pair.network_friction)
+                                make_price = from_price * (Decimal(1) + MAKER_MARKUP + MAKER_CROSS_MARKUP + pair.maker_network_friction())
                                 make_price = make_price.quantize(Decimal(1)/Decimal(10**precision), rounding=ROUND_CEILING)
                                 oflags = 'fciq'
 
