@@ -842,7 +842,7 @@ while True:
         last_loop_traded_pair = best_trade.pair
 
         # TODO temporarily quiet last traded ticker?
-        sleep(4, 'TRADED')
+        sleep(1, 'TRADED')
 
         for exch in exchanges:
             exch.protected_refresh_balances()
