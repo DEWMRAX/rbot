@@ -820,6 +820,10 @@ while True:
         if ENABLE_MAKER and any(map(lambda p:p==pair, MAKER_PAIR_LIST)):
             continue
 
+        # temp disable BTC trading
+        if pair.token == 'BTC' and pair.currency == 'USD':
+            continue
+
         if trade.profit > 0 and (best_trade is None or best_trade.profit < trade.profit):
             best_trade = trade
 
