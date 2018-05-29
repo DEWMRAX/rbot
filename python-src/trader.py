@@ -46,7 +46,7 @@ UPDATE_ALL_TARGET_BALANCE = False
 REPAIR_BALANCES = False
 INITIALIZE_BALANCE_CACHE = False
 TERMINATION_MODE = False
-DISABLE_MAKER = False
+ENABLE_MAKER = False
 
 def termination_handler(signum, frame):
     global TERMINATION_MODE
@@ -693,14 +693,14 @@ for exch in exchanges:
 sleep(1, 'STARTUP,INITIAL_REFRESH')
 
 for exch in exchanges:
-    if exch.name != make_at.name:
-        exch.protected_cancel_all_orders()
-    else:
+    if exch.name == make_at.name and ENABLE_MAKER:
         make_at.cancel_all_orders(map(lambda o:o['order_id'], open_orders))
+    else:
+        exch.protected_cancel_all_orders()
 sleep(1, 'STARTUP,CANCEL_ALL')
 
 for exch in exchanges:
-    if exch.name != make_at.name:
+    if exch.name != make_at.name or not ENABLE_MAKER:
         sanity_check_open(exch)
 sleep(1, 'STARTUP,SANITY_CHECK_OPEN')
 
@@ -817,7 +817,7 @@ while True:
 
         trade = check_imbalance(buyer, seller, pair)
 
-        if any(map(lambda p:p==pair, MAKER_PAIR_LIST)):
+        if ENABLE_MAKER and any(map(lambda p:p==pair, MAKER_PAIR_LIST)):
             continue
 
         if trade.profit > 0 and (best_trade is None or best_trade.profit < trade.profit):
@@ -842,12 +842,15 @@ while True:
         last_loop_traded_pair = best_trade.pair
 
         # TODO temporarily quiet last traded ticker?
-        sleep(1, 'TRADED')
+        if ENABLE_MAKER:
+            sleep(1, 'TRADED')
+        else:
+            sleep(4, 'TRADED')
 
         for exch in exchanges:
             exch.protected_refresh_balances()
 
-    if (not DISABLE_TRADING) and (not DISABLE_MAKER):
+    if (not DISABLE_TRADING) and ENABLE_MAKER:
         record_event("MAKER_HEARTBEAT,%s" % balances_string())
 
         open_orders = list(maker_orders_collection.find({}))
