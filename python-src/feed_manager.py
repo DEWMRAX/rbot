@@ -6,6 +6,7 @@ from decimal import Decimal
 from threading import Thread
 import boto3
 import time
+import json
 
 STALE_AGE = 20
 ACTIVE_AGE = 0
@@ -23,7 +24,9 @@ def invoke_one(market, reason, waiting_time, throttle=True):
     if (time.time() > last_invoked[market] + INVOKE_THROTTLE or not throttle) and not market.startswith('LIQUI'):
         last_invoked[market] = time.time()
         record_event("INVOKING,%s,%s,%0.4f" % (market, reason, waiting_time))
-        t = Thread(target=lambda_client.invoke, name=market, kwargs=dict(InvocationType='Event', FunctionName=market))
+        (exchange, token, currency) = market.split('-')
+        event = dict(exchange=exchange, token=token, currency=currency)
+        t = Thread(target=lambda_client.invoke, name='FEED-HANDLER', kwargs=dict(InvocationType='Event', FunctionName='FEED-HANDLER', Payload=json.dumps(event)))
         t.start()
 
 def invoke_all(markets, reason):
