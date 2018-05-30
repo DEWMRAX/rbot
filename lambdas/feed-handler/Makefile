@@ -8,4 +8,4 @@ compile:
 
 upload: clean compile
 	zip -r -X build/bundle.zip build/*.js node_modules/
-	aws s3 cp build/bundle.zip s3://dewmrax-lambdas-2/feed-handler.zip
+	aws s3 cp build/bundle.zip s3://dewmrax-lambdas-2/universal-feed-handler.zip

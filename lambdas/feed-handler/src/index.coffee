@@ -14,9 +14,9 @@ AWS.config.update
 docClient = new AWS.DynamoDB.DocumentClient()
 
 exports.handler = (event, context, callback) ->
-  token = process.env.TOKEN
-  currency = process.env.CURRENCY
-  exchange = process.env.EXCHANGE
+  token = event.token
+  currency = event.currency
+  exchange = event.exchange
   pair = "#{token}-#{currency}"
 
   console.log "Looking up #{pair} on #{exchange}"
@@ -34,7 +34,7 @@ exports.handler = (event, context, callback) ->
   await feed_handler.get_book token, currency, callback, defer book
 
   params =
-    TableName: 'orderbooks'
+    TableName: 'orderbooks-test'
     Item:
       pair: pair
       exchange: exchange
