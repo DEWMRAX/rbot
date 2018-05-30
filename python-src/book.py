@@ -53,9 +53,9 @@ def process_data(ret, response):
         ret[book.pair].extend([book])
 
 # returns map of pair => [list of books, one per exchange]
-def query_all():
+def query_all(tablename='orderbooks'):
     ret = defaultdict(lambda:[])
-    table = boto3.resource('dynamodb').Table('orderbooks')
+    table = boto3.resource('dynamodb').Table(tablename)
     response = table.scan()
     process_data(ret, response)
     while response.get('LastEvaluatedKey'):
@@ -64,7 +64,7 @@ def query_all():
 
     return ret
 
-def query_pair(pair):
+def query_pair(pair, tablename='orderbooks'):
     filtr = Key('pair').eq(str(pair))
-    table = boto3.resource('dynamodb').Table('orderbooks')
+    table = boto3.resource('dynamodb').Table(tablename)
     return map(lambda doc:Book(doc), table.scan(FilterExpression=filtr)['Items'])

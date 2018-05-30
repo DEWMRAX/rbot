@@ -31,7 +31,7 @@ def best_bid(books):
 def best_ask(books):
     return min(map(lambda book: (book.exchange_name, effective_ask(book)), books), key=lambda (name,price):price)
 
-for pair, pair_books in query_all().iteritems():
+for pair, pair_books in query_all(tablename='orderbooks-test').iteritems():
     (token, currency) = pair.split('-')
     # pair = pair_factory(token, currency)
 
@@ -44,7 +44,7 @@ for pair, pair_books in query_all().iteritems():
 print edges
 
 HOME = 'BTC'
-MAX_LOOP = 5
+MAX_LOOP = int(sys.argv[1])
 
 node_val = defaultdict(lambda: None)
 node_from = defaultdict(lambda: None)
