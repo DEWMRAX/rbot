@@ -27,8 +27,8 @@ MAKER_PAIR_LIST = [
     pair_factory('XLM','BTC'),
     pair_factory('GNO','BTC'), pair_factory('GNO','ETH'),
     pair_factory('MLN','BTC'),
-    pair_factory('BTC','USD')#,
-    # pair_factory('ICN','BTC'), pair_factory('ICN','ETH')
+    pair_factory('BTC','USD'),
+    pair_factory('ICN','BTC'), pair_factory('ICN','ETH')
 ]
 #pair_factory('ICN','BTC'), pair_factory('ICN','ETH'),
 # pair_factory('REP','BTC'), pair_factory('REP','ETH'),
@@ -37,7 +37,7 @@ MAKER_PAIR_LIST = [
 # pair_factory('XMR','BTC'),
 # pair_factory('ETH','BTC'),
 # pair_factory('BCC','BTC'),
-MAKER_SIZE = {'BTC':Decimal('0.4'), 'GNO':Decimal('3'), 'ICN':Decimal('600'), 'MLN':Decimal('6'), 'REP':Decimal('15'), 'ETH':Decimal('5'), 'BCC':Decimal('1'), 'LTC':Decimal('4'), 'XRP':Decimal('300'), 'XLM':Decimal('2000'), 'XMR':Decimal('2'), 'ZEC':Decimal('1')}
+MAKER_SIZE = {'BTC':Decimal('0.3'), 'GNO':Decimal('2'), 'ICN':Decimal('400'), 'MLN':Decimal('6'), 'REP':Decimal('15'), 'ETH':Decimal('5'), 'BCC':Decimal('1'), 'LTC':Decimal('4'), 'XRP':Decimal('300'), 'XLM':Decimal('2000'), 'XMR':Decimal('2'), 'ZEC':Decimal('1')}
 MAKER_MIN_CURRENCY_BALANCE = {'BTC':Decimal('0.6'), 'ETH':Decimal('5'), 'USD':Decimal(8000)}
 
 DISABLE_TRADING = False
@@ -46,7 +46,7 @@ UPDATE_ALL_TARGET_BALANCE = False
 REPAIR_BALANCES = False
 INITIALIZE_BALANCE_CACHE = False
 TERMINATION_MODE = False
-ENABLE_MAKER = False
+ENABLE_MAKER = True
 
 def termination_handler(signum, frame):
     global TERMINATION_MODE
