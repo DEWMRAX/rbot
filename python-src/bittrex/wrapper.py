@@ -31,8 +31,8 @@ class Bittrex(Exchange):
         self.markets = self.api.get_markets()
 
         for market in self.markets:
-            token = symbol_from_bittrex(market['BaseCurrency'])
-            currency = symbol_from_bittrex(market['MarketCurrency'])
+            currency = symbol_from_bittrex(market['BaseCurrency'])
+            token = symbol_from_bittrex(market['MarketCurrency'])
             uniform_ticker = "%s-%s" % (token,currency)
             if token in self.symbols and currency in self.symbols:
                 self.fees[uniform_ticker] = FEES[self.name].taker
