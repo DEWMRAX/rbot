@@ -7,6 +7,18 @@ from fees import FEES
 import json
 import time
 
+def symbol_from_bittrex(symbol):
+    if symbol == "BCH":
+        return "BCC"
+    else:
+        return symbol
+
+def symbol_to_bittrex(symbol):
+    if symbol == "BCC":
+        return "BCH"
+    else:
+        return symbol
+
 class Bittrex(Exchange):
     def __init__(self):
         Exchange.__init__(self, "BITTREX")
@@ -19,12 +31,14 @@ class Bittrex(Exchange):
         self.markets = self.api.get_markets()
 
         for market in self.markets:
-            uniform_ticker = "%s-%s" % (market['MarketCurrency'], market['BaseCurrency'])
-            if market['MarketCurrency'] in self.symbols and market['BaseCurrency'] in self.symbols:
+            token = symbol_from_bittrex(market['BaseCurrency'])
+            currency = symbol_from_bittrex(market['MarketCurrency'])
+            uniform_ticker = "%s-%s" % (token,currency)
+            if token in self.symbols and currency in self.symbols:
                 self.fees[uniform_ticker] = FEES[self.name].taker
 
     def pair_name(self, market):
-        return "%s-%s" % (market.currency, market.token)
+        return "%s-%s" % (symbol_to_bittrex(market.currency), symbol_to_bittrex(market.token))
 
     def deposit_address(self, symbol):
         addr_map = {
@@ -81,8 +95,8 @@ class Bittrex(Exchange):
         if symbol in self.require_deposit_message: # only message is returned from api
             return addr_map[symbol]
 
-        addr_result = self.api.get_deposit_address(symbol)
-        assert(addr_result['Currency'] == symbol)
+        addr_result = self.api.get_deposit_address(symbol_to_bittrex(symbol))
+        assert(symbol_from_bittrex(addr_result['Currency']) == symbol)
         assert(addr_result['Address'] == addr_map[symbol])
 
         return addr_result['Address']
@@ -95,8 +109,8 @@ class Bittrex(Exchange):
             "XMR":"153fa389022049e393808eb7850dafd9c9ca703b800945f9be3d2bc8017fd085"
         }
 
-        msg_result = self.api.get_deposit_address(symbol)
-        assert(msg_result['Currency'] == symbol)
+        msg_result = self.api.get_deposit_address(symbol_to_bittrex(symbol))
+        assert(symbol_from_bittrex(msg_result['Currency']) == symbol)
         assert(msg_result['Address'] == msg_map[symbol])
 
         return msg_map[symbol]
@@ -111,15 +125,15 @@ class Bittrex(Exchange):
         if message:
             event += "," + message
             record_event(event)
-            self.api.withdraw_message(symbol, amount, address, message)
+            self.api.withdraw_message(symbol_to_bittrex(symbol), amount, address, message)
         else:
             record_event(event)
-            self.api.withdraw(symbol, amount, address)
+            self.api.withdraw(symbol_to_bittrex(symbol), amount, address)
 
     def refresh_balances(self):
         for info in self.api.get_balances():
-            if info['Currency'] in self.symbols:
-                self.balance[info['Currency']] = Decimal(info['Available'])
+            if symbol_from_bittrex(info['Currency']) in self.symbols:
+                self.balance[symbol_from_bittrex(info['Currency'])] = Decimal(info['Available'])
 
     def trade_ioc(self, market, side, price, amount, reason):
         if side == 'buy':
