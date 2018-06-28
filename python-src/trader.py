@@ -46,7 +46,7 @@ UPDATE_ALL_TARGET_BALANCE = False
 REPAIR_BALANCES = False
 INITIALIZE_BALANCE_CACHE = False
 TERMINATION_MODE = False
-ENABLE_MAKER = True
+ENABLE_MAKER = False
 
 # def termination_handler(signum, frame):
 #     global TERMINATION_MODE
