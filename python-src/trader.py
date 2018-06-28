@@ -48,10 +48,10 @@ INITIALIZE_BALANCE_CACHE = False
 TERMINATION_MODE = False
 ENABLE_MAKER = True
 
-def termination_handler(signum, frame):
-    global TERMINATION_MODE
-    TERMINATION_MODE = True
-signal.signal(signal.SIGTERM, termination_handler)
+# def termination_handler(signum, frame):
+#     global TERMINATION_MODE
+#     TERMINATION_MODE = True
+# signal.signal(signal.SIGTERM, termination_handler)
 
 if len(sys.argv) > 1:
     if sys.argv[1] == 'repair_balances':
