@@ -41,10 +41,10 @@ for pair, pair_books in query_all(tablename='orderbooks-test').iteritems():
     (exchange_name, price) = best_ask(pair_books)
     edges[currency][token] = Edge(Decimal(1) / price, exchange_name, "%s->%s" % (currency, token))
 
-print edges
+# print edges
 
-HOME = 'BTC'
 MAX_LOOP = int(sys.argv[1])
+HOME = sys.argv[2]
 
 node_val = defaultdict(lambda: None)
 node_from = defaultdict(lambda: None)
@@ -54,18 +54,25 @@ node_val[HOME] = Decimal(1)
 node_from[HOME] = [HOME]
 
 while(len(q) > 0):
-    print q
-    print node_val
+    # print q
+    # print node_val
     for node in q:
         for dest, edge in edges[node].iteritems():
             if len(node_from[node]) >= MAX_LOOP and dest is not HOME:
                 continue
             exchange_val = node_val[node] * edge.rate
+
+            if dest == HOME and exchange_val > Decimal('1.002'):
+                print exchange_val
+                print node_from[node] + [dest]
+                print
+
             if node_val[dest] is None or exchange_val > node_val[dest]:
                 node_val[dest] = exchange_val
                 if dest not in node_from[node]:
                     next_q.add(dest)
                 node_from[dest] = node_from[node] + [dest]
+
 
     q = next_q
     next_q = set()
