@@ -9,8 +9,13 @@ format_quote = (quote) ->
 format_quotes = (quotes) ->
   format_quote quote for quote in quotes[0..LIMIT]
 
+symbol_to_bittrex = (symbol) ->
+  switch symbol
+    when 'BCC' then 'bch'
+    else symbol.toLowerCase()
+
 pair_name = (token, currency) ->
-  "#{currency.toLowerCase()}-#{token.toLowerCase()}"
+  "#{symbol_to_bittrex currency}-#{symbol_to_bittrex token}"
 
 sanity_check = (book) ->
   (book?.buy and book.buy.length > MIN_BOOK_DATA and book?.sell and book.sell.length > MIN_BOOK_DATA)
