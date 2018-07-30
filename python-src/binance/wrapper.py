@@ -47,7 +47,7 @@ class Binance(Exchange):
         with open('binance.keys', 'r') as api_key:
             self.api = api(api_key.readline().strip(), api_key.readline().strip())
 
-        self.symbols = ['BTC','ETH','USDT','LTC','BNT','OAX','SNT','DNT','QTUM','ICN','OMG','ZRX','STRAT','SNGLS','KNC','FUN','SALT','DASH','ENG','AST','STORJ','RCN','KMD','ARK','XMR','BCC','POWR','ZEC','BAT','ADA','ADX','DGD','REQ','XRP','LSK','MANA','XLM','NEO','BNB','VEN','ELF','RLC','AION','NANO','XEM','CVC']
+        self.symbols = ['BTC','ETH','USDT','LTC','BNT','OAX','SNT','DNT','QTUM','ICN','OMG','ZRX','STRAT','SNGLS','KNC','FUN','SALT','DASH','ENG','AST','STORJ','RCN','KMD','ARK','XMR','BCC','POWR','ZEC','BAT','ADA','ADX','DGD','REQ','XRP','LSK','MANA','XLM','NEO','BNB','VET','ELF','RLC','AION','NANO','XEM','CVC']
         self.fees = {}
 
         account_info = self.api.account_info()
@@ -98,7 +98,7 @@ class Binance(Exchange):
             "XLM":"GAHK7EEG2WWHVKDNT4CEQFZGKF2LGDSW2IVM4S5DP42RBW3K6BTODB4A",
             "NEO":"AWcMmdvUBoJ6MmStNR91X2Q7Xne3VxchRe",
             "XEM":"NC64UFOWRO6AVMWFV2BFX2NT6W2GURK2EOX6FFMZ",
-            "VEN":"0xbaf143b074bb657e85daafdf33419d74f23c4335",
+            "VET":"0xbaf143b074bb657e85daafdf33419d74f23c4335",
             "RLC":"0xbaf143b074bb657e85daafdf33419d74f23c4335",
             "AION":"0xbaf143b074bb657e85daafdf33419d74f23c4335",
             "CVC":"0xbaf143b074bb657e85daafdf33419d74f23c4335",
