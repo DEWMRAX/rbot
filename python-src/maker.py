@@ -530,8 +530,9 @@ def check_symbol_balance(symbol, target, targets):
     if balance < Decimal(1):
         return False
 
+    tinfo = open_transfers_collection.find_one({'symbol':symbol, 'active':True})
+
     if balance < target and not near_equals(target, balance, BALANCE_ACCURACY):
-        tinfo = open_transfers_collection.find_one({'symbol':symbol, 'active':True})
         if not tinfo:
             if REPAIR_BALANCES and symbol not in ['BTC','ETH','USDT']:
                 buy_at_market('REPAIR', pair_factory(symbol, 'BTC'), target-balance)
@@ -544,6 +545,8 @@ def check_symbol_balance(symbol, target, targets):
 
     elif balance > target or near_equals(target, balance, BALANCE_ACCURACY): # no pending transfers
         open_transfers_collection.update_many({'symbol':symbol}, {'$set':{'active':False}})
+        if tinfo:
+            record_event("WITHDRAW COMPLETED,%s,%s,%s,%s,%s,%s" % (tinfo['from'], tinfo['to'], symbol, tinfo['amount'], tinfo['address'], tinfo['time']))
 
         if not near_equals(target, balance, BALANCE_ACCURACY) and symbol not in ['BTC','ETH','USDT','USD']:
             if REPAIR_BALANCES:
