@@ -14,5 +14,5 @@ FEES = {
     "LIQUI":Fee(10, 25),
     "GDAX":Fee(0, 25),
     "ITBIT":Fee(0, 20),
-    "BITFLYER":Fee(0, 0)
+    "BITFLYER":Fee(12, 12)
 }
