@@ -31,7 +31,7 @@ class Pair(namedtuple('Pair', ['token','currency','network_friction'])):
         return Decimal(3) * self.network_friction
 
 def friction(base):
-    return Decimal(0.24 * base)
+    return Decimal(0.4 * base)
 
 ALL_PAIRS = [
 
