@@ -376,6 +376,9 @@ def check_imbalance(buyer_book, seller_book, pair):
         if pair.token in ['']: # tokens temp. not trading
             break
 
+        if pair.currency in ['USD']: # not trading USD pairs at the moment
+            break
+
         if buyer.name == seller.name:
             break
 
@@ -821,10 +824,6 @@ while True:
         trade = check_imbalance(buyer, seller, pair)
 
         if ENABLE_MAKER and any(map(lambda p:p==pair, MAKER_PAIR_LIST)):
-            continue
-
-        # temp disable BTC trading
-        if pair.token == 'BTC' and pair.currency == 'USD':
             continue
 
         if trade.profit > 0 and (best_trade is None or best_trade.profit < trade.profit):
