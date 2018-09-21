@@ -25,13 +25,17 @@ def parse_ticker(ticker):
     a = ticker.split('_')
     return (symbol_from_polo(a[1]), symbol_from_polo(a[0]))
 
+INFO_CACHE_PATH = 'poloniex_info.json'
+
 class Poloniex(Exchange):
     def __init__(self):
         Exchange.__init__(self, "POLO")
         with open("poloniex.keys") as secrets_file:
             secrets = json.load(secrets_file)
             self.tapi = api(bytearray(secrets['key'], 'utf-8'), bytearray(secrets['secret'], 'utf-8'))
-        self.tickers = self.tapi.returnTicker()
+
+        with open(INFO_CACHE_PATH) as f:
+            self.tickers = json.loads(f.read())
 
         self.symbols = ['BTC','ETH','GNT','LTC','REP','USDT','XEM','AMP','DASH','SC','LBC','BCC','ZRX','STRAT','SYS','CVC','OMG','STORJ','XMR','ZEC','XRP','LSK','XLM','DCR','GNO','KNC','BAT']
         for ticker in self.tickers.keys():
