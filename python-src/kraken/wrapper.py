@@ -98,6 +98,7 @@ class Kraken(Exchange):
             "ZEC":"t1bRnuSuykATwXtNVUkYdJ5nyd9kgppEz5p",
             "XRP":"rLHzPsX6oXkzU2qL12kHCH8G8cnZv1rBJh",
             "GNO":"0x28e019139a20024559e228b70256ae369807d985",
+            "ADA":"DdzFFzCqrhsy3h8kKB7no9gLEHkikCNtop1VTQkgMdeeehBU2ELLt9NPhxTMAcs99f2MnG6ABHeCXCFMc6fqd9whe1rMn9jzyc9qsqxU",
             "XLM":"GA5XIGA5C7QTPTWXQHY6MCJRMTRZDOSHR6EFIBNDQTCQHG262N4GGKTM"
         }
         method_map = {
@@ -113,6 +114,7 @@ class Kraken(Exchange):
             "ZEC":"Zcash (Transparent)",
             "XRP":"Ripple XRP",
             "GNO":"GNO",
+            "ADA":"Cardano",
             "XLM":"Stellar XLM"
         }
 
