@@ -102,10 +102,14 @@ class BITSTAMP(Exchange):
         url = self.api._construct_url(side + "/", symbol_to_bitstamp(pair.token), symbol_to_bitstamp(pair.currency))
         return self.api._post(url, data=data, return_json=True, version=2)
 
+    def order_status(self, order_id):
+        data = {'id': order_id}
+        return self.api._post("order_status/", data=data, return_json=True, version=2)
+
     def trade_ioc(self, pair, side, price, amount, reason):
 
         order_id = self.place_limit_order(pair, side, price, amount)['id']
-        order_info = self.api.order_status(order_id)
+        order_info = self.order_status(order_id)
 
         print 'first print'
         print order_info
@@ -113,17 +117,17 @@ class BITSTAMP(Exchange):
         if order_info['status'] != 'Finished':
             record_event("SLEEPING,1,EXEC_WAIT")
             time.sleep(1)
-            order_info = self.api.order_status(order_id)
+            order_info = self.order_status(order_id)
 
         if order_info['status'] != 'Finished':
             record_event("SLEEPING,1,EXEC_WAIT")
             time.sleep(1)
-            order_info = self.api.order_status(order_id)
+            order_info = self.order_status(order_id)
 
         if order_info['status'] != 'Finished':
             record_event("SLEEPING,5,EXEC_WAIT")
             time.sleep(5)
-            order_info = self.api.order_status(order_id)
+            order_info = self.order_status(order_id)
 
         print 'second print'
         print order_info
