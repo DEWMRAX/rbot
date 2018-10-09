@@ -114,7 +114,7 @@ class Kraken(Exchange):
             "ZEC":"Zcash (Transparent)",
             "XRP":"Ripple XRP",
             "GNO":"GNO",
-            "ADA":"Cardano",
+            "ADA":"ADA",
             "XLM":"Stellar XLM"
         }
 
