@@ -55,10 +55,11 @@ class BITSTAMP(Exchange):
     def pair_name(self, pair):
         return "%s%s" % (symbol_to_bitstamp(pair.token), symbol_to_bitstamp(pair.currency))
 
+    # TODO verify deposit address hasn't changed using API
     def deposit_address(self, symbol):
         addr_map = {
             'BTC':'3QMypupHax8pk5MvwvJBMfe8NMqYrbAHdG',
-            'LTC':'MCy2iNhnVyLDoL5JqBGUxajqcPbjQeDyCM',
+            'LTC':'36ktQVHpYrUnzpoQjJH98wVSHh1HTzMgcj',
             'ETH':'0x504d9d5a9933840d4cf38024e088aefad00caffa',
             'BCC':'33x3CiR7qPkmresKhr7mchYELTu9szRh2x',
             'XRP':'rDsbeomae4FXwgQTJp9Rs64Qg9vDiTCdBv',
