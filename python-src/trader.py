@@ -3,7 +3,7 @@ from collections import namedtuple
 from decimal import Decimal, Context, ROUND_FLOOR, ROUND_CEILING
 from pymongo import MongoClient
 
-import poloniex, bittrex, binance, kraken, GDAX, itbit, bitflyer, bitstamp, exchange
+import poloniex, bittrex, binance, kraken, GDAX, itbit, bitflyer, BITSTAMP, exchange
 from book import query_all, query_pair
 from feed_manager import invoke_all
 from logger import record_event, record_trade
@@ -82,7 +82,7 @@ def sleep(duration, reason):
 
 # order determines execution ordering, assumes more liquidity at the latter exchange
 #   and that earlier exchanges are faster responding
-exchanges = [gdax.GDAX(), kraken.Kraken(), bittrex.Bittrex(), binance.Binance(), poloniex.Poloniex(), bitstamp.BITSTAMP(), bitflyer.BitFlyer(), itbit.ItBit()]
+exchanges = [gdax.GDAX(), kraken.Kraken(), bittrex.Bittrex(), binance.Binance(), poloniex.Poloniex(), BITSTAMP.BITSTAMP(), bitflyer.BitFlyer(), itbit.ItBit()]
 def get_exchange_handler(name):
     return filter(lambda exchange:exchange.name == name, exchanges)[0]
 make_at = get_exchange_handler('KRAKEN')
