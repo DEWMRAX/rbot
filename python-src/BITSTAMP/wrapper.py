@@ -142,6 +142,7 @@ class BITSTAMP(Exchange):
 
         filled_qty = Decimal(0)
         total_price = Decimal(0)
+        average_price = Decimal(0)
 
         for tx in order_info['transactions']:
             filled_qty += Decimal(tx[symbol_to_bitstamp(pair.token)])
