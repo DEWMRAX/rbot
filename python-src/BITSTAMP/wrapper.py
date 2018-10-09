@@ -141,7 +141,8 @@ class BITSTAMP(Exchange):
             filled_qty += Decimal(tx[symbol_to_bitstamp(pair.token)])
             total_price += Decimal(tx[symbol_to_bitstamp(pair.currency)])
 
-        average_price = total_price / filled_qty
+        if filled_qty > Decimal(0):
+            average_price = total_price / filled_qty
 
         record_event("EXEC,%s,%s,%s,%s,%s,%0.9f,%0.9f" % (side.upper(), reason, self.name, pair.token, pair.currency, filled_qty, average_price))
 
