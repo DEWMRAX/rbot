@@ -109,6 +109,9 @@ class BITSTAMP(Exchange):
 
     def trade_ioc(self, pair, side, price, amount, reason):
         order_id = self.place_limit_order(pair, side, price, amount)['id']
+        print 'order id'
+        print order_id
+
         order_info = self.order_status(order_id)
 
         print 'first print'
