@@ -22,6 +22,7 @@ def symbol_to_bitstamp(symbol):
 
 PAIRS = dict()
 INFO_CACHE_PATH = 'bitstamp_info.json'
+CLOSED_STATES = ['Canceled', 'Finished']
 
 with open(INFO_CACHE_PATH) as f:
     info = json.loads(f.read())
@@ -107,24 +108,23 @@ class BITSTAMP(Exchange):
         return self.api._post("order_status/", data=data, return_json=True, version=2)
 
     def trade_ioc(self, pair, side, price, amount, reason):
-
         order_id = self.place_limit_order(pair, side, price, amount)['id']
         order_info = self.order_status(order_id)
 
         print 'first print'
         print order_info
 
-        if order_info['status'] != 'Finished':
+        if order_info['status'] not in CLOSED_STATES:
             record_event("SLEEPING,1,EXEC_WAIT")
             time.sleep(1)
             order_info = self.order_status(order_id)
 
-        if order_info['status'] != 'Finished':
+        if order_info['status'] not in CLOSED_STATES:
             record_event("SLEEPING,1,EXEC_WAIT")
             time.sleep(1)
             order_info = self.order_status(order_id)
 
-        if order_info['status'] != 'Finished':
+        if order_info['status'] not in CLOSED_STATES:
             record_event("SLEEPING,5,EXEC_WAIT")
             time.sleep(5)
             order_info = self.order_status(order_id)
@@ -132,7 +132,7 @@ class BITSTAMP(Exchange):
         print 'second print'
         print order_info
 
-        assert(order_info['status'] == 'Finished')
+        assert(order_info['status'] in CLOSED_STATES)
 
         filled_qty = Decimal(0)
         total_price = Decimal(0)
