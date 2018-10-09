@@ -104,8 +104,11 @@ class BITSTAMP(Exchange):
         return self.api._post(url, data=data, return_json=True, version=2)
 
     def order_status(self, order_id):
-        data = {'id': order_id}
-        return self.api._post("order_status/", data=data, return_json=True, version=2)
+        try:
+            data = {'id': order_id}
+            return self.api._post("order_status/", data=data, return_json=True, version=2)
+        except:
+            return {'status':'unknown'}
 
     def trade_ioc(self, pair, side, price, amount, reason):
         order_id = self.place_limit_order(pair, side, price, amount)['id']
