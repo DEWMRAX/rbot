@@ -30,6 +30,7 @@ alias clear-trades='python commands/clear_all_trades.py'
 alias repair='python trader.py repair_balances'
 alias inactive='tail -n10000 events.txt | grep INACTIVE'
 alias killbot='ps auxwf | egrep "start.sh|python trader.py" | grep -v grep | awk '\''{print $2}'\'' | xargs -L1 kill -9; rm PIDFILE'
+alias napattack='./stop.sh'
 
 function trades(){
 	tail -n ${1:-50} trades.txt
