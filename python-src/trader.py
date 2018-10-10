@@ -19,9 +19,9 @@ DRAWUP_AMOUNT=Decimal('1.75') # how much to target on an exchange we are transfe
 BALANCE_ACCURACY=Decimal('0.02')
 LIQUI_NAV_PERCENTAGE_MAX=Decimal('0.01')
 
-MAKER_MARKUP = Decimal('0.0016')
+MAKER_MARKUP = Decimal('0.001')
 MAKER_CROSS_MARKUP = Decimal('0.001')
-MINIMUM_MARKUP = Decimal('0.0021')
+MINIMUM_MARKUP = Decimal('0.001')
 MAXIMUM_MARKUP = Decimal('0.02')
 MAKER_PAIR_LIST = [
     pair_factory('BTC','USD'),
@@ -31,7 +31,7 @@ MAKER_PAIR_LIST = [
     pair_factory('XRP','USD'),
 ]
 
-MAKER_SIZE = {'BTC':Decimal('0.2'), 'GNO':Decimal('2'), 'ICN':Decimal('400'), 'MLN':Decimal('6'), 'REP':Decimal('15'), 'ETH':Decimal('3'), 'BCC':Decimal('1'), 'LTC':Decimal('6'), 'XRP':Decimal('1000'), 'XLM':Decimal('2000'), 'XMR':Decimal('2'), 'ZEC':Decimal('1')}
+MAKER_SIZE = {'BTC':Decimal('0.2'), 'GNO':Decimal('2'), 'ICN':Decimal('400'), 'MLN':Decimal('6'), 'REP':Decimal('15'), 'ETH':Decimal('3'), 'BCC':Decimal('0.5'), 'LTC':Decimal('4'), 'XRP':Decimal('1000'), 'XLM':Decimal('2000'), 'XMR':Decimal('2'), 'ZEC':Decimal('1')}
 MAKER_MIN_CURRENCY_BALANCE = {'BTC':Decimal('0.6'), 'ETH':Decimal('5'), 'USD':Decimal(4000)}
 
 DISABLE_TRADING = False
@@ -109,7 +109,9 @@ OVERRIDE_TARGET_BALANCE = {
         'BCC': Decimal(1.7)
     },
     'KRAKEN':{
-        'BTC':Decimal(5)
+        'BTC':Decimal(4),
+        'LTC':Decimal(8),
+        'BCC':Decimal(2)
     },
     'BITFLYER':{
         'BTC':Decimal(1)
