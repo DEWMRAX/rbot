@@ -24,21 +24,15 @@ MAKER_CROSS_MARKUP = Decimal('0.001')
 MINIMUM_MARKUP = Decimal('0.0021')
 MAXIMUM_MARKUP = Decimal('0.02')
 MAKER_PAIR_LIST = [
-    pair_factory('XLM','BTC'),
-    pair_factory('GNO','BTC'), pair_factory('GNO','ETH'),
-    pair_factory('MLN','BTC'),
     pair_factory('BTC','USD'),
-    pair_factory('ICN','BTC'), pair_factory('ICN','ETH')
+    pair_factory('LTC','USD'),
+    pair_factory('BCC','USD'),
+    pair_factory('ETH','USD'),
+    pair_factory('XRP','USD'),
 ]
-#pair_factory('ICN','BTC'), pair_factory('ICN','ETH'),
-# pair_factory('REP','BTC'), pair_factory('REP','ETH'),
-# pair_factory('ZEC','BTC'),
-# pair_factory('XRP','BTC'),
-# pair_factory('XMR','BTC'),
-# pair_factory('ETH','BTC'),
-# pair_factory('BCC','BTC'),
-MAKER_SIZE = {'BTC':Decimal('0.3'), 'GNO':Decimal('2'), 'ICN':Decimal('400'), 'MLN':Decimal('6'), 'REP':Decimal('15'), 'ETH':Decimal('5'), 'BCC':Decimal('1'), 'LTC':Decimal('4'), 'XRP':Decimal('300'), 'XLM':Decimal('2000'), 'XMR':Decimal('2'), 'ZEC':Decimal('1')}
-MAKER_MIN_CURRENCY_BALANCE = {'BTC':Decimal('0.6'), 'ETH':Decimal('5'), 'USD':Decimal(8000)}
+
+MAKER_SIZE = {'BTC':Decimal('0.2'), 'GNO':Decimal('2'), 'ICN':Decimal('400'), 'MLN':Decimal('6'), 'REP':Decimal('15'), 'ETH':Decimal('3'), 'BCC':Decimal('1'), 'LTC':Decimal('6'), 'XRP':Decimal('1000'), 'XLM':Decimal('2000'), 'XMR':Decimal('2'), 'ZEC':Decimal('1')}
+MAKER_MIN_CURRENCY_BALANCE = {'BTC':Decimal('0.6'), 'ETH':Decimal('5'), 'USD':Decimal(4000)}
 
 DISABLE_TRADING = False
 UPDATE_TARGET_BALANCE = False
@@ -46,12 +40,12 @@ UPDATE_ALL_TARGET_BALANCE = False
 REPAIR_BALANCES = False
 INITIALIZE_BALANCE_CACHE = False
 TERMINATION_MODE = False
-ENABLE_MAKER = False
+ENABLE_MAKER = True
 
-# def termination_handler(signum, frame):
-#     global TERMINATION_MODE
-#     TERMINATION_MODE = True
-# signal.signal(signal.SIGTERM, termination_handler)
+def termination_handler(signum, frame):
+    global TERMINATION_MODE
+    TERMINATION_MODE = True
+signal.signal(signal.SIGTERM, termination_handler)
 
 if len(sys.argv) > 1:
     if sys.argv[1] == 'repair_balances':
