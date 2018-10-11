@@ -883,7 +883,7 @@ while True:
                 make_from = None
                 from_price = None
                 if side == 'buy':
-                    eligible_filter = lambda b:get_exchange_handler(b.exchange_name).get_balance(pair.token) >= order_size
+                    eligible_filter = lambda b:b.exchange_name != 'GDAX' and get_exchange_handler(b.exchange_name).get_balance(pair.token) >= order_size
                     eligible_books = filter(lambda b:b.exchange_name != make_at.name and eligible_filter(b), books)
                     if len(eligible_books):
                         prices = map(lambda book:(book, simulate_market_order(get_exchange_handler(book.exchange_name), book.bids, order_size)), eligible_books)
@@ -892,7 +892,7 @@ while True:
                             prices = map(lambda (book, (exch, total, price)): (book, exch, price * (Decimal(1) - exch.get_fee(pair))), prices)
                             (from_book, make_from, from_price) = max(prices, key=lambda (book, exch, price):price)
                 else:
-                    eligible_filter = lambda b:get_exchange_handler(b.exchange_name).get_balance(pair.currency) > MAKER_MIN_CURRENCY_BALANCE[pair.currency]
+                    eligible_filter = lambda b:b.exchange_name != 'GDAX' and get_exchange_handler(b.exchange_name).get_balance(pair.currency) > MAKER_MIN_CURRENCY_BALANCE[pair.currency]
                     eligible_books = filter(lambda b:b.exchange_name != make_at.name and eligible_filter(b), books)
                     if len(eligible_books):
                         prices = map(lambda book:(book, simulate_market_order(get_exchange_handler(book.exchange_name), book.asks, order_size)), eligible_books)
