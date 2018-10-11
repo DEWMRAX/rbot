@@ -21,7 +21,7 @@ LIQUI_NAV_PERCENTAGE_MAX=Decimal('0.01')
 
 MAKER_MARKUP = Decimal('0.002')
 MAKER_CROSS_MARKUP = Decimal('0.001')
-MINIMUM_MARKUP = Decimal('0.002')
+MINIMUM_MARKUP = Decimal('0.0015')
 MAXIMUM_MARKUP = Decimal('0.01')
 MAKER_PAIR_LIST = [
     pair_factory('BTC','USD'),
