@@ -3,7 +3,7 @@ from collections import namedtuple
 from decimal import Decimal, Context, ROUND_FLOOR, ROUND_CEILING
 from pymongo import MongoClient
 
-import poloniex, bittrex, binance, kraken, GDAX, itbit, bitflyer, BITSTAMP, exchange
+import poloniex, bittrex, binance, kraken, itbit, bitflyer, BITSTAMP, exchange
 from book import query_all, query_pair
 from feed_manager import invoke_all
 from logger import record_event, record_trade
@@ -19,10 +19,10 @@ DRAWUP_AMOUNT=Decimal('1.75') # how much to target on an exchange we are transfe
 BALANCE_ACCURACY=Decimal('0.02')
 LIQUI_NAV_PERCENTAGE_MAX=Decimal('0.01')
 
-MAKER_MARKUP = Decimal('0.0016')
+MAKER_MARKUP = Decimal('0.001')
 MAKER_CROSS_MARKUP = Decimal('0.001')
-MINIMUM_MARKUP = Decimal('0.0021')
-MAXIMUM_MARKUP = Decimal('0.02')
+MINIMUM_MARKUP = Decimal('0.001')
+MAXIMUM_MARKUP = Decimal('0.01')
 MAKER_PAIR_LIST = [
     pair_factory('BTC','USD'),
     pair_factory('LTC','USD'),
@@ -31,8 +31,8 @@ MAKER_PAIR_LIST = [
     pair_factory('XRP','USD'),
 ]
 
-MAKER_SIZE = {'BTC':Decimal('0.2'), 'GNO':Decimal('2'), 'ICN':Decimal('400'), 'MLN':Decimal('6'), 'REP':Decimal('15'), 'ETH':Decimal('3'), 'BCC':Decimal('0.5'), 'LTC':Decimal('4'), 'XRP':Decimal('1000'), 'XLM':Decimal('2000'), 'XMR':Decimal('2'), 'ZEC':Decimal('1')}
-MAKER_MIN_CURRENCY_BALANCE = {'BTC':Decimal('0.6'), 'ETH':Decimal('5'), 'USD':Decimal(4000)}
+MAKER_SIZE = {'BTC':Decimal('0.05'), 'ETH':Decimal('2'), 'BCC':Decimal('0.5'), 'LTC':Decimal('2'), 'XRP':Decimal('500')}
+MAKER_MIN_CURRENCY_BALANCE = {'BTC':Decimal('0.4'), 'ETH':Decimal('5'), 'USD':Decimal(4000)}
 
 DISABLE_TRADING = False
 UPDATE_TARGET_BALANCE = False
@@ -76,7 +76,7 @@ def sleep(duration, reason):
 
 # order determines execution ordering, assumes more liquidity at the latter exchange
 #   and that earlier exchanges are faster responding
-exchanges = [GDAX.GDAX(), kraken.Kraken(), bittrex.Bittrex(), binance.Binance(), poloniex.Poloniex(), BITSTAMP.BITSTAMP(), bitflyer.BitFlyer(), itbit.ItBit()]
+exchanges = [kraken.Kraken(), bittrex.Bittrex(), binance.Binance(), poloniex.Poloniex(), BITSTAMP.BITSTAMP(), bitflyer.BitFlyer(), itbit.ItBit()]
 def get_exchange_handler(name):
     return filter(lambda exchange:exchange.name == name, exchanges)[0]
 make_at = get_exchange_handler('KRAKEN')
@@ -102,19 +102,10 @@ def total_balance(symbol):
     return sum(map(lambda exch:exch.get_balance(symbol), exchanges))
 
 OVERRIDE_TARGET_BALANCE = {
-    'LIQUI':{
-        'BTC': Decimal(0.8),
-        'ETH': Decimal(17),
-        'LTC': Decimal(7),
-        'BCC': Decimal(1.7)
-    },
     'KRAKEN':{
-        'BTC':Decimal(4),
+        'BTC':Decimal(1.7),
         'LTC':Decimal(8),
-        'BCC':Decimal(2)
-    },
-    'BITFLYER':{
-        'BTC':Decimal(1)
+        'BCC':Decimal(1.5)
     }
 }
 def has_override(exchange, symbol):
@@ -157,7 +148,7 @@ if UPDATE_TARGET_BALANCE:
     for exch in exchanges:
         exch.unprotected_refresh_balances()
 
-    symbol_list = ALL_SYMBOLS if UPDATE_ALL_TARGET_BALANCE else ['BTC','ETH','USDT','USD']
+    symbol_list = ALL_SYMBOLS if UPDATE_ALL_TARGET_BALANCE else ['BTC','ETH','USD']
 
     for symbol in symbol_list:
         balance = "%0.8f" % total_balance_incl_pending(symbol)
@@ -583,7 +574,7 @@ def check_symbol_balance(symbol, target, targets):
 
     if balance < target and not near_equals(target, balance, BALANCE_ACCURACY):
         if not tinfo:
-            if REPAIR_BALANCES and symbol not in ['BTC','ETH','USDT']:
+            if REPAIR_BALANCES and symbol not in ['BTC','ETH','USDT','USD']:
                 buy_at_market('REPAIR', pair_factory(symbol, 'BTC'), target-balance)
             else:
                 record_event("WITHDRAW MISSING BALANCE,%s,%0.4f,%0.4f,%0.4f" % (symbol, target, balance, target-balance))
@@ -603,7 +594,7 @@ def check_symbol_balance(symbol, target, targets):
             else:
                 record_event("WITHDRAW EXTRA BALANCE,%s,%0.4f,%0.4f,%0.4f" % (symbol, target, balance, balance-target))
 
-        participating_exchanges = filter(lambda exch:symbol in exch.symbols and not exch.name in ['GDAX','ITBIT','BITFLYER'], exchanges)
+        participating_exchanges = filter(lambda exch:symbol in exch.symbols, exchanges)
         lowest_exchange = min(participating_exchanges, key=lambda exch:exch.balance[symbol] / targets[exch.name])
         highest_exchange = max(participating_exchanges, key=lambda exch:exch.balance[symbol] / targets[exch.name])
         if lowest_exchange.balance[symbol] / targets[lowest_exchange.name] < TRANSFER_THRESHOLD_LOW or \
@@ -883,8 +874,8 @@ while True:
                 make_from = None
                 from_price = None
                 if side == 'buy':
-                    eligible_filter = lambda b:b.exchange_name != 'GDAX' and get_exchange_handler(b.exchange_name).get_balance(pair.token) >= order_size
-                    eligible_books = filter(lambda b:b.exchange_name != make_at.name and eligible_filter(b), books)
+                    eligible_filter = lambda b:get_exchange_handler(b.exchange_name).get_balance(pair.token) >= order_size
+                    eligible_books = filter(lambda b:b.exchange_name != make_at.name and eligible_filter(b), eligible_books_filter(books))
                     if len(eligible_books):
                         prices = map(lambda book:(book, simulate_market_order(get_exchange_handler(book.exchange_name), book.bids, order_size)), eligible_books)
                         prices = filter(lambda (book, (exch, total, price)): exch is not None, prices)
@@ -892,8 +883,8 @@ while True:
                             prices = map(lambda (book, (exch, total, price)): (book, exch, price * (Decimal(1) - exch.get_fee(pair))), prices)
                             (from_book, make_from, from_price) = max(prices, key=lambda (book, exch, price):price)
                 else:
-                    eligible_filter = lambda b:b.exchange_name != 'GDAX' and get_exchange_handler(b.exchange_name).get_balance(pair.currency) > MAKER_MIN_CURRENCY_BALANCE[pair.currency]
-                    eligible_books = filter(lambda b:b.exchange_name != make_at.name and eligible_filter(b), books)
+                    eligible_filter = lambda b:get_exchange_handler(b.exchange_name).get_balance(pair.currency) > MAKER_MIN_CURRENCY_BALANCE[pair.currency]
+                    eligible_books = filter(lambda b:b.exchange_name != make_at.name and eligible_filter(b), eligible_books_filter(books))
                     if len(eligible_books):
                         prices = map(lambda book:(book, simulate_market_order(get_exchange_handler(book.exchange_name), book.asks, order_size)), eligible_books)
                         prices = filter(lambda (book, (exch, total, price)): exch is not None, prices)

@@ -11,7 +11,8 @@ STALE_AGE = 20
 ACTIVE_AGE = 0
 INVOKE_THROTTLE = 2
 
-MAKER_SYMBOLS = ['ICN','REP','MLN','XLM','BTC']
+MAKER_SYMBOLS = []
+MAKER_CURRENCIES = ['USD']
 
 # lambda-name => timestamp of last update
 book_age = defaultdict(lambda: 99999999)
@@ -43,7 +44,7 @@ if __name__ == '__main__':
             for book in pair_books:
                 book_age[book.name] = book.age
 
-            if near_crossed(pair_books) or any(map(lambda sym:pair.startswith(sym), MAKER_SYMBOLS)):
+            if near_crossed(pair_books) or any(map(lambda sym:pair.endswith(sym), MAKER_CURRENCIES)) or any(map(lambda sym:pair.startswith(sym), MAKER_SYMBOLS)):
                 for book in pair_books:
                     if book.age > ACTIVE_AGE:
                         invoke_one(book.name, 'ACTIVE', book.age)
