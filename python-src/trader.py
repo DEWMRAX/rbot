@@ -31,7 +31,7 @@ MAKER_PAIR_LIST = [
     pair_factory('XRP','USD'),
 ]
 
-MAKER_SIZE = {'BTC':Decimal('0.05'), 'ETH':Decimal('2'), 'BCC':Decimal('0.5'), 'LTC':Decimal('2'), 'XRP':Decimal('500')}
+MAKER_SIZE = {'BTC':Decimal('0.05'), 'ETH':Decimal('2'), 'BCC':Decimal('0.5'), 'LTC':Decimal('2'), 'XRP':Decimal('400')}
 MAKER_MIN_CURRENCY_BALANCE = {'BTC':Decimal('0.4'), 'ETH':Decimal('5'), 'USD':Decimal(4000)}
 
 DISABLE_TRADING = False
@@ -106,7 +106,8 @@ OVERRIDE_TARGET_BALANCE = {
     'KRAKEN':{
         'BTC':Decimal(1.7),
         'LTC':Decimal(8),
-        'BCC':Decimal(1.5)
+        'BCC':Decimal(1.5),
+        'XRP':Decimal(800)
     }
 }
 def has_override(exchange, symbol):
