@@ -31,7 +31,7 @@ MAKER_PAIR_LIST = [
     pair_factory('XRP','USD'),
 ]
 
-MAKER_SIZE = {'BTC':Decimal('0.05'), 'ETH':Decimal('2'), 'BCC':Decimal('0.5'), 'LTC':Decimal('2'), 'XRP':Decimal('400')}
+MAKER_SIZE = {'BTC':Decimal('0.05'), 'ETH':Decimal('2'), 'BCC':Decimal('0.5'), 'LTC':Decimal('2'), 'XRP':Decimal('300')}
 MAKER_MIN_CURRENCY_BALANCE = {'BTC':Decimal('0.4'), 'ETH':Decimal('5'), 'USD':Decimal(4000)}
 
 DISABLE_TRADING = False
@@ -626,6 +626,8 @@ def check_symbol_balance(symbol, target, targets):
 
             record_event("WITHDRAW_ATTEMPT,%s,%s,%s,%s" % (highest_exchange.name, lowest_exchange.name, symbol, amount_str))
             if DISABLE_WITHDRAWALS:
+                return False
+            if symbol == 'USD':
                 return False
 
             if lowest_exchange.name == 'LIQUI' and exchange_nav_as_percentage_of_total(get_exchange_handler('LIQUI')) > LIQUI_NAV_PERCENTAGE_MAX:
