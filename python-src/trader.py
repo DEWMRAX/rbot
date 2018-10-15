@@ -19,7 +19,7 @@ DRAWUP_AMOUNT=Decimal('1.75') # how much to target on an exchange we are transfe
 BALANCE_ACCURACY=Decimal('0.02')
 LIQUI_NAV_PERCENTAGE_MAX=Decimal('0.01')
 
-MAKER_MARKUP = Decimal('0.002')
+MAKER_MARKUP = Decimal('0.0023')
 MAKER_CROSS_MARKUP = Decimal('0.001')
 MINIMUM_MARKUP = Decimal('0.0018')
 MAXIMUM_MARKUP = Decimal('0.01')
