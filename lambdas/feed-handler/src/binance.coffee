@@ -9,8 +9,13 @@ format_quote = (quote) ->
 format_quotes = (quotes) ->
   format_quote quote for quote in quotes[0..LIMIT]
 
+symbol_to_binance = (symbol) ->
+  switch symbol
+    when 'BCH' then 'BCHABC'
+    else symbol
+
 pair_name = (token, currency) ->
-  "#{token}#{currency}"
+  "#{symbol_to_binance token}#{symbol_to_binance currency}"
 
 sanity_check = (book) ->
   (book?.asks and book.asks.length > MIN_BOOK_DATA and book?.bids and book.bids.length > MIN_BOOK_DATA)

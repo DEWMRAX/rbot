@@ -12,7 +12,6 @@ format_quotes = (quotes) ->
 symbol_to_kraken = (symbol) ->
   switch symbol
     when 'BTC' then 'XBT'
-    when 'BCC' then 'BCH'
     else symbol
 
 pair_name = (token, currency) ->

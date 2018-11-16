@@ -10,9 +10,7 @@ format_quotes = (quotes) ->
   format_quote quote for quote in quotes[0..LIMIT]
 
 symbol_to_bittrex = (symbol) ->
-  switch symbol
-    when 'BCC' then 'bch'
-    else symbol.toLowerCase()
+  symbol.toLowerCase()
 
 pair_name = (token, currency) ->
   "#{symbol_to_bittrex currency}-#{symbol_to_bittrex token}"

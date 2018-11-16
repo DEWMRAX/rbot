@@ -362,7 +362,7 @@ def check_imbalance(buyer_book, seller_book, pair):
         if DISABLE_TRADING:
             break
 
-        if pair.token in ['BCC']: # tokens temp. not trading
+        if pair.token in ['']: # tokens temp. not trading
             break
 
         if pair.currency in ['USD']: # not trading USD pairs at the moment

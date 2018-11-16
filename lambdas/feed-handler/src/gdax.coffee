@@ -10,9 +10,7 @@ format_quotes = (quotes) ->
   format_quote quote for quote in quotes[0..LIMIT]
 
 symbol_to_gdax = (symbol) ->
-  switch symbol
-    when 'BCC' then 'BCH'
-    else symbol
+  symbol
 
 pair_name = (token, currency) ->
   "#{symbol_to_gdax token.toUpperCase()}-#{symbol_to_gdax currency.toUpperCase()}"

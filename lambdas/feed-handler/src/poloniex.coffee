@@ -10,8 +10,8 @@ format_quotes = (quotes) ->
   format_quote quote for quote in quotes[0..LIMIT]
 
 symbol_to_polo = (symbol) ->
-  if symbol == 'BCC'
-    return 'BCH'
+  if symbol == 'BCH'
+    return 'BCHABC'
   if symbol == 'XLM'
     return 'STR'
   return symbol
