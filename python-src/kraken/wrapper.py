@@ -14,7 +14,7 @@ import time
 def symbol_from_kraken(symbol):
     if symbol == "XXBT":
         return "BTC"
-    elif symbol == "GNO" or symbol == "DASH" or symbol == "ADA":
+    elif symbol == "GNO" or symbol == "DASH" or symbol == "ADA" or symbol == "BCH":
         return symbol
     elif symbol == "ZUSD":
         return "USD"
@@ -24,7 +24,7 @@ def symbol_from_kraken(symbol):
 def symbol_to_kraken(symbol):
     if symbol == "BTC":
         return "XXBT"
-    elif symbol == "GNO" or symbol == "DASH" or symbol == "ADA":
+    elif symbol == "GNO" or symbol == "DASH" or symbol == "ADA" or symbol == "BCH":
         return symbol
     elif symbol == "USD":
         return "ZUSD"
