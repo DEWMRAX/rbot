@@ -9,16 +9,10 @@ import time
 import gdax
 
 def symbol_from_gdax(symbol):
-    if symbol == 'BCH':
-        return 'BCC'
-    else:
-        return symbol
+    return symbol
 
 def symbol_to_gdax(symbol):
-    if symbol == 'BCC':
-        return 'BCH'
-    else:
-        return symbol
+    return symbol
 
 PAIRS = dict()
 INFO_CACHE_PATH = 'gdax_info.json'
@@ -51,7 +45,7 @@ class GDAX(Exchange):
             secrets = json.load(secrets_file)
             self.api = gdax.AuthenticatedClient(secrets['key'], secrets['secret'], secrets['passphrase'])
 
-        self.symbols = ['USD','BTC','ETH','LTC','BCC']
+        self.symbols = ['USD','BTC','ETH','LTC','BCH']
 
         for ticker in PAIRS:
             if ticker.startswith('LTC') or ticker.startswith('ETH'):
@@ -67,7 +61,6 @@ class GDAX(Exchange):
             'BTC':'13dqE8EaauY8uzQCdgiadX16eggWKwG9rJ',
             'LTC':'LcjF3N5KU3QVisZtD1FzdCFdj1x3vGz3Yv',
             'ETH':'0xE2332C48a43cD0f9E802fF347F148F5924f0E1Cc',
-            'BCC':'1FwKuosXyAqQy845bDsDoAsWhWsSPg3WmL',
             'USD':'SILVERGATE'
         }
 

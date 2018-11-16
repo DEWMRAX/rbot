@@ -8,16 +8,10 @@ import json
 import time
 
 def symbol_from_bittrex(symbol):
-    if symbol == "BCH":
-        return "BCC"
-    else:
-        return symbol
+    return symbol
 
 def symbol_to_bittrex(symbol):
-    if symbol == "BCC":
-        return "BCH"
-    else:
-        return symbol
+    return symbol
 
 class Bittrex(Exchange):
     def __init__(self):
@@ -26,7 +20,7 @@ class Bittrex(Exchange):
             secrets = json.load(secrets_file)
             self.api = api(secrets['key'], secrets['secret'])
 
-        self.symbols = ['BTC','ETH','LTC','BAT','CVC','BCC','DNT','RCN','XMR','ADA','XRP','MANA','XLM','ZRX','PART']
+        self.symbols = ['BTC','ETH','LTC','BAT','CVC','BCH','DNT','RCN','XMR','ADA','XRP','MANA','XLM','ZRX','PART']
 
         self.markets = self.api.get_markets()
 
@@ -70,7 +64,6 @@ class Bittrex(Exchange):
             "OMG":"0x5ba6b3b16e45914e592eac770bea6339b490f35f",
             "QTUM":"QSaPHrUnTfVbjz9kjeijubMbPsizy7V7q4",
             "CVC":"0x5ba6b3b16e45914e592eac770bea6339b490f35f",
-            "BCC":"1HQvhvXP8C3K5Rt2yRdmZehcS4yyHB5cLp",
             "STRAT":"Sd2BwBLnQUNMzK2dGhiGxL9Tiyo9H6mpUy",
             "SYS":"SYXwyps7kHQ5JUjQWyFTvCEr2Tih5aYE4P",
             "SALT":"0x5ba6b3b16e45914e592eac770bea6339b490f35f",

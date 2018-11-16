@@ -5,9 +5,21 @@ from fees import FEES
 from binance.api import api
 import json
 
+def symbol_to_binance(symbol):
+    if symbol == 'BCH':
+        return 'BCHABC'
+    else:
+        return symbol
+
+def symbol_from_binance(symbol):
+    if symbol == 'BCHABC':
+        return 'BCH'
+    else:
+        return symbol
+
 def pair_name_to_binance(pair):
     p = pair.split('-')
-    return "%s%s" % (p[0], p[1])
+    return "%s%s" % (symbol_to_binance(p[0]), symbol_to_binance(p[1]))
 
 PAIRS = dict()
 INFO_CACHE_PATH = 'binance_info.json'
@@ -35,7 +47,7 @@ with open(INFO_CACHE_PATH) as f:
             elif filtr['filterType'] == 'LOT_SIZE':
                 lot_decimals = convert_tick_size_to_decimal_position(filtr['stepSize'])
 
-        PAIRS["%s-%s" % (pair_info['baseAsset'],pair_info['quoteAsset'])] = {
+        PAIRS["%s-%s" % (symbol_from_binance(pair_info['baseAsset']), symbol_from_binance(pair_info['quoteAsset']))] = {
             'price_decimals':price_decimals,
             'lot_decimals':lot_decimals
         }
@@ -47,7 +59,7 @@ class Binance(Exchange):
         with open('binance.keys', 'r') as api_key:
             self.api = api(api_key.readline().strip(), api_key.readline().strip())
 
-        self.symbols = ['BTC','ETH','LTC','DNT','ZRX','KNC','RCN','XMR','BCC','BAT','ADA','XRP','MANA','XLM','BNB','CVC']
+        self.symbols = ['BTC','ETH','LTC','DNT','ZRX','KNC','RCN','XMR','BCH','BAT','ADA','XRP','MANA','XLM','BNB','CVC']
         self.fees = {}
 
         account_info = self.api.account_info()
@@ -56,7 +68,7 @@ class Binance(Exchange):
             self.fees[ticker] = FEES[self.name].taker
 
     def pair_name(self, pair):
-        return "%s%s" % (pair.token.upper(), pair.currency.upper())
+        return "%s%s" % (symbol_to_binance(pair.token.upper()), symbol_to_binance(pair.currency.upper()))
 
     def deposit_address(self, symbol):
         address = {
@@ -84,7 +96,6 @@ class Binance(Exchange):
             "DASH":"XjsmifTUttg82woe6Pz34rcqiroCehpVSz",
             "ARK":"ANmGwvAqD9yHT3bVo4Xp4BcvHCzwcoioNC",
             "XMR":"44tLjmXrQNrWJ5NBsEj2R77ZBEgDa3fEe9GLpSf2FRmhexPvfYDUAB7EXX1Hdb3aMQ9FLqdJ56yaAhiXoRsceGJCRS3Jxkn",
-            "BCC":"1Mag9UBm59C3SELgNaJaWCW6NvKK67bWVt",
             "POWR":"0xbaf143b074bb657e85daafdf33419d74f23c4335",
             "ZEC":"t1MF9S9o7jhEGVSSgfW7oFupBEohgBTxpvE",
             "BAT":"0xbaf143b074bb657e85daafdf33419d74f23c4335",
@@ -105,7 +116,7 @@ class Binance(Exchange):
             "DGD":"0xbaf143b074bb657e85daafdf33419d74f23c4335"
         }[symbol]
 
-        assert(address == self.api.deposit_address(symbol))
+        assert(address == self.api.deposit_address(symbol_to_binance(symbol)))
 
         return address
 
@@ -134,16 +145,16 @@ class Binance(Exchange):
             event += "," + message
             record_event(event)
             print "BINANCE TAGGED WITHDRAWAL"
-            print self.api.withdraw_tag(symbol, amount, address, message, key_name)
+            print self.api.withdraw_tag(symbol_to_binance(symbol), amount, address, message, key_name)
         else:
             record_event(event)
             print "BINANCE WITHDRAWAL"
-            print self.api.withdraw(symbol, amount, address, key_name)
+            print self.api.withdraw(symbol_to_binance(symbol), amount, address, key_name)
 
     def refresh_balances(self):
         for info in self.api.account_info()['balances']:
-            if info['asset'] in self.symbols:
-                self.balance[info['asset']] = Decimal(info['free'])
+            if symbol_from_binance(info['asset']) in self.symbols:
+                self.balance[symbol_from_binance(info['asset'])] = Decimal(info['free'])
 
     def any_open_orders(self):
         for info in self.api.account_info()['balances']:

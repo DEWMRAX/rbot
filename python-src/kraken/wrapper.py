@@ -16,8 +16,6 @@ def symbol_from_kraken(symbol):
         return "BTC"
     elif symbol == "GNO" or symbol == "DASH" or symbol == "ADA":
         return symbol
-    elif symbol == "BCH":
-        return "BCC"
     elif symbol == "ZUSD":
         return "USD"
     else:
@@ -28,17 +26,13 @@ def symbol_to_kraken(symbol):
         return "XXBT"
     elif symbol == "GNO" or symbol == "DASH" or symbol == "ADA":
         return symbol
-    elif symbol == "BCC":
-        return "BCH"
     elif symbol == "USD":
         return "ZUSD"
     else:
         return "X%s" % symbol
 
 def asset_name(symbol):
-    if symbol == "BCC":
-        return "BCH"
-    elif symbol == "BTC":
+    if symbol == "BTC":
         return "XBT"
     else:
         return symbol
@@ -57,7 +51,7 @@ class Kraken(Exchange):
         with open('kraken_info.json') as f:
             self.tickers = json.loads(f.read())['result'].items()
 
-        self.symbols = ['USD', 'BTC', 'ETH', 'LTC', 'BCC', 'XMR', 'XRP', 'XLM', 'ADA']
+        self.symbols = ['USD', 'BTC', 'ETH', 'LTC', 'BCH', 'XMR', 'XRP', 'XLM', 'ADA']
         for pair,info in self.tickers:
             if '.' in pair: # some duplicate entries have a period, unsure why
                 continue
@@ -93,7 +87,7 @@ class Kraken(Exchange):
             "ICN":"0x2f6434e86066e225aa2872e4b880d6da14fc5503",
             "LTC":"LWY6VsRVhAY7LDmbV9xQJvuXNxC4HpPVeb",
             "REP":"0xed68535e57ddc72ed099a4ccb536c51ea5b07664",
-            "BCC":"1C641sGmnpE9yRgfzThmKdsDdUz8QHd9H4",
+            "BCH":"1C641sGmnpE9yRgfzThmKdsDdUz8QHd9H4",
             "XMR":"4GdoN7NCTi8a5gZug7PrwZNKjvHFmKeV11L6pNJPgj5QNEHsN6eeX3DaAQFwZ1ufD4LYCZKArktt113W7QjWvQ7CWDM25ByQyJ4VcAfaDe",
             "ZEC":"t1bRnuSuykATwXtNVUkYdJ5nyd9kgppEz5p",
             "XRP":"rLHzPsX6oXkzU2qL12kHCH8G8cnZv1rBJh",
@@ -109,7 +103,7 @@ class Kraken(Exchange):
             "ICN":"ICN",
             "MLN":"MLN",
             "DASH":"Dash",
-            "BCC":"Bitcoin Cash",
+            "BCH":"Bitcoin Cash",
             "XMR":"Monero",
             "ZEC":"Zcash (Transparent)",
             "XRP":"Ripple XRP",

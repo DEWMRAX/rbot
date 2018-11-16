@@ -9,16 +9,10 @@ import time
 import bitstamp.client
 
 def symbol_from_bitstamp(symbol):
-    if symbol == 'bch':
-        return 'BCC'
-    else:
-        return symbol.upper()
+    return symbol.upper()
 
 def symbol_to_bitstamp(symbol):
-    if symbol == 'BCC':
-        return 'bch'
-    else:
-        return symbol.lower()
+    return symbol.lower()
 
 PAIRS = dict()
 INFO_CACHE_PATH = 'bitstamp_info.json'
@@ -45,7 +39,7 @@ class BITSTAMP(Exchange):
 
             self.api = bitstamp.client.Trading(username=secrets['username'], key=secrets['key'], secret=secrets['secret'])
 
-        self.symbols = ['USD','BTC','ETH','LTC','BCC','XRP']
+        self.symbols = ['USD','BTC','ETH','LTC','BCH','XRP']
 
         for ticker,info in PAIRS.iteritems():
             if info['token'] in self.symbols and info['currency'] in self.symbols:
@@ -61,7 +55,6 @@ class BITSTAMP(Exchange):
             'BTC':'3QMypupHax8pk5MvwvJBMfe8NMqYrbAHdG',
             'LTC':'36ktQVHpYrUnzpoQjJH98wVSHh1HTzMgcj',
             'ETH':'0x504d9d5a9933840d4cf38024e088aefad00caffa',
-            'BCC':'33x3CiR7qPkmresKhr7mchYELTu9szRh2x',
             'XRP':'rDsbeomae4FXwgQTJp9Rs64Qg9vDiTCdBv',
             'USD':'SILVERGATE'
         }

@@ -2,7 +2,7 @@ import GDAX
 import pair
 import decimal
 
-p = pair.pair_factory('BCC','USD')
+p = pair.pair_factory('BCH','USD')
 
 g = GDAX.GDAX()
 # g.refresh_balances()

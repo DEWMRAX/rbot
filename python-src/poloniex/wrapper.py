@@ -8,15 +8,15 @@ import time
 import json
 
 def symbol_from_polo(symbol):
-    if symbol == "BCH":
-        return "BCC"
+    if symbol == "BCHABC":
+        return "BCH"
     if symbol == "STR":
         return "XLM"
     return symbol
 
 def symbol_to_polo(symbol):
-    if symbol == "BCC":
-        return "BCH"
+    if symbol == "BCH":
+        return "BCHABC"
     if symbol == "XLM":
         return "STR"
     return symbol
@@ -37,7 +37,7 @@ class Poloniex(Exchange):
         with open(INFO_CACHE_PATH) as f:
             self.tickers = json.loads(f.read())
 
-        self.symbols = ['BTC','ETH','LTC','BCC','ZRX','CVC','XMR','XRP','XLM','KNC','BAT','MANA']
+        self.symbols = ['BTC','ETH','LTC','BCH','ZRX','CVC','XMR','XRP','XLM','KNC','BAT','MANA']
         for ticker in self.tickers.keys():
             (token, currency) = parse_ticker(ticker)
             if token in self.symbols and currency in self.symbols:
@@ -60,7 +60,6 @@ class Poloniex(Exchange):
             "DASH":"XdYRotE1AvNBTWgKtWJttsUxy8rbPPJqXh",
             "SC":"538ae6014a5abf2fafda6d3c111fd8d83413ac98f9f8313f0344ba891bde64a6b8268d3f688c",
             "LBC":"bGZiktvzjVRZ9XkCmbJPb2Z4e7iREo4xKn",
-            "BCC":"1LBW616GieQL9JcKLiSraE5Pgu85cBWdjk",
             "ZRX":"0x8e4ba814b18775a13e416563bbb306b5700652fd",
             "CVC":"0xe571d5011c3f57c3c82a62793825e0d1ec8b97e6",
             "STRAT":"ScGYRqA7A9nD4iyERBe86BmsFabKcskwrk",

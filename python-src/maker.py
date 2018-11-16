@@ -83,7 +83,7 @@ OVERRIDE_TARGET_BALANCE = {
         'BTC': Decimal(0.8),
         'ETH': Decimal(17),
         'LTC': Decimal(7),
-        'BCC': Decimal(1.7)},
+        'BCH': Decimal(1.7)},
     'KRAKEN':{
         'BTC':Decimal(5)
 }}
@@ -677,8 +677,8 @@ MAKER_PAIR_LIST = [#pair_factory('ICN','BTC'), pair_factory('ICN','ETH'),
              pair_factory('XMR','BTC'),
              pair_factory('XLM','BTC')]
              # pair_factory('ETH','BTC'),
-             # pair_factory('BCC','BTC'),
-MAKER_SIZE = {'GNO':Decimal('3'), 'ICN':Decimal('350'), 'MLN':Decimal('4'), 'REP':Decimal('10'), 'ETH':Decimal('5'), 'BCC':Decimal('1'), 'LTC':Decimal('4'), 'XRP':Decimal('300'), 'XLM':Decimal('1500'), 'XMR':Decimal('2'), 'ZEC':Decimal('1')}
+             # pair_factory('BCH','BTC'),
+MAKER_SIZE = {'GNO':Decimal('3'), 'ICN':Decimal('350'), 'MLN':Decimal('4'), 'REP':Decimal('10'), 'ETH':Decimal('5'), 'BCH':Decimal('1'), 'LTC':Decimal('4'), 'XRP':Decimal('300'), 'XLM':Decimal('1500'), 'XMR':Decimal('2'), 'ZEC':Decimal('1')}
 MAKER_MIN_CURRENCY_BALANCE = {'BTC':Decimal('0.4'), 'ETH':Decimal('5')}
 
 while True:
