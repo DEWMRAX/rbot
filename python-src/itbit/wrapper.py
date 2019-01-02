@@ -12,6 +12,10 @@ PAIRS = {
     'BTC-USD': {
         'price_decimals' : 2,
         'lot_decimals' : 4
+    },
+    'ETH-USD': {
+        'price_decimals' : 2,
+        'lot_decimals' : 4
     }
 }
 def symbol_from_itbit(symbol):
@@ -36,8 +40,9 @@ class ItBit(Exchange):
             secrets = json.load(secrets_file)
             self.api = itBitApiConnection(secrets['key'], secrets['secret'], secrets['userId'])
 
-        self.symbols = ['USD','BTC']
+        self.symbols = ['USD','BTC','ETH']
         self.fees['BTC-USD'] = FEES[self.name].taker
+        self.fees['ETH-USD'] = FEES[self.name].taker
 
         wallets = self.api.get_all_wallets().json()
         assert(len(wallets) == 1)
