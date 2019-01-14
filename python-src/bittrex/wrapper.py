@@ -37,6 +37,7 @@ class Bittrex(Exchange):
     def deposit_address(self, symbol):
         addr_map = {
             "BTC":"1LSpJq8xuMudeMLBSPE5GjJBnpcNus1AHq",
+            "BCH":"1HQvhvXP8C3K5Rt2yRdmZehcS4yyHB5cLp",
             "WAVES":"3P7iY9aePAUaQff4Np8P1aU5CqXifxY3Rc2",
             "TRST":"0x5ba6b3b16e45914e592eac770bea6339b490f35f",
             "ETH":"0x5ba6b3b16e45914e592eac770bea6339b490f35f",
