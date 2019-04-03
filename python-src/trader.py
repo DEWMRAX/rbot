@@ -41,7 +41,7 @@ UPDATE_ALL_TARGET_BALANCE = False
 REPAIR_BALANCES = False
 INITIALIZE_BALANCE_CACHE = False
 TERMINATION_MODE = False
-ENABLE_MAKER = True
+ENABLE_MAKER = False
 
 def termination_handler(signum, frame):
     global TERMINATION_MODE
@@ -108,6 +108,9 @@ OVERRIDE_TARGET_BALANCE = {
         'LTC':Decimal(8),
         'BCH':Decimal(1.5),
         'XRP':Decimal(800)
+    },
+    'ITBIT':{
+        'BTC':Decimal(0.2)
     }
 }
 def has_override(exchange, symbol):
