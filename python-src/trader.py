@@ -110,7 +110,8 @@ OVERRIDE_TARGET_BALANCE = {
         'XRP':Decimal(800)
     },
     'ITBIT':{
-        'BTC':Decimal(0.45)
+        'BTC':Decimal(0.45),
+        'ETH':Decimal(10)
     }
 }
 def has_override(exchange, symbol):
