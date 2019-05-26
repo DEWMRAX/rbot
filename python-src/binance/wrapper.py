@@ -59,7 +59,7 @@ class Binance(Exchange):
         with open('binance.keys', 'r') as api_key:
             self.api = api(api_key.readline().strip(), api_key.readline().strip())
 
-        self.symbols = ['BTC','ETH','LTC','DNT','ZRX','KNC','RCN','XMR','BCH','BAT','ADA','XRP','MANA','XLM','BNB','CVC']
+        self.symbols = ['BTC','ETH','LTC','DNT','ZRX','KNC','RCN','XMR','BCH','BAT','ADA','XRP','MANA','XLM','BNB','CVC','ATOM']
         self.fees = {}
 
         account_info = self.api.account_info()

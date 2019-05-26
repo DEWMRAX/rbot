@@ -20,7 +20,7 @@ class Bittrex(Exchange):
             secrets = json.load(secrets_file)
             self.api = api(secrets['key'], secrets['secret'])
 
-        self.symbols = ['BTC','ETH','LTC','BAT','CVC','BCH','DNT','RCN','XMR','ADA','XRP','MANA','XLM','ZRX','PART']
+        self.symbols = ['BTC','ETH','LTC','BAT','CVC','BCH','DNT','RCN','XMR','ADA','XRP','MANA','XLM','ZRX','PART','ATOM']
 
         self.markets = self.api.get_markets()
 

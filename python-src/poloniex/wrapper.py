@@ -37,7 +37,7 @@ class Poloniex(Exchange):
         with open(INFO_CACHE_PATH) as f:
             self.tickers = json.loads(f.read())
 
-        self.symbols = ['BTC','ETH','LTC','BCH','ZRX','CVC','XMR','XRP','XLM','KNC','BAT','MANA']
+        self.symbols = ['BTC','ETH','LTC','BCH','ZRX','CVC','XMR','XRP','XLM','KNC','BAT','MANA','ATOM']
         for ticker in self.tickers.keys():
             (token, currency) = parse_ticker(ticker)
             if token in self.symbols and currency in self.symbols:

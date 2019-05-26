@@ -51,7 +51,7 @@ class Kraken(Exchange):
         with open('kraken_info.json') as f:
             self.tickers = json.loads(f.read())['result'].items()
 
-        self.symbols = ['USD', 'BTC', 'ETH', 'LTC', 'BCH', 'XMR', 'XRP', 'XLM', 'ADA']
+        self.symbols = ['USD', 'BTC', 'ETH', 'LTC', 'BCH', 'XMR', 'XRP', 'XLM', 'ADA', 'ATOM']
         for pair,info in self.tickers:
             if '.' in pair: # some duplicate entries have a period, unsure why
                 continue
