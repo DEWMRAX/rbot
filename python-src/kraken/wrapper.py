@@ -11,7 +11,7 @@ import pprint
 import sys
 import time
 
-def modern_symbols = ['GNO','DASH','ADA','BCH','ATOM']
+modern_symbols = ['GNO','DASH','ADA','BCH','ATOM']
 
 def symbol_from_kraken(symbol):
     if symbol == "XXBT":
