@@ -77,7 +77,7 @@ def sleep(duration, reason):
 
 # order determines execution ordering, assumes more liquidity at the latter exchange
 #   and that earlier exchanges are faster responding
-exchanges = [kraken.Kraken(), bittrex.Bittrex(), binance.Binance(), poloniex.Poloniex(), BITSTAMP.BITSTAMP(), bitflyer.BitFlyer(), itbit.ItBit()]
+exchanges = [kraken.Kraken(), bittrex.Bittrex(), binance.Binance(), poloniex.Poloniex(), BITSTAMP.BITSTAMP()]
 def get_exchange_handler(name):
     return filter(lambda exchange:exchange.name == name, exchanges)[0]
 make_at = get_exchange_handler('KRAKEN')
@@ -104,7 +104,7 @@ def total_balance(symbol):
 
 OVERRIDE_TARGET_BALANCE = {
     'KRAKEN':{
-        'BTC':Decimal(1.7),
+        'BTC':Decimal(1.2),
         'LTC':Decimal(8),
         'BCH':Decimal(1.5),
         'XRP':Decimal(800)
