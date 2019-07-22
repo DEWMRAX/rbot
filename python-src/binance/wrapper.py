@@ -113,6 +113,7 @@ class Binance(Exchange):
             "RLC":"0xbaf143b074bb657e85daafdf33419d74f23c4335",
             "AION":"0xbaf143b074bb657e85daafdf33419d74f23c4335",
             "CVC":"0xbaf143b074bb657e85daafdf33419d74f23c4335",
+            "ATOM":"cosmos15v50ymp6n5dn73erkqtmq0u8adpl8d3ujv2e74",
             "DGD":"0xbaf143b074bb657e85daafdf33419d74f23c4335"
         }[symbol]
 
@@ -125,6 +126,7 @@ class Binance(Exchange):
             "XMR":"416aedb4b063c03e4c078aaf2f45807ccc3dc4f2143c4fd67a9d35b1959ce128",
             "XRP":"100077456",
             "XLM":"1034493707",
+            "ATOM":"103674278",
             "XEM":"101028584"
         }
         return msg_map[symbol]

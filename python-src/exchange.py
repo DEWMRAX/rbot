@@ -17,7 +17,7 @@ class Exchange():
         self.active = True
         self.permanent_inactive = False
 
-        self.require_deposit_message = ['XEM','XMR','XRP','XLM']
+        self.require_deposit_message = ['XEM','XMR','XRP','XLM','ATOM']
 
     def has_pair(self, pair):
         return (pair.token in self.symbols and pair.currency in self.symbols and str(pair) in self.fees)

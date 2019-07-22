@@ -95,6 +95,7 @@ class Kraken(Exchange):
             "XRP":"rLHzPsX6oXkzU2qL12kHCH8G8cnZv1rBJh",
             "GNO":"0x28e019139a20024559e228b70256ae369807d985",
             "ADA":"DdzFFzCqrhsy3h8kKB7no9gLEHkikCNtop1VTQkgMdeeehBU2ELLt9NPhxTMAcs99f2MnG6ABHeCXCFMc6fqd9whe1rMn9jzyc9qsqxU",
+            "ATOM":"cosmos122u89vat7xsl5regrl4a43vc8pyvdrwy5mvh4l",
             "XLM":"GA5XIGA5C7QTPTWXQHY6MCJRMTRZDOSHR6EFIBNDQTCQHG262N4GGKTM"
         }
         method_map = {
@@ -111,6 +112,7 @@ class Kraken(Exchange):
             "XRP":"Ripple XRP",
             "GNO":"GNO",
             "ADA":"ADA",
+            "ATOM":"Cosmos",
             "XLM":"Stellar XLM"
         }
 
@@ -123,6 +125,7 @@ class Kraken(Exchange):
     def deposit_message(self, symbol):
         msg_map = {
             "XMR":"",
+            "ATOM":"",
             "XRP":"1642413265",
             "XLM":"1031647566"
         }

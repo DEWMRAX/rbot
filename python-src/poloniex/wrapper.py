@@ -74,6 +74,7 @@ class Poloniex(Exchange):
             "OMG":"0x9e5841973e2a3e3636c8b398a4e7a5c0adc53287",
             "KNC":"0x5ea1048e225e33c1094d605f545eceae449145ac",
             "MANA":"0x32c6e06815d3341c20521ec49a744d76e5c3de7e",
+            "ATOM":"cosmos1m9467hdy9v9xjqaquyzuthv8huvz3smfy6aspd",
             "BAT":"0xc9ca4e9271c9b427df344bb527725d1893dd70f7"
         }
 
@@ -86,7 +87,7 @@ class Poloniex(Exchange):
         return addr_map[symbol]
 
     def deposit_message(self, symbol):
-        if symbol in ['XMR','XRP']: # polo does not use payment-id on incoming XMR deposits
+        if symbol in ['XMR','XRP','ATOM']: # polo does not use payment-id on many deposits
             return ""
 
         msg_map = {
@@ -108,7 +109,10 @@ class Poloniex(Exchange):
         if message:
             event += "," + message
             record_event(event)
-            self.tapi.withdraw_message(symbol_to_polo(symbol), amount, address, message)
+            if symbol == 'ATOM': #polo does not support atom memo field
+                record_event("MANUAL_WITHDRAW_NEEDED")
+            else:
+                self.tapi.withdraw_message(symbol_to_polo(symbol), amount, address, message)
         else:
             record_event(event)
             self.tapi.withdraw(symbol_to_polo(symbol), amount, address)
