@@ -798,6 +798,9 @@ while True:
         sys.exit(1)
 
     if last_balance_check_time + 300 < int(time.time()) or last_balance_check_revenue + 6 < arbitrage_revenue():
+        for exch in exchanges:
+            exch.protected_refresh_balances()
+
         check_symbol_balance_loop()
         last_balance_check_time = int(time.time())
         last_balance_check_revenue = arbitrage_revenue()
