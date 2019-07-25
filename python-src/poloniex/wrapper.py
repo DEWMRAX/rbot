@@ -101,15 +101,18 @@ class Poloniex(Exchange):
 
     def withdraw(self, dest, symbol, amount):
         address = dest.deposit_address(symbol)
-        message = ""
-        event = "WITHDRAW,%s,%s,%s,%s,%s" % (self.name, dest.name, symbol, amount, address)
-        if symbol in self.require_deposit_message:
-            message = dest.deposit_message(symbol)
+        message = dest.deposit_message(symbol) if symbol in self.require_deposit_message else ''
 
+        if symbol == 'ATOM' and message != '': #polo does not support atom memo field
+            record_event('WITHDRAW_REROUTE')
+            address = 'cosmos122u89vat7xsl5regrl4a43vc8pyvdrwy5mvh4l'
+            message = ''
+
+        event = "WITHDRAW,%s,%s,%s,%s,%s" % (self.name, dest.name, symbol, amount, address)
         if message:
             event += "," + message
             record_event(event)
-            if symbol == 'ATOM': #polo does not support atom memo field
+            if symbol == 'ATOM': #polo does not support atom memo field -- safety, this should never happen
                 record_event("MANUAL_WITHDRAW_NEEDED")
             else:
                 self.tapi.withdraw_message(symbol_to_polo(symbol), amount, address, message)
