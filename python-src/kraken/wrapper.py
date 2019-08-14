@@ -84,16 +84,16 @@ class Kraken(Exchange):
 
         addr_map = {
             "BTC":"38kTfMQmD53d3DED35PtahwwX84jYPUtJe",
-            "MLN":"0x230b1c7981df97ac05aa5a85eb7fe8ae3a40bfd8",
+            # "MLN":"0x230b1c7981df97ac05aa5a85eb7fe8ae3a40bfd8",
             "ETH":"0xebcea4f26374764b0a564bfa36a362a4693fa5f3",
             "ICN":"0x2f6434e86066e225aa2872e4b880d6da14fc5503",
             "LTC":"LWY6VsRVhAY7LDmbV9xQJvuXNxC4HpPVeb",
-            "REP":"0xed68535e57ddc72ed099a4ccb536c51ea5b07664",
-            "BCH":"1C641sGmnpE9yRgfzThmKdsDdUz8QHd9H4",
+            # "REP":"0xed68535e57ddc72ed099a4ccb536c51ea5b07664",
+            # "BCH":"1C641sGmnpE9yRgfzThmKdsDdUz8QHd9H4",
             "XMR":"4GdoN7NCTi8a5gZug7PrwZNKjvHFmKeV11L6pNJPgj5QNEHsN6eeX3DaAQFwZ1ufD4LYCZKArktt113W7QjWvQ7CWDM25ByQyJ4VcAfaDe",
             "ZEC":"t1bRnuSuykATwXtNVUkYdJ5nyd9kgppEz5p",
             "XRP":"rLHzPsX6oXkzU2qL12kHCH8G8cnZv1rBJh",
-            "GNO":"0x28e019139a20024559e228b70256ae369807d985",
+            # "GNO":"0x28e019139a20024559e228b70256ae369807d985",
             "ADA":"DdzFFzCqrhsy3h8kKB7no9gLEHkikCNtop1VTQkgMdeeehBU2ELLt9NPhxTMAcs99f2MnG6ABHeCXCFMc6fqd9whe1rMn9jzyc9qsqxU",
             "ATOM":"cosmos122u89vat7xsl5regrl4a43vc8pyvdrwy5mvh4l",
             "XLM":"GA5XIGA5C7QTPTWXQHY6MCJRMTRZDOSHR6EFIBNDQTCQHG262N4GGKTM"
