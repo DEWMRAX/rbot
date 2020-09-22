@@ -5,7 +5,7 @@ The triggering of the AWS lambda functions is managed by a python script called 
 
 Trading decisions are managed and invoked by the python script trader.py
 
-This code is provided as-is, with no warranty, and no assumption of use. Author of code is not responsible for any losses incurred trading with this program. Author emphasizes that this code is not up to date with various recent protocol changes such as websockets, and as such is intended for educational and case-study purposes only. Anyone attempting to trade on a similar algorithm today should strongly consider a complete rebuild as websockets change the architecture of the system dramatically.
+This code is provided as-is, with no warranty, and no assumption of use. Author of code is not responsible for any losses incurred trading with this program. Author emphasizes that this code is not up to date with various recent protocol changes such as websockets, and as such is intended for educational and case-study purposes only. Anyone attempting to trade on a similar algorithm today should extract the logic around trading decisions but rebuild the architecture as websockets change the system dramatically.
 
 Released under MIT license
 
